@@ -1,0 +1,24 @@
+.table-slot {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px;
+    display: inline-block;
+    text-align: center;
+    width: 150px;
+}
+.table-slot img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+.table-slot.available {
+    background-color: #d4edda;
+}
+.table-slot.booked {
+    background-color: #f8d7da;
+}
+.booking-details {
+    margin-top: 20px;
+    display: none;
+}

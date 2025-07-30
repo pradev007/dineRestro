@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment | DineManager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0; padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #4caf50, #81c784);
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+    }
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    #payment-total {
+      font-weight: 600;
+      text-align: right;
+      font-size: 1.2rem;
+      color: #2e7d32;
+      margin-bottom: 1.5rem;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Payment</h2>
+    <input type="text" id="card-number" placeholder="Card Number" />
+    <input type="text" id="card-expiry" placeholder="MM/YY" />
+    <input type="text" id="card-cvc" placeholder="CVC" />
+    <h3 id="payment-total">Total: ₹0</h3>
+    <p id="payment-error" class="error">Payment failed</p>
+    <button onclick="alert('Implement payment processing')">Pay Now</button>
+  </div>
+</body>
+</html>
