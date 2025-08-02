@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'foods',
 
     # packages
+    'drf_spectacular',
     'rest_framework',
     'rest_framework_simplejwt',
 ]
@@ -99,10 +100,12 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -115,6 +118,26 @@ AUTHENTICATION_BACKENDS = [
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Enter JWT token as: Bearer <token>',
+        },
+        'cookieAuth': {
+            'type': 'apiKey',
+            'in': 'cookie',
+            'name': 'sessionid',
+        },
+    },
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': '/user/login/',
+    'LOGOUT_URL': '/admin/logout/',
 }
 
 
