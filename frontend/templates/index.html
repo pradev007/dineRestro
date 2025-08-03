@@ -445,7 +445,6 @@
       <div class="nav-links">
         <a onclick="showScreen('index')">Home</a>
         <a onclick="showScreen('menu')">Menu</a>
-        <!-- <a onclick="showScreen('bookings')">Bookings</a> -->
         <a onclick="showScreen('favourites')">Favourites</a>
       </div>
 
@@ -476,113 +475,11 @@
         </p>
       </div>
 
-      <div class="categories">
+      <div class="categories" id="categories">
         <button onclick="filterFoods('all')">All</button>
-        <button onclick="filterFoods('pizza')">Pizza</button>
-        <button onclick="filterFoods('burger')">Burger</button>
-        <button onclick="filterFoods('pasta')">Pasta</button>
       </div>
       <div style="width: 100%; display: flex; justify-content: center">
-        <div class="food-list">
-          <div class="food-card" data-category="pizza" data-id="pizza1">
-            <div class="fav-icon" onclick="toggleFavorite('pizza1', this)">
-              ❤️
-            </div>
-            <img
-              src="/frontend/images/amirali-mirhashemian-sc5sTPMrVfk-unsplash.jpg"
-              alt="Margherita Pizza"
-            />
-            <div class="food-card-body">
-              <h4>Margherita Pizza</h4>
-              <div class="price">₹350</div>
-              <p>
-                Classic pizza with fresh mozzarella, basil, and tomato sauce.
-              </p>
-              <p>
-                <strong>Ingredients:</strong> Mozzarella, Basil, Tomato Sauce,
-                Olive Oil
-              </p>
-              <div class="buttons">
-                <button onclick="addToCart('pizza1')">Add to Cart</button>
-                <button onclick="buyNow('pizza1')">Buy Now</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="food-card" data-category="burger" data-id="burger1">
-            <div class="fav-icon" onclick="toggleFavorite('burger1', this)">
-              ❤️
-            </div>
-            <img
-              src="/frontend/images/nicholas-grande-d9jcPTRD9fo-unsplash.jpg"
-              alt="Veggie Burger"
-            />
-            <div class="food-card-body">
-              <h4>Veggie Burger</h4>
-              <div class="price">₹250</div>
-              <p>
-                Delicious plant-based patty with lettuce, tomato, and vegan
-                mayo.
-              </p>
-              <p>
-                <strong>Ingredients:</strong> Chickpea Patty, Lettuce, Tomato,
-                Vegan Mayo
-              </p>
-              <div class="buttons">
-                <button onclick="addToCart('burger1')">Add to Cart</button>
-                <button onclick="buyNow('burger1')">Buy Now</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="food-card" data-category="pasta" data-id="pasta1">
-            <div class="fav-icon" onclick="toggleFavorite('pasta1', this)">
-              ❤️
-            </div>
-            <img
-              src="/frontend/images/premium_photo-1673439304183-8840bd0dc1bf.avif"
-              alt="Creamy Alfredo Pasta"
-            />
-            <div class="food-card-body">
-              <h4>Creamy Alfredo Pasta</h4>
-              <div class="price">₹400</div>
-              <p>Rich and creamy Alfredo sauce with fettuccine pasta.</p>
-              <p>
-                <strong>Ingredients:</strong> Fettuccine, Cream, Parmesan,
-                Garlic
-              </p>
-              <div class="buttons">
-                <button onclick="addToCart('pasta1')">Add to Cart</button>
-                <button onclick="buyNow('pasta1')">Buy Now</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="food-card" data-category="pizza" data-id="pizza1">
-            <div class="fav-icon" onclick="toggleFavorite('pizza1', this)">
-              ❤️
-            </div>
-            <img
-              src="/frontend/images/amirali-mirhashemian-sc5sTPMrVfk-unsplash.jpg"
-              alt="Margherita Pizza"
-            />
-            <div class="food-card-body">
-              <h4>Margherita Pizza</h4>
-              <div class="price">₹350</div>
-              <p>
-                Classic pizza with fresh mozzarella, basil, and tomato sauce.
-              </p>
-              <p>
-                <strong>Ingredients:</strong> Mozzarella, Basil, Tomato Sauce,
-                Olive Oil
-              </p>
-              <div class="buttons">
-                <button onclick="addToCart('pizza1')">Add to Cart</button>
-                <button onclick="buyNow('pizza1')">Buy Now</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="food-list" id="food-list"></div>
       </div>
 
       <div class="booking-box">
@@ -689,6 +586,86 @@
         { id: 7, image: "/frontend/images/7.jpg" },
         { id: 8, image: "/frontend/images/8.jpg" },
       ];
+      let foodData = [];
+
+      // Fetch food items from API
+      async function fetchFoods() {
+        try {
+          const baseUrl = "http://127.0.0.1:8000";
+          const token = localStorage.getItem("authToken");
+          const headers = {
+            "Content-Type": "application/json",
+          };
+          if (token) {
+            headers["Authorization"] = `Token ${token}`;
+          }
+          const response = await fetch(`${baseUrl}/foods/list/`, {
+            method: "GET",
+            headers: headers,
+          });
+          if (!response.ok) {
+            if (response.status === 401) {
+              showToast("Please sign in to view the menu");
+              showScreen("signin"); // Redirect to sign-in page
+              return;
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.json();
+          foodData = data;
+          renderCategories();
+          renderFoodList(data);
+        } catch (error) {
+          console.error("Error fetching food items:", error);
+          showToast(`Failed to load food items: ${error.message}`);
+        }
+      }
+
+      // Render dynamic categories
+      function renderCategories() {
+        const categoriesContainer = document.getElementById("categories");
+        const uniqueCategories = [
+          ...new Set(foodData.map((item) => item.category.name)),
+        ];
+        categoriesContainer.innerHTML = `<button onclick="filterFoods('all')">All</button>`;
+        uniqueCategories.forEach((category) => {
+          const button = document.createElement("button");
+          button.textContent = category;
+          button.onclick = () => filterFoods(category);
+          categoriesContainer.appendChild(button);
+        });
+      }
+
+      // Render food list
+      function renderFoodList(foods) {
+        const foodList = document.getElementById("food-list");
+        foodList.innerHTML = "";
+        foods.forEach((food) => {
+          const foodCard = document.createElement("div");
+          foodCard.className = "food-card";
+          foodCard.dataset.category = food.category.name;
+          foodCard.dataset.id = food.id;
+          foodCard.innerHTML = `
+            <div class="fav-icon" onclick="toggleFavorite('${
+              food.id
+            }', this)">❤️</div>
+            <img src="${food.image}" alt="${food.name}" />
+            <div class="food-card-body">
+              <h4>${food.name}</h4>
+              <div class="price">₹${food.price}</div>
+              <p>${food.description}</p>
+              <p><strong>Ingredients:</strong> ${food.ingredients.join(
+                ", "
+              )}</p>
+              <div class="buttons">
+                <button onclick="addToCart('${food.id}')">Add to Cart</button>
+                <button onclick="buyNow('${food.id}')">Buy Now</button>
+              </div>
+            </div>
+          `;
+          foodList.appendChild(foodCard);
+        });
+      }
 
       // Mobile menu toggle functionality
       document
@@ -777,12 +754,11 @@
 
         // Map screen names to their corresponding HTML file paths
         const screenPaths = {
-          'index': '/frontend/templates/index.html',
-          'menu': '/frontend/templates/menu.html',
-          // 'bookings': '/frontend/templates/bookings.html',
-          'favourites': '/frontend/templates/favourites.html',
-          'signin': '/frontend/templates/signin.html',
-          'signup': '/frontend/templates/signup.html'
+          index: "/frontend/templates/index.html",
+          menu: "/frontend/templates/menu.html",
+          favourites: "/frontend/templates/favourites.html",
+          signin: "/frontend/templates/signin.html",
+          signup: "/frontend/templates/signup.html",
         };
 
         // Redirect to the specified page if it exists in the mapping
@@ -796,14 +772,11 @@
 
       // Food filtering
       function filterFoods(category) {
-        const cards = document.querySelectorAll(".food-card");
-        cards.forEach((card) => {
-          if (category === "all" || card.dataset.category === category) {
-            card.style.display = "block";
-          } else {
-            card.style.display = "none";
-          }
-        });
+        const filteredFoods =
+          category === "all"
+            ? foodData
+            : foodData.filter((food) => food.category.name === category);
+        renderFoodList(filteredFoods);
         showToast(`Showing ${category === "all" ? "all" : category} items`);
       }
 
@@ -811,37 +784,35 @@
       function toggleFavorite(id, iconEl) {
         if (iconEl.style.color === "red") {
           iconEl.style.color = "";
-          showToast(`Removed ${id} from favorites`);
+          showToast(`Removed item ${id} from favorites`);
         } else {
           iconEl.style.color = "red";
-          showToast(`Added ${id} to favorites`);
+          showToast(`Added item ${id} to favorites`);
         }
       }
 
       // Add to cart
       function addToCart(id) {
-        showToast(`Added ${id} to cart`);
+        showToast(`Added item ${id} to cart`);
       }
 
       // Buy now function
       function buyNow(id) {
-        const card = document.querySelector(`.food-card[data-id="${id}"]`);
-        const priceText = card?.querySelector(".price")?.textContent || "₹0";
-        const amount = priceText.replace(/[^\d]/g, "");
-        const itemName = card.querySelector("h4").textContent;
-
+        const food = foodData.find((item) => item.id == id);
+        if (!food) {
+          showToast("Item not found");
+          return;
+        }
         const name = prompt("Please enter your name:");
         const phone = prompt("Please enter your phone number:");
-
         if (name && phone) {
           const userDetails = {
             name: name,
             phone: phone,
           };
-
-          showPaymentModal(userDetails, amount, {
-            name: itemName,
-            price: priceText,
+          showPaymentModal(userDetails, food.price, {
+            name: food.name,
+            price: `₹${food.price}`,
           });
         }
       }
@@ -974,6 +945,8 @@
         // Set minimum date to today
         const today = new Date().toISOString().split("T")[0];
         document.getElementById("booking-date").min = today;
+        // Fetch food items on load
+        fetchFoods();
       };
     </script>
   </body>

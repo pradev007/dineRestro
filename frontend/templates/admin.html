@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | DineManager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Modern Navbar Styles (Copied from index.html) */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      .navbar-logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2e7d32;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .navbar-logo-icon {
+        font-size: 1.8rem;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.5rem 0;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .nav-links a:hover {
+        color: #2e7d32;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #2e7d32;
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .nav-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .nav-button {
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .primary-button {
+        background-color: #2e7d32;
+        color: white;
+        border: none;
+      }
+
+      .primary-button:hover {
+        background-color: #1b5e20;
+        transform: translateY(-2px);
+      }
+
+      .mobile-menu-button {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #333;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links,
+        .nav-actions {
+          display: none;
+        }
+
+        .mobile-menu-button {
+          display: block;
+        }
+
+        .navbar {
+          padding: 1rem;
+        }
+      }
+
+      /* Main Content Styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background: #f6f6f6;
+        padding-top: 80px;
+      }
+
+      #main-content {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .admin-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+      }
+
+      .admin-container h2 {
+        color: #2e7d32;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      /* Add Food Form */
+      .add-food-form {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f1f8e9;
+        border-radius: 8px;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: #4caf50;
+        outline: none;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-group button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .form-group button:hover {
+        background-color: #388e3c;
+      }
+
+      /* Food List Table */
+      .food-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      .food-table th,
+      .food-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .food-table th {
+        background-color: #4caf50;
+        color: white;
+        font-weight: 600;
+      }
+
+      .food-table td img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .food-table .actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .food-table button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .food-table .edit-btn {
+        background-color: #2e7d32;
+        color: white;
+      }
+
+      .food-table .edit-btn:hover {
+        background-color: #1b5e20;
+      }
+
+      .food-table .delete-btn {
+        background-color: #d32f2f;
+        color: white;
+      }
+
+      .food-table .delete-btn:hover {
+        background-color: #b71c1c;
+      }
+
+      /* Edit Modal */
+      #edit-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1200;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      #edit-modal h3 {
+        color: #2e7d32;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      #edit-modal button {
+        width: 100%;
+        padding: 0.75rem;
+        margin-top: 1rem;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      #edit-modal button:hover {
+        background-color: #388e3c;
+      }
+
+      #edit-modal .close-btn {
+        background-color: #ccc;
+        color: #333;
+        margin-left: 0.5rem;
+      }
+
+      /* Toast message */
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #2e7d32;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 9999;
+      }
+
+      #toast.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Modern Navbar -->
+    <nav class="navbar">
+      <div class="navbar-logo">
+        <span class="navbar-logo-icon">🍽️</span>
+        <span>DineManager</span>
+      </div>
+
+      <div class="nav-links">
+        <a onclick="showScreen('index')">Home</a>
+        <a onclick="showScreen('menu')">Menu</a>
+        <a onclick="showScreen('favourites')">Favourites</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="nav-button primary-button" onclick="logout()">
+          Logout
+        </button>
+      </div>
+
+      <button class="mobile-menu-button">☰</button>
+    </nav>
+
+    <div id="main-content">
+      <div class="admin-container">
+        <h2>Admin Dashboard</h2>
+
+        <!-- Add Food Form -->
+        <div class="add-food-form">
+          <h3>Add New Food Item</h3>
+          <div class="form-group">
+            <label for="food-name">Name</label>
+            <input type="text" id="food-name" placeholder="Enter food name" />
+          </div>
+          <div class="form-group">
+            <label for="food-price">Price (₹)</label>
+            <input type="number" id="food-price" placeholder="Enter price" />
+          </div>
+          <div class="form-group">
+            <label for="food-description">Description</label>
+            <textarea
+              id="food-description"
+              placeholder="Enter description"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="food-ingredients">Ingredients (comma-separated)</label>
+            <input
+              type="text"
+              id="food-ingredients"
+              placeholder="e.g., chilli, cheese, meat"
+            />
+          </div>
+          <div class="form-group">
+            <label for="food-category">Category</label>
+            <select id="food-category">
+              <option value="1">Fast Foods</option>
+              <!-- Add more categories dynamically if needed -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="food-image">Image</label>
+            <input type="file" id="food-image" accept="image/*" />
+          </div>
+          <div class="form-group">
+            <button onclick="addFood()">Add Food</button>
+          </div>
+        </div>
+
+        <!-- Food List -->
+        <h3>Manage Food Items</h3>
+        <table class="food-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="food-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal">
+      <div class="modal-content">
+        <h3>Edit Food Item</h3>
+        <div class="form-group">
+          <label for="edit-food-id">ID</label>
+          <input type="text" id="edit-food-id" readonly />
+        </div>
+        <div class="form-group">
+          <label for="edit-food-name">Name</label>
+          <input type="text" id="edit-food-name" placeholder="Enter food name" />
+        </div>
+        <div class="form-group">
+          <label for="edit-food-price">Price (₹)</label>
+          <input
+            type="number"
+            id="edit-food-price"
+            placeholder="Enter price"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-food-description">Description</label>
+          <textarea
+            id="edit-food-description"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-food-ingredients">Ingredients (comma-separated)</label>
+          <input
+            type="text"
+            id="edit-food-ingredients"
+            placeholder="e.g., chilli, cheese, meat"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-food-category">Category</label>
+          <select id="edit-food-category">
+            <option value="1">Fast Foods</option>
+            <!-- Add more categories dynamically if needed -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-food-current-image">Current Image URL</label>
+          <input
+            type="text"
+            id="edit-food-current-image"
+            readonly
+            placeholder="Current image URL"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-food-image">New Image (optional)</label>
+          <input type="file" id="edit-food-image" accept="image/*" />
+        </div>
+        <div class="form-group">
+          <button onclick="updateFood()">Update Food</button>
+          <button class="close-btn" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast message container -->
+    <div id="toast"></div>
+
+    <script>
+      // Global variables
+      let foodData = [];
+
+      // Check authentication on load
+      window.onload = function () {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          showToast("Please sign in to access the admin dashboard");
+          setTimeout(() => {
+            window.location.href = "/frontend/templates/signin.html";
+          }, 1000);
+          return;
+        }
+        fetchFoods();
+      };
+
+      // Toast function
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
+
+      // Navigation function
+      function showScreen(screen) {
+        showToast(`Loading ${screen} page...`);
+        const screenPaths = {
+          index: "/frontend/templates/index.html",
+          menu: "/frontend/templates/menu.html",
+          favourites: "/frontend/templates/favourites.html",
+        };
+        if (screenPaths[screen]) {
+          window.location.href = screenPaths[screen];
+        } else {
+          showToast("Page not found");
+          console.error(`No page found for screen: ${screen}`);
+        }
+      }
+
+      // Logout function
+      function logout() {
+        localStorage.removeItem("authToken");
+        showToast("Logged out successfully");
+        setTimeout(() => {
+          window.location.href = "/frontend/templates/signin.html";
+        }, 1000);
+      }
+
+      // Mobile menu toggle
+      document
+        .querySelector(".mobile-menu-button")
+        .addEventListener("click", function () {
+          const navLinks = document.querySelector(".nav-links");
+          const navActions = document.querySelector(".nav-actions");
+          if (navLinks.style.display === "flex") {
+            navLinks.style.display = "none";
+            navActions.style.display = "none";
+          } else {
+            navLinks.style.display = "flex";
+            navActions.style.display = "flex";
+            if (window.innerWidth <= 768) {
+              navLinks.style.flexDirection = "column";
+              navLinks.style.position = "absolute";
+              navLinks.style.top = "100%";
+              navLinks.style.left = "0";
+              navLinks.style.width = "100%";
+              navLinks.style.backgroundColor = "white";
+              navLinks.style.padding = "1rem";
+              navLinks.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+              navActions.style.flexDirection = "column";
+              navActions.style.position = "absolute";
+              navActions.style.top = "calc(100% + 100px)";
+              navActions.style.left = "0";
+              navActions.style.width = "100%";
+              navActions.style.backgroundColor = "white";
+              navActions.style.padding = "1rem";
+              navActions.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+            }
+          }
+        });
+
+      // Close mobile menu when clicking a link
+      document.querySelectorAll(".nav-links a").forEach((link) => {
+        link.addEventListener("click", function () {
+          if (window.innerWidth <= 768) {
+            document.querySelector(".nav-links").style.display = "none";
+            document.querySelector(".nav-actions").style.display = "none";
+          }
+        });
+      });
+
+      // Responsive adjustments
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 768) {
+          const navLinks = document.querySelector(".nav-links");
+          const navActions = document.querySelector(".nav-actions");
+          navLinks.style.display = "flex";
+          navLinks.style.flexDirection = "row";
+          navLinks.style.position = "static";
+          navLinks.style.width = "auto";
+          navLinks.style.backgroundColor = "transparent";
+          navLinks.style.padding = "0";
+          navLinks.style.boxShadow = "none";
+          navActions.style.display = "flex";
+          navActions.style.flexDirection = "row";
+          navActions.style.position = "static";
+          navActions.style.width = "auto";
+          navActions.style.backgroundColor = "transparent";
+          navActions.style.padding = "0";
+          navActions.style.boxShadow = "none";
+        }
+      });
+
+      // Fetch food items
+      async function fetchFoods() {
+        try {
+          const baseUrl = "http://127.0.0.1:8000";
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${baseUrl}/foods/list/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            if (response.status === 401) {
+              showToast("Session expired. Please sign in again.");
+              localStorage.removeItem("authToken");
+              setTimeout(() => {
+                window.location.href = "/frontend/templates/signin.html";
+              }, 1000);
+              return;
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.json();
+          foodData = data;
+          renderFoodTable(data);
+        } catch (error) {
+          console.error("Error fetching food items:", error);
+          showToast(`Failed to load food items: ${error.message}`);
+        }
+      }
+
+      // Render food table
+      function renderFoodTable(foods) {
+        const tableBody = document.getElementById("food-table-body");
+        tableBody.innerHTML = "";
+        foods.forEach((food) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${food.name}</td>
+            <td>₹${food.price}</td>
+            <td>${food.category.name}</td>
+            <td><img src="${food.image}" alt="${food.name}" /></td>
+            <td class="actions">
+              <button class="edit-btn" onclick="openEditModal(${food.id})">Edit</button>
+              <button class="delete-btn" onclick="deleteFood(${food.id})">Delete</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Add food item
+      async function addFood() {
+        const name = document.getElementById("food-name").value;
+        const price = document.getElementById("food-price").value;
+        const description = document.getElementById("food-description").value;
+        const ingredients = document
+          .getElementById("food-ingredients")
+          .value.split(",")
+          .map((i) => i.trim());
+        const category = document.getElementById("food-category").value;
+        const image = document.getElementById("food-image").files[0];
+
+        if (!name || !price || !description || !ingredients.length || !category || !image) {
+          showToast("Please fill in all required fields, including an image");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("price", parseFloat(price));
+        formData.append("description", description);
+        formData.append("ingredients", JSON.stringify(ingredients));
+        formData.append("category_id", parseInt(category)); // Changed to category_id
+        formData.append("image", image);
+
+        try {
+          const baseUrl = "http://127.0.0.1:8000";
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${baseUrl}/foods/list/`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Backend error response:", errorData); // Log full error response
+            throw new Error(
+              errorData.detail || 
+              JSON.stringify(errorData) || 
+              `HTTP error! Status: ${response.status}`
+            );
+          }
+          showToast("Food item added successfully");
+          document.getElementById("food-name").value = "";
+          document.getElementById("food-price").value = "";
+          document.getElementById("food-description").value = "";
+          document.getElementById("food-ingredients").value = "";
+          document.getElementById("food-image").value = "";
+          fetchFoods(); // Refresh the food list
+        } catch (error) {
+          console.error("Error adding food item:", error);
+          showToast(`Failed to add food item: ${error.message}`);
+        }
+      }
+
+      // Open edit modal
+      function openEditModal(id) {
+        const food = foodData.find((item) => item.id === id);
+        if (!food) {
+          showToast("Food item not found");
+          return;
+        }
+        document.getElementById("edit-food-id").value = food.id;
+        document.getElementById("edit-food-name").value = food.name;
+        document.getElementById("edit-food-price").value = food.price;
+        document.getElementById("edit-food-description").value = food.description;
+        document.getElementById("edit-food-ingredients").value =
+          food.ingredients.join(", ");
+        document.getElementById("edit-food-category").value = food.category.id;
+        document.getElementById("edit-food-current-image").value = food.image;
+        document.getElementById("edit-food-image").value = ""; // Clear file input
+        document.getElementById("edit-modal").style.display = "flex";
+      }
+
+      // Update food item
+      async function updateFood() {
+        const id = document.getElementById("edit-food-id").value;
+        const name = document.getElementById("edit-food-name").value;
+        const price = document.getElementById("edit-food-price").value;
+        const description = document.getElementById("edit-food-description").value;
+        const ingredients = document
+          .getElementById("edit-food-ingredients")
+          .value.split(",")
+          .map((i) => i.trim());
+        const category = document.getElementById("edit-food-category").value;
+        const image = document.getElementById("edit-food-image").files[0];
+        const currentImage = document.getElementById("edit-food-current-image").value;
+
+        if (!name || !price || !description || !ingredients.length || !category) {
+          showToast("Please fill in all required fields");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("price", parseFloat(price));
+        formData.append("description", description);
+        formData.append("ingredients", JSON.stringify(ingredients));
+        formData.append("category_id", parseInt(category)); // Changed to category_id
+        if (image) {
+          formData.append("image", image);
+        } else {
+          formData.append("image", currentImage); // Retain current image if no new file
+        }
+
+        try {
+          const baseUrl = "http://127.0.0.1:8000";
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${baseUrl}/foods/${id}/`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Backend error response:", errorData); // Log full error response
+            throw new Error(
+              errorData.detail || 
+              JSON.stringify(errorData) || 
+              `HTTP error! Status: ${response.status}`
+            );
+          }
+          showToast("Food item updated successfully");
+          closeEditModal();
+          fetchFoods(); // Refresh the food list
+        } catch (error) {
+          console.error("Error updating food item:", error);
+          showToast(`Failed to update food item: ${error.message}`);
+        }
+      }
+
+      // Delete food item
+      async function deleteFood(id) {
+        if (!confirm("Are you sure you want to delete this food item?")) return;
+        try {
+          const baseUrl = "http://127.0.0.1:8000";
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${baseUrl}/foods/${id}/`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Backend error response:", errorData); // Log full error response
+            throw new Error(
+              errorData.detail || 
+              JSON.stringify(errorData) || 
+              `HTTP error! Status: ${response.status}`
+            );
+          }
+          showToast("Food item deleted successfully");
+          fetchFoods(); // Refresh the food list
+        } catch (error) {
+          console.error("Error deleting food item:", error);
+          showToast(`Failed to delete food item: ${error.message}`);
+        }
+      }
+
+      // Close edit modal
+      function closeEditModal() {
+        document.getElementById("edit-modal").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
