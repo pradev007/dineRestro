@@ -162,60 +162,61 @@
     }
 
     async function signIn() {
-      const email = document.getElementById("signin-email").value;
-      const password = document.getElementById("signin-password").value;
-      const userType = document.getElementById("user-type").value;
-      const error = document.getElementById("signin-error");
+    const email = document.getElementById("signin-email").value;
+    const password = document.getElementById("signin-password").value;
+    const userType = document.getElementById("user-type").value;
+    const error = document.getElementById("signin-error");
 
-      if (!email || !password) {
+    if (!email || !password) {
         error.textContent = "Please fill in all fields";
         error.style.display = "block";
         return;
-      }
+    }
 
-      try {
+    try {
         const response = await fetch("http://127.0.0.1:8000/users/login/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          error.textContent = data.detail || "Invalid credentials";
-          error.style.display = "block";
-          return;
+            error.textContent = data.detail || "Invalid credentials";
+            error.style.display = "block";
+            return;
         }
 
-        // Store the access token
-        localStorage.setItem("authToken", data.access);
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("userData", JSON.stringify({
+            staff: data.staff,
+            superuser: data.superuser
+        }));
 
-        // Check if user is admin based on API response
         const isAdmin = data.staff || data.superuser;
 
         if (userType === "admin" && !isAdmin) {
-          error.textContent = "You do not have admin privileges";
-          error.style.display = "block";
-          localStorage.removeItem("authToken"); // Clear token on failed admin login
-          return;
+            error.textContent = "You do not have admin privileges";
+            error.style.display = "block";
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userData");
+            return;
         }
 
-        // Redirect based on user type
         if (userType === "admin") {
-          window.location.href = "/frontend/templates/admin.html"; // Replace with actual admin dashboard path
+            window.location.href = "admin.html";
         } else {
-          window.location.href = "/frontend/templates/index.html";
+            window.location.href = "index.html";
         }
-
-      } catch (error) {
+    } catch (error) {
         console.error("Login error:", error);
         error.textContent = "Failed to connect to the server";
         error.style.display = "block";
-      }
     }
+}
   </script>
 </body>
 </html>

@@ -1,954 +1,3494 @@
-    
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DineManager</title>
+    <title>DineManager | Modern Restaurant Management</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <style>
-      /* Modern Navbar Styles */
-      .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 2rem;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-      }
-
-      .navbar-logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2e7d32;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .navbar-logo-icon {
-        font-size: 1.8rem;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 1.5rem;
-        align-items: center;
-      }
-
-      .nav-links a {
-        color: #333;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.95rem;
-        padding: 0.5rem 0;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-
-      .nav-links a:hover {
-        color: #2e7d32;
-      }
-
-      .nav-links a::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: #2e7d32;
-        transition: width 0.3s ease;
-      }
-
-      .nav-links a:hover::after {
-        width: 100%;
-      }
-
-      .nav-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-      }
-
-      .nav-button {
-        padding: 0.6rem 1.2rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .primary-button {
-        background-color: #2e7d32;
-        color: white;
-        border: none;
-      }
-
-      .primary-button:hover {
-        background-color: #1b5e20;
-        transform: translateY(-2px);
-      }
-
-      .secondary-button {
-        background-color: transparent;
-        color: #2e7d32;
-        border: 2px solid #2e7d32;
-      }
-
-      .secondary-button:hover {
-        background-color: rgba(46, 125, 50, 0.1);
-      }
-
-      .mobile-menu-button {
-        display: none;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #333;
-      }
-
-      /* Responsive styles */
-      @media (max-width: 768px) {
-        .nav-links,
-        .nav-actions {
-          display: none;
-        }
-
-        .mobile-menu-button {
-          display: block;
-        }
-
-        .navbar {
-          padding: 1rem;
-        }
-      }
-
-      /* Main Content Styles */
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Inter", sans-serif;
+      :root {
+        --primary: #10b981;
+        --primary-dark: #025c3f;
+        --secondary: #3b82f6;
+        --dark: #1f2937;
+        --light: #fbf9fb;
+        --accent: #f59e0b;
       }
 
       body {
-        background: #f6f6f6;
-        padding-top: 80px;
+        font-family: "Poppins", sans-serif;
+        background-color: var(--light);
+        color: var(--dark);
       }
 
-      #main-content {
-        padding: 2rem;
+      .navbar {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
       }
 
-      .container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
-        text-align: center;
-        max-width: 800px;
-        margin: auto;
-        background-image: linear-gradient(to right, #e7e978, #cccf0f);
+      .nav-link {
+        position: relative;
+        transition: all 0.3s ease;
       }
 
-      .categories {
-        margin-bottom: 2rem;
-        text-align: center;
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
       }
 
-      .categories button {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        padding: 0.6rem 1.2rem;
-        margin: 0.3rem;
-        border-radius: 8px;
-        cursor: pointer;
+      .nav-link:hover::after,
+      .nav-link.active::after {
+        width: 100%;
+      }
+
+      .nav-link.active {
+        color: var(--primary);
         font-weight: 600;
       }
 
-      .categories button:hover {
-        background-color: #388e3c;
+      .card {
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
       }
 
-      .food-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1.5rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       }
 
       .food-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: 0.3s ease;
-        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .food-card img {
-        width: 100%;
-        height: 160px;
-        object-fit: cover;
-      }
-
-      .food-card-body {
-        padding: 1rem;
-      }
-
-      .food-card h4 {
-        margin-bottom: 0.5rem;
-      }
-
-      .food-card .price {
-        color: #388e3c;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-      }
-
-      .food-card p {
-        font-size: 0.9rem;
-        color: #555;
-      }
-
-      .food-card .buttons {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-      }
-
-      .food-card button {
-        padding: 0.5rem 1rem;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        flex: 1;
-      }
-
-      .food-card button:hover {
-        background-color: #388e3c;
-      }
-
-      .booking-box {
-        margin-top: 3rem;
-        background: #fff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .booking-box h3 {
-        margin-bottom: 1rem;
-        color: #2e7d32;
-      }
-
-      .booking-box input[type="date"],
-      .booking-box input[type="time"] {
-        width: calc(50% - 0.5rem);
-        padding: 0.75rem;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        margin-bottom: 1rem;
-      }
-
-      .booking-box button {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #4caf50;
-        border: none;
-        color: white;
-        font-weight: 600;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
-      }
-
-      .booking-box button:hover {
-        background-color: #388e3c;
+      .food-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
       }
 
       .fav-icon {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        background: white;
-        border-radius: 50%;
-        padding: 4px 4px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-        transition: transform 0.2s ease;
+        transition: all 0.2s ease;
       }
 
       .fav-icon:hover {
         transform: scale(1.2);
       }
 
+      .toast {
+        transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+      }
+
+      .modal-content {
+        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
       .table-slot {
-        background: #e8f5e9;
-        border: 2px solid #c8e6c9;
-        border-radius: 10px;
-        padding: 10px 16px;
-        cursor: pointer;
-        flex: 1 1 100px;
-        text-align: center;
-        position: relative;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        color: #2e7d32;
+        transition: all 0.3s ease;
       }
 
       .table-slot:hover {
-        background: #c8e6c9;
+        transform: scale(1.05);
       }
 
-      .table-slot.selected {
-        background: #a5d6a7;
-        border-color: #66bb6a;
-        color: white;
+      .hero-section {
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
       }
 
-      .table-slot.selected::after {
-        content: "✔️";
+      .gradient-text {
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, var(--secondary), #2563eb);
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+      }
+
+      .input-field {
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+      }
+
+      .input-field:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      }
+
+      .floating-label {
         position: absolute;
-        top: 6px;
-        right: 10px;
-        font-size: 1rem;
-        color: white;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        transition: all 0.3s ease;
+        pointer-events: none;
+        color: #9ca3af;
       }
 
-      /* Payment Modal */
-      #payment-modal {
-        display: none;
-        position: fixed;
+      .input-field:focus + .floating-label,
+      .input-field:not(:placeholder-shown) + .floating-label {
         top: 0;
+        left: 0.75rem;
+        transform: translateY(-50%) scale(0.85);
+        background-color: white;
+        padding: 0 0.25rem;
+        color: var(--primary);
+      }
+
+      .parallax {
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .pulse-animation {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .rotate-animation {
+        animation: rotate 10s linear infinite;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .scroll-snap-container {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        height: 100vh;
+      }
+
+      .scroll-snap-child {
+        scroll-snap-align: start;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f3f4f6;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+      }
+
+      .wave-shape {
+        position: absolute;
+        bottom: 0;
         left: 0;
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-        z-index: 1200;
+        overflow: hidden;
+        line-height: 0;
       }
 
-      #payment-modal .modal-content {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        max-width: 800px;
-        width: 90%;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      .wave-shape svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 150px;
+      }
+
+      .wave-shape .shape-fill {
+        fill: #ffffff;
+      }
+
+      /* Hero Section Styles */
+      .h-screen-80 {
+        height: 80vh;
+        min-height: 600px;
+      }
+
+      /* Button Hover Effects */
+      .btn-hover-effect {
+        transition: all 0.3s ease;
+      }
+
+      .btn-hover-effect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .h-screen-80 {
+          height: 70vh;
+          min-height: 500px;
+        }
+
+        .hero-content h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero-content p {
+          font-size: 1.1rem;
+        }
+      }
+
+      /* Custom animation classes */
+      .animate-spin-slow {
+        animation: spin 15s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* Carousel Styles */
+      .testimonial-carousel {
         display: flex;
-        gap: 2rem;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
       }
 
-      #payment-modal .modal-left {
-        flex: 1;
-        text-align: center;
+      .testimonial-card {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
       }
 
-      #payment-modal .modal-right {
-        flex: 1;
+      @media (min-width: 768px) {
+        .testimonial-card {
+          flex: 0 0 calc(33.333% - 1rem);
+        }
       }
 
-      #payment-modal h3 {
-        color: #2e7d32;
-        margin-bottom: 1rem;
-      }
-
-      #payment-modal .qr-code {
-        width: 200px;
-        height: 200px;
-        margin: 1rem auto;
-        background: #fff;
-        padding: 10px;
-        border: 1px solid #ddd;
-      }
-
-      #payment-modal .user-details {
-        text-align: left;
-        margin: 1rem 0;
-        padding: 1rem;
-        background: #f5f5f5;
-        border-radius: 8px;
-      }
-
-      #payment-modal button {
-        background-color: #4caf50;
-        border: none;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 1rem;
-        margin-top: 1rem;
-      }
-
-      #payment-modal button.secondary {
+      .testimonial-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
         background-color: #ccc;
-        color: #333;
-        margin-left: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
       }
 
-      /* Toast message */
-      #toast {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #2e7d32;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        z-index: 9999;
+      .testimonial-dot.active {
+        background-color: #4f46e5;
       }
 
-      #toast.show {
-        opacity: 1;
+      /* Custom animation classes */
+      .animate-spin-slow {
+        animation: spin 15s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .delay-100 {
+        animation-delay: 100ms;
+      }
+
+      .delay-200 {
+        animation-delay: 200ms;
       }
     </style>
   </head>
-  <body>
-    <!-- Modern Navbar -->
-    <nav class="navbar">
-      <div class="navbar-logo">
-        <span class="navbar-logo-icon">🍽️</span>
-        <span>DineManager</span>
-      </div>
-
-      <div class="nav-links">
-        <a onclick="showScreen('index')">Home</a>
-        <a onclick="showScreen('menu')">Menu</a>
-        <a onclick="showScreen('favourites')">Favourites</a>
-      </div>
-
-      <div class="nav-actions">
-        <button
-          class="nav-button secondary-button"
-          onclick="showScreen('signin')"
+  <body class="antialiased">
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-8 right-8 z-40">
+      <button
+        id="cart-fab"
+        class="relative bg-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+      >
+        <i class="fas fa-shopping-cart text-2xl text-emerald-600"></i>
+        <span
+          id="cart-count"
+          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse"
+          >0</span
         >
-          Sign In
-        </button>
-        <button
-          class="nav-button primary-button"
-          onclick="showScreen('signup')"
-        >
-          Sign Up
-        </button>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+          <div class="flex items-center">
+            <div class="flex items-center space-x-3">
+              <div class="bg-emerald-600 text-white p-2 rounded-lg">
+                <i class="fas fa-utensils text-xl"></i>
+              </div>
+              <span class="text-2xl font-bold gradient-text">DineManager</span>
+            </div>
+          </div>
+
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="#"
+              onclick="showPage('home')"
+              class="nav-link text-gray-700 hover:text-emerald-600 active"
+              >Home</a
+            >
+            <a
+              href="#"
+              onclick="showPage('menu')"
+              class="nav-link text-gray-700 hover:text-emerald-600"
+              >Menu</a
+            >
+            <a
+              href="#"
+              onclick="showPage('booking')"
+              class="nav-link text-gray-700 hover:text-emerald-600"
+              >Book Table</a
+            >
+            <a
+              href="#"
+              onclick="showPage('favourites')"
+              class="nav-link text-gray-700 hover:text-emerald-600"
+              >Favorites</a
+            >
+
+            <a
+              href="#"
+              onclick="showPage('order')"
+              class="nav-link text-gray-700 hover:text-emerald-600"
+              >Order Online</a
+            >
+
+            <a
+              href="#"
+              onclick="showPage('profile')"
+              class="nav-link text-gray-700 hover:text-emerald-600"
+              id="profile-link"
+              >Profile</a
+            >
+          </div>
+
+          <div class="hidden md:flex items-center space-x-4">
+            <button
+              id="signin-button"
+              onclick="showPage('signin')"
+              class="text-emerald-600 border-2 border-emerald-600 px-6 py-2 rounded-lg hover:bg-emerald-50 transition-all duration-300"
+            >
+              Sign In
+            </button>
+            <button
+              id="signup-button"
+              onclick="showPage('signup')"
+              class="btn-primary text-white px-6 py-2 rounded-lg transition-all duration-300"
+            >
+              Sign Up
+            </button>
+            <button
+              id="logout-button"
+              onclick="logout()"
+              class="hidden text-red-600 border-2 border-red-600 px-6 py-2 rounded-lg hover:bg-red-50 transition-all duration-300"
+            >
+              Logout
+            </button>
+          </div>
+
+          <div class="md:hidden flex items-center">
+            <button
+              id="mobile-menu-button"
+              class="text-gray-700 hover:text-emerald-600 focus:outline-none transition-all duration-300"
+            >
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button class="mobile-menu-button">☰</button>
+      <div class="hidden md:hidden" id="mobile-menu">
+        <div class="px-2 pt-2 pb-4 space-y-2 sm:px-3 glass-effect">
+          <a
+            href="#"
+            onclick="showPage('home')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            >Home</a
+          >
+          <a
+            href="#"
+            onclick="showPage('menu')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            >Menu</a
+          >
+          <a
+            href="#"
+            onclick="showPage('booking')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            >Book Table</a
+          >
+          <a
+            href="#"
+            onclick="showPage('favourites')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            >Favorites</a
+          >
+
+          <a
+            href="#"
+            onclick="showPage('order')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            >Order Online</a
+          >
+          <a
+            href="#"
+            onclick="showPage('profile')"
+            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+            id="mobile-profile-link"
+            >Profile</a
+          >
+          <div class="pt-2 space-y-2">
+            <button
+              id="mobile-signin-button"
+              onclick="showPage('signin')"
+              class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50 transition-all duration-300"
+            >
+              Sign In
+            </button>
+            <button
+              id="mobile-signup-button"
+              onclick="showPage('signup')"
+              class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium btn-primary text-white hover:shadow-lg transition-all duration-300"
+            >
+              Sign Up
+            </button>
+            <button
+              id="mobile-logout-button"
+              onclick="logout()"
+              class="hidden block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all duration-300"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
     </nav>
 
-    <div id="main-content">
-      <div class="container">
-        <h2>Welcome to DineManager</h2>
-        <p>
-          Your one-stop solution for managing restaurant operations, from menu
-          management to table bookings.
-        </p>
-      </div>
-
-      <div class="categories" id="categories">
-        <button onclick="filterFoods('all')">All</button>
-      </div>
-      <div style="width: 100%; display: flex; justify-content: center">
-        <div class="food-list" id="food-list"></div>
-      </div>
-
-      <div class="booking-box">
-        <h3>Book a Table</h3>
-        <input
-          type="text"
-          id="user-name"
-          placeholder="Your Name"
-          style="
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-          "
-        />
-        <input
-          type="tel"
-          id="user-phone"
-          placeholder="Phone Number"
-          style="
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-          "
-        />
-        <input type="date" id="booking-date" min="2025-07-30" />
-        <input type="time" id="booking-time" min="10:00" max="22:00" />
-        <button onclick="checkTableAvailability('booking')">
-          Check Availability
-        </button>
-        <div id="table-slots" style="margin-top: 1rem; color: #444">
-          <h4>Select Your Table</h4>
-          <div
-            id="tables-grid"
-            style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem"
-          ></div>
-        </div>
-        <div
-          id="booking-details"
-          style="
-            display: none;
-            margin-top: 1rem;
-            background: #f1f8e9;
-            padding: 1rem;
-            border-radius: 8px;
-          "
-        >
-          <h4>Reservation Fee: ₹250 for 2 hours</h4>
-          <p id="selected-tables-text"></p>
-          <button onclick="bookTable('booking')">Pay and Book</button>
-        </div>
-      </div>
-    </div>
+    <!-- Main Content -->
+    <main
+      id="main-content"
+      class="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12"
+    ></main>
 
     <!-- Payment Modal -->
-    <div id="payment-modal">
-      <div class="modal-content">
-        <div class="modal-left">
-          <h3>Complete Your Payment</h3>
-          <p id="payment-amount">Amount: ₹0</p>
-          <div class="qr-code">
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://dinemanager.com/pay"
-              alt="Scan to Pay"
-              style="width: 100%; height: 100%"
-            />
-          </div>
+    <div
+      id="payment-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="modal-content bg-white rounded-xl p-8 w-full max-w-md mx-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-emerald-600">Complete Payment</h3>
+          <button
+            onclick="closeModal()"
+            class="text-gray-500 hover:text-gray-700 transition-all duration-300"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
         </div>
-        <div class="modal-right">
-          <h3>Booking Details</h3>
-          <div class="user-details" id="payment-user-details">
-            <!-- User details will be inserted here -->
-          </div>
-          <p><strong>Date:</strong> <span id="popup-date"></span></p>
-          <p><strong>Time:</strong> <span id="popup-time"></span></p>
-          <p><strong>Table(s):</strong> <span id="popup-tables"></span></p>
-          <button onclick="completePayment()">Payment Done</button>
-          <button onclick="closeModal()" class="secondary">Cancel</button>
-          <p style="margin-top: 1rem; font-size: 0.9rem; color: #666">
-            We will send you confirmation shortly after payment verification
-          </p>
+        <p class="text-gray-600 mb-6">
+          Scan QR code to complete your booking payment
+        </p>
+
+        <div
+          class="qr-code mx-auto mb-6 p-4 bg-white rounded-lg shadow-inner flex justify-center"
+        >
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://dinemanager.com/pay"
+            alt="Scan to Pay"
+            class="w-48 h-48 rounded-lg"
+          />
+        </div>
+
+        <div
+          class="booking-details bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200"
+          id="booking-details"
+        ></div>
+
+        <div class="flex justify-end space-x-3">
+          <button
+            onclick="closeModal()"
+            class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition-all duration-300"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="completePayment()"
+            class="btn-primary text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300"
+          >
+            <i class="fas fa-check-circle mr-2"></i> Payment Done
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Toast message container -->
-    <div id="toast"></div>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-3"></div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8 relative">
+      <div class="wave-shape">
+        <svg
+          data-name="Layer 1"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          <!-- <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path> -->
+        </svg>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="animate__animated animate__fadeIn">
+            <h3 class="text-xl font-bold mb-4 gradient-text">DineManager</h3>
+            <p class="text-gray-400">
+              Revolutionizing restaurant management with modern technology and
+              exceptional service.
+            </p>
+            <div class="flex space-x-4 mt-4">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-all duration-300"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-all duration-300"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-all duration-300"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-all duration-300"
+              >
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="animate__animated animate__fadeIn animate__delay-1s">
+            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  onclick="showPage('home')"
+                  class="text-gray-400 hover:text-white transition-all duration-300"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="showPage('menu')"
+                  class="text-gray-400 hover:text-white transition-all duration-300"
+                  >Menu</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="showPage('booking')"
+                  class="text-gray-400 hover:text-white transition-all duration-300"
+                  >Reservations</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="showPage('order')"
+                  class="text-gray-400 hover:text-white transition-all duration-300"
+                  >Order Online</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="animate__animated animate__fadeIn animate__delay-2s">
+            <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+            <ul class="space-y-2">
+              <li class="flex items-center space-x-2">
+                <i class="fas fa-map-marker-alt text-emerald-500"></i>
+                <span class="text-gray-400">123 Restaurant St, Foodville</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <i class="fas fa-phone-alt text-emerald-500"></i>
+                <span class="text-gray-400">(123) 456-7890</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <i class="fas fa-envelope text-emerald-500"></i>
+                <span class="text-gray-400">info@dinemanager.com</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="animate__animated animate__fadeIn animate__delay-3s">
+            <h4 class="text-lg font-semibold mb-4">Opening Hours</h4>
+            <ul class="space-y-2">
+              <li class="flex justify-between">
+                <span class="text-gray-400">Monday - Friday</span>
+                <span class="text-white">9:00 AM - 10:00 PM</span>
+              </li>
+              <li class="flex justify-between">
+                <span class="text-gray-400">Saturday</span>
+                <span class="text-white">10:00 AM - 11:00 PM</span>
+              </li>
+              <li class="flex justify-between">
+                <span class="text-gray-400">Sunday</span>
+                <span class="text-white">10:00 AM - 9:00 PM</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500"
+        >
+          <p>&copy; 2025 DineManager. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
 
     <script>
-      // Global variables
-      let selectedTables = [];
-      const tables = [
-        { id: 1, image: "/frontend/images/1.avif" },
-        { id: 2, image: "/frontend/images/2.webp" },
-        { id: 3, image: "/frontend/images/3.avif" },
-        { id: 4, image: "/frontend/images/4.jpg" },
-        { id: 5, image: "/frontend/images/5.jpg" },
-        { id: 6, image: "/frontend/images/6.jpg" },
-        { id: 7, image: "/frontend/images/7.jpg" },
-        { id: 8, image: "/frontend/images/8.jpg" },
-      ];
-      let foodData = [];
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- Carousel Initialization ---
+        const carousel = document.getElementById("testimonial-container");
+        const cards = document.querySelectorAll(".testimonial-card");
+        const prevBtn = document.getElementById("prev-testimonial");
+        const nextBtn = document.getElementById("next-testimonial");
+        const dotsContainer = document.getElementById("testimonial-dots");
 
-      // Fetch food items from API
-      async function fetchFoods() {
-        try {
-          const baseUrl = "http://127.0.0.1:8000";
-          const token = localStorage.getItem("authToken");
-          const headers = {
-            "Content-Type": "application/json",
-          };
-          if (token) {
-            headers["Authorization"] = `Token ${token}`;
-          }
-          const response = await fetch(`${baseUrl}/foods/list/`, {
-            method: "GET",
-            headers: headers,
+        if (
+          !carousel ||
+          !cards.length ||
+          !prevBtn ||
+          !nextBtn ||
+          !dotsContainer
+        ) {
+          console.error("Carousel elements not found");
+          return;
+        }
+
+        let currentIndex = 0;
+        const cardCount = cards.length;
+        const visibleCards = window.innerWidth >= 768 ? 3 : 1;
+        let cardWidth = cards[0].offsetWidth + 16; // Include padding/margin (4px each side)
+
+        // Create dots
+        const maxDots = Math.max(1, cardCount - visibleCards + 1);
+        dotsContainer.innerHTML = ""; // Clear existing dots
+        for (let i = 0; i < maxDots; i++) {
+          const dot = document.createElement("div");
+          dot.classList.add("testimonial-dot");
+          if (i === 0) dot.classList.add("active");
+          dot.addEventListener("click", () => goToTestimonial(i));
+          dotsContainer.appendChild(dot);
+        }
+
+        // Auto-rotate
+        let autoRotate = setInterval(nextTestimonial, 5000);
+
+        function resetAutoRotate() {
+          clearInterval(autoRotate);
+          autoRotate = setInterval(nextTestimonial, 5000);
+        }
+
+        function updateDots() {
+          const dots = document.querySelectorAll(".testimonial-dot");
+          dots.forEach((dot, index) => {
+            dot.classList.toggle("active", index === currentIndex);
           });
-          if (!response.ok) {
-            if (response.status === 401) {
-              showToast("Please sign in to view the menu");
-              showScreen("signin"); // Redirect to sign-in page
-              return;
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          const data = await response.json();
-          foodData = data;
-          renderCategories();
-          renderFoodList(data);
-        } catch (error) {
-          console.error("Error fetching food items:", error);
-          showToast(`Failed to load food items: ${error.message}`);
         }
-      }
 
-      // Render dynamic categories
-      function renderCategories() {
-        const categoriesContainer = document.getElementById("categories");
-        const uniqueCategories = [
-          ...new Set(foodData.map((item) => item.category.name)),
-        ];
-        categoriesContainer.innerHTML = `<button onclick="filterFoods('all')">All</button>`;
-        uniqueCategories.forEach((category) => {
-          const button = document.createElement("button");
-          button.textContent = category;
-          button.onclick = () => filterFoods(category);
-          categoriesContainer.appendChild(button);
+        function goToTestimonial(index) {
+          currentIndex = Math.max(0, Math.min(index, cardCount - visibleCards));
+          const scrollPosition = currentIndex * cardWidth;
+          carousel.scrollTo({
+            left: scrollPosition,
+            behavior: "smooth",
+          });
+          updateDots();
+          resetAutoRotate();
+        }
+
+        function nextTestimonial() {
+          currentIndex = (currentIndex + 1) % (cardCount - visibleCards + 1);
+          goToTestimonial(currentIndex);
+        }
+
+        function prevTestimonial() {
+          currentIndex =
+            (currentIndex - 1 + (cardCount - visibleCards + 1)) %
+            (cardCount - visibleCards + 1);
+          goToTestimonial(currentIndex);
+        }
+
+        prevBtn.addEventListener("click", () => {
+          prevTestimonial();
+          resetAutoRotate();
         });
-      }
 
-      // Render food list
-      function renderFoodList(foods) {
-        const foodList = document.getElementById("food-list");
-        foodList.innerHTML = "";
-        foods.forEach((food) => {
-          const foodCard = document.createElement("div");
-          foodCard.className = "food-card";
-          foodCard.dataset.category = food.category.name;
-          foodCard.dataset.id = food.id;
-          foodCard.innerHTML = `
-            <div class="fav-icon" onclick="toggleFavorite('${
-              food.id
-            }', this)">❤️</div>
-            <img src="${food.image}" alt="${food.name}" />
-            <div class="food-card-body">
-              <h4>${food.name}</h4>
-              <div class="price">₹${food.price}</div>
-              <p>${food.description}</p>
-              <p><strong>Ingredients:</strong> ${food.ingredients.join(
-                ", "
-              )}</p>
-              <div class="buttons">
-                <button onclick="addToCart('${food.id}')">Add to Cart</button>
-                <button onclick="buyNow('${food.id}')">Buy Now</button>
-              </div>
-            </div>
-          `;
-          foodList.appendChild(foodCard);
+        nextBtn.addEventListener("click", () => {
+          nextTestimonial();
+          resetAutoRotate();
         });
-      }
 
-      // Mobile menu toggle functionality
-      document
-        .querySelector(".mobile-menu-button")
-        .addEventListener("click", function () {
-          const navLinks = document.querySelector(".nav-links");
-          const navActions = document.querySelector(".nav-actions");
-
-          if (navLinks.style.display === "flex") {
-            navLinks.style.display = "none";
-            navActions.style.display = "none";
-          } else {
-            navLinks.style.display = "flex";
-            navActions.style.display = "flex";
-
-            if (window.innerWidth <= 768) {
-              navLinks.style.flexDirection = "column";
-              navLinks.style.position = "absolute";
-              navLinks.style.top = "100%";
-              navLinks.style.left = "0";
-              navLinks.style.width = "100%";
-              navLinks.style.backgroundColor = "white";
-              navLinks.style.padding = "1rem";
-              navLinks.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-
-              navActions.style.flexDirection = "column";
-              navActions.style.position = "absolute";
-              navActions.style.top = "calc(100% + 150px)";
-              navActions.style.left = "0";
-              navActions.style.width = "100%";
-              navActions.style.backgroundColor = "white";
-              navActions.style.padding = "1rem";
-              navActions.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          cardWidth = cards[0].offsetWidth + 16; // Recalculate card width
+          const newVisibleCards = window.innerWidth >= 768 ? 3 : 1;
+          if (newVisibleCards !== visibleCards) {
+            goToTestimonial(0); // Reset to first slide on resize
+            // Recreate dots
+            dotsContainer.innerHTML = "";
+            const maxDots = Math.max(1, cardCount - newVisibleCards + 1);
+            for (let i = 0; i < maxDots; i++) {
+              const dot = document.createElement("div");
+              dot.classList.add("testimonial-dot");
+              if (i === 0) dot.classList.add("active");
+              dot.addEventListener("click", () => goToTestimonial(i));
+              dotsContainer.appendChild(dot);
             }
           }
         });
+      });
+      // Global state
+      let currentPage = "home";
+      let isLoggedIn = false;
+      let isAdmin = false;
+      let selectedCategory = "all";
+      let selectedTable = null;
+      let bookingDetails = { date: "", time: "", guests: 2, table: "" };
+      let cart = [];
+      const baseUrl = "http://127.0.0.1:8000/";
+      const fallbackImage =
+        "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60";
 
-      // Close mobile menu when clicking a link
-      document.querySelectorAll(".nav-links a").forEach((link) => {
-        link.addEventListener("click", function () {
-          if (window.innerWidth <= 768) {
-            document.querySelector(".nav-links").style.display = "none";
-            document.querySelector(".nav-actions").style.display = "none";
+      // Booking pricing structure
+      const bookingPrices = {
+        1: 200,
+        2: 300,
+        3: 400,
+        4: 500,
+        5: 600,
+        6: 700,
+        7: 800,
+        8: 800,
+      };
+
+      // Static data for events, discounts, and staff
+      const events = [
+        {
+          id: 1,
+          type: "current",
+          name: "Live Music Night",
+          date: "August 12, 2025",
+          description: "Enjoy live jazz with local artists tonight!",
+          image:
+            "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          id: 2,
+          type: "upcoming",
+          name: "Coffee Tasting Workshop",
+          date: "August 20, 2025",
+          description: "Learn about coffee origins and brewing techniques.",
+          image:
+            "https://images.unsplash.com/photo-1495474472287-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+      ];
+
+      const discounts = [
+        {
+          occasion: "National Coffee Day",
+          date: "September 29, 2025",
+          offer: "50% off all coffee drinks",
+        },
+        {
+          occasion: "Cafe Anniversary",
+          date: "October 10, 2025",
+          offer: "Buy one dessert, get one free",
+        },
+        {
+          occasion: "Cafe Anniversary",
+          date: "October 10, 2025",
+          offer: "Buy one dessert, get one free",
+        },
+        {
+          occasion: "Halloween Special",
+          date: "October 31, 2025",
+          offer: "20% off all spooky-themed drinks",
+        },
+        {
+          occasion: "Thanksgiving Week",
+          date: "November 24-30, 2025",
+          offer: "Free dessert with any main course",
+        },
+        {
+          occasion: "Christmas Celebration",
+          date: "December 20-25, 2025",
+          offer: "25% off all festive drinks and desserts",
+        },
+        {
+          occasion: "New Year Countdown",
+          date: "December 31, 2025",
+          offer: "Free champagne toast with any meal",
+        },
+      ];
+
+      const staff = [
+        {
+          name: "Chef Anna",
+          role: "Head Chef",
+          bio: "Anna brings 10 years of culinary expertise to our signature dishes.",
+          image:
+            "https://images.unsplash.com/photo-1583394293214-28ded15f4d90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          name: "Barista Mike",
+          role: "Lead Barista",
+          bio: "Mike's latte art and coffee blends are a guest favorite.",
+          image:
+            "https://images.unsplash.com/photo-1573496359142-b8d877c6f8f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          name: "Pastry Chef Lisa",
+          role: "Pastry Chef",
+          bio: "Lisa's desserts are a sweet ending to any meal.",
+          image:
+            "https://images.unsplash.com/photo-1589927986089-358123789b8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+      ];
+
+      // Static fallback foodItems
+      const foodItems = [
+        {
+          id: "1",
+          name: "Margherita Pizza",
+          description: "Fresh mozzarella, tomato sauce, basil",
+          price: 12.99,
+          category: { id: 1, name: "Pizza" },
+          is_favorite: false,
+          popularity: 95,
+          image:
+            "https://images.unsplash.com/photo-1571066811602-716837d3302d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          id: "2",
+          name: "Caesar Salad",
+          description: "Romaine lettuce, parmesan, croutons",
+          price: 8.99,
+          category: { id: 2, name: "Salad" },
+          is_favorite: true,
+          popularity: 90,
+          image:
+            "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          id: "3",
+          name: "Grilled Salmon",
+          description: "Atlantic salmon with lemon butter",
+          price: 18.99,
+          category: { id: 3, name: "Main" },
+          is_favorite: false,
+          popularity: 85,
+          image:
+            "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+        {
+          id: "4",
+          name: "Chocolate Lava Cake",
+          description: "Warm chocolate cake with molten center",
+          price: 6.99,
+          category: { id: 4, name: "Dessert" },
+          is_favorite: false,
+          popularity: 88,
+          image:
+            "https://images.unsplash.com/photo-1611348586804-4067de2e7a2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+        },
+      ];
+
+      // Utility functions
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
           }
-        });
-      });
-
-      // Responsive adjustments
-      window.addEventListener("resize", function () {
-        if (window.innerWidth > 768) {
-          const navLinks = document.querySelector(".nav-links");
-          const navActions = document.querySelector(".nav-actions");
-
-          navLinks.style.display = "flex";
-          navLinks.style.flexDirection = "row";
-          navLinks.style.position = "static";
-          navLinks.style.width = "auto";
-          navLinks.style.backgroundColor = "transparent";
-          navLinks.style.padding = "0";
-          navLinks.style.boxShadow = "none";
-
-          navActions.style.display = "flex";
-          navActions.style.flexDirection = "row";
-          navActions.style.position = "static";
-          navActions.style.width = "auto";
-          navActions.style.backgroundColor = "transparent";
-          navActions.style.padding = "0";
-          navActions.style.boxShadow = "none";
         }
-      });
+        return cookieValue;
+      }
 
-      // Toast function
-      function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.classList.add("show");
+      function generateUUID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          function (c) {
+            const r = (Math.random() * 16) | 0,
+              v = c === "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+          }
+        );
+      }
+
+      function showToast(message, type = "success") {
+        const toastContainer = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = `toast flex items-center p-4 rounded-lg shadow-lg ${
+          type === "success" ? "bg-emerald-600" : "bg-red-600"
+        } text-white opacity-0 transform translate-x-8`;
+        toast.innerHTML = `
+              <i class="fas ${
+                type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
+              } mr-2"></i>
+              <span>${message}</span>
+            `;
+        toastContainer.appendChild(toast);
 
         setTimeout(() => {
-          toast.classList.remove("show");
+          toast.classList.remove("translate-x-8");
+          toast.classList.add("opacity-100");
+        }, 10);
+
+        setTimeout(() => {
+          toast.classList.add("translate-x-8");
+          toast.classList.remove("opacity-100");
+          setTimeout(() => toast.remove(), 400);
         }, 3000);
       }
 
-      // Navigation function
-      async function showScreen(screen) {
-        showToast(`Loading ${screen} page...`);
-
-        // Map screen names to their corresponding HTML file paths
-        const screenPaths = {
-          index: "/frontend/templates/index.html",
-          menu: "/frontend/templates/menu.html",
-          favourites: "/frontend/templates/favourites.html",
-          signin: "/frontend/templates/signin.html",
-          signup: "/frontend/templates/signup.html",
+      // API functions
+      async function makeRequest(
+        url,
+        method,
+        body = null,
+        requiresAuth = false
+      ) {
+        const headers = {
+          "Content-Type": "application/json",
         };
 
-        // Redirect to the specified page if it exists in the mapping
-        if (screenPaths[screen]) {
-          window.location.href = screenPaths[screen];
-        } else {
-          showToast("Page not found");
-          console.error(`No page found for screen: ${screen}`);
+        if (requiresAuth && localStorage.getItem("accessToken")) {
+          headers["Authorization"] = `Bearer ${localStorage.getItem(
+            "accessToken"
+          )}`;
+        }
+
+        const options = {
+          method,
+          headers,
+        };
+
+        if (body) {
+          options.body = JSON.stringify(body);
+        }
+
+        try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.detail || "Something went wrong");
+          }
+
+          return data;
+        } catch (error) {
+          console.error("API Error:", error);
+          showToast(error.message || "API request failed", "error");
+          throw error;
         }
       }
 
-      // Food filtering
-      function filterFoods(category) {
-        const filteredFoods =
-          category === "all"
-            ? foodData
-            : foodData.filter((food) => food.category.name === category);
-        renderFoodList(filteredFoods);
-        showToast(`Showing ${category === "all" ? "all" : category} items`);
-      }
+      async function registerUser(email, password, fullname) {
+        try {
+          const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
+            email,
+            password,
+            fullname,
+          });
 
-      // Favorite toggle
-      function toggleFavorite(id, iconEl) {
-        if (iconEl.style.color === "red") {
-          iconEl.style.color = "";
-          showToast(`Removed item ${id} from favorites`);
-        } else {
-          iconEl.style.color = "red";
-          showToast(`Added item ${id} to favorites`);
+          showToast(data.message || "Registration successful");
+          return data;
+        } catch (error) {
+          return null;
         }
       }
 
-      // Add to cart
+      async function loginUser(email, password) {
+        try {
+          const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
+            email,
+            password,
+          });
+
+          localStorage.setItem("accessToken", data.access);
+          localStorage.setItem("refreshToken", data.refresh);
+          localStorage.setItem(
+            "userData",
+            JSON.stringify({
+              email: data.email,
+              fullname: data.fullname,
+              staff: data.staff,
+              active: data.active,
+              superuser: data.superuser,
+            })
+          );
+
+          isLoggedIn = true;
+          isAdmin = data.staff || data.superuser;
+
+          // Update UI
+          updateNavbar();
+          showToast(`Welcome back, ${data.fullname}!`);
+
+          // Reload current page with new auth state
+          showPage(currentPage);
+
+          return data;
+        } catch (error) {
+          console.error("Login error:", error);
+          showToast(error.message || "Login failed", "error");
+          return null;
+        }
+      }
+
+      function logoutUser() {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userData");
+        isLoggedIn = false;
+        isAdmin = false;
+        cart = [];
+        updateNavbar();
+        showToast("Logged out successfully");
+        showPage("home");
+      }
+
+      async function loadCategories() {
+        try {
+          const data = await makeRequest(
+            `${baseUrl}foods/categories/`,
+            "GET",
+            null,
+            true
+          );
+          return data.length
+            ? data
+            : [
+                { id: 1, name: "Pizza" },
+                { id: 2, name: "Salad" },
+                { id: 3, name: "Main" },
+                { id: 4, name: "Dessert" },
+              ];
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+          showToast("Failed to load categories", "error");
+          return [
+            { id: 1, name: "Pizza" },
+            { id: 2, name: "Salad" },
+            { id: 3, name: "Main" },
+            { id: 4, name: "Dessert" },
+          ];
+        }
+      }
+
+      async function loadFoodItems() {
+        try {
+          const data = await makeRequest(
+            `${baseUrl}foods/list/`,
+            "GET",
+            null,
+            true
+          );
+          return data.map((item) => ({
+            ...item,
+            is_favorite: item.is_favorite || false,
+            image:
+              item.image && item.image.startsWith("http")
+                ? item.image
+                : fallbackImage,
+            ingredients: item.ingredients || [],
+          }));
+        } catch (error) {
+          console.error("Error fetching food items:", error);
+          showToast("Failed to load menu items", "error");
+          return foodItems;
+        }
+      }
+
+      async function toggleFavorite(id, element = null) {
+        try {
+          const token = localStorage.getItem("accessToken");
+          if (!token) {
+            showToast("Please log in to add favorites", "error");
+            showPage("signin");
+            return;
+          }
+
+          const response = await fetch(`${baseUrl}foods/favorites/${id}/`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to update favorite");
+          }
+
+          const data = await response.json();
+
+          if (element) {
+            const isFavorite = data.is_favorite;
+            if (isFavorite) {
+              element.classList.add("text-red-500");
+              element.classList.remove("text-gray-400");
+            } else {
+              element.classList.add("text-gray-400");
+              element.classList.remove("text-red-500");
+            }
+          }
+
+          showToast(
+            data.is_favorite ? "Added to favorites" : "Removed from favorites"
+          );
+          return data;
+        } catch (error) {
+          console.error("Error toggling favorite:", error);
+          showToast(error.message || "Failed to update favorite", "error");
+          return null;
+        }
+      }
+
+      async function addCategory(name) {
+        if (!isAdmin) {
+          showToast("Admin access required to add categories", "error");
+          return null;
+        }
+
+        try {
+          const data = await makeRequest(
+            `${baseUrl}foods/categories/`,
+            "POST",
+            { name },
+            true
+          );
+          showToast("Category added successfully");
+          return data;
+        } catch (error) {
+          console.error("Error adding category:", error);
+          showToast("Failed to add category", "error");
+          return null;
+        }
+      }
+
       function addToCart(id) {
-        showToast(`Added item ${id} to cart`);
-      }
-
-      // Buy now function
-      function buyNow(id) {
-        const food = foodData.find((item) => item.id == id);
-        if (!food) {
-          showToast("Item not found");
+        if (!isLoggedIn) {
+          showToast("Please log in to add items to cart", "error");
+          showPage("signin");
           return;
         }
-        const name = prompt("Please enter your name:");
-        const phone = prompt("Please enter your phone number:");
-        if (name && phone) {
-          const userDetails = {
-            name: name,
-            phone: phone,
-          };
-          showPaymentModal(userDetails, food.price, {
-            name: food.name,
-            price: `₹${food.price}`,
+
+        const food = foodItems.find((item) => item.id === id);
+        if (!food) {
+          showToast("Item not found", "error");
+          return;
+        }
+
+        cart.push(food);
+        updateCartCount();
+        showToast(`${food.name} added to cart!`, "success");
+        updateCartDisplay();
+      }
+
+      function removeFromCart(index) {
+        const item = cart.splice(index, 1)[0];
+        updateCartCount();
+        showToast(`${item.name} removed from cart`, "success");
+        updateCartDisplay();
+      }
+
+      function updateCartCount() {
+        const cartCount = document.getElementById("cart-count");
+        if (cartCount) {
+          cartCount.textContent = cart.length;
+          if (cart.length > 0) {
+            cartCount.classList.remove("hidden");
+          } else {
+            cartCount.classList.add("hidden");
+          }
+        }
+      }
+
+      function updateCartDisplay() {
+        const cartItemsDiv = document.getElementById("cart-items");
+        const cartTotalSpan = document.getElementById("cart-total");
+
+        if (cartItemsDiv && cartTotalSpan) {
+          if (cart.length === 0) {
+            cartItemsDiv.innerHTML =
+              '<p class="text-gray-500">Your cart is empty</p>';
+            cartTotalSpan.textContent = "0.00";
+          } else {
+            cartItemsDiv.innerHTML = cart
+              .map(
+                (item, index) => `
+                  <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-200 last:border-0">
+                    <div class="flex items-center">
+                      <img src="${item.image}" alt="${
+                  item.name
+                }" class="w-12 h-12 rounded-lg object-cover mr-3" onerror="this.src='${fallbackImage}'" />
+                      <div>
+                        <p class="font-medium text-gray-800">${item.name}</p>
+                        <p class="text-emerald-600 font-bold">$${item.price.toFixed(
+                          2
+                        )}</p>
+                      </div>
+                    </div>
+                    <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                `
+              )
+              .join("");
+
+            const total = cart
+              .reduce((sum, item) => sum + item.price, 0)
+              .toFixed(2);
+            cartTotalSpan.textContent = total;
+          }
+        }
+      }
+
+      function placeOrder() {
+        if (!isLoggedIn) {
+          showToast("Please log in to place an order", "error");
+          showPage("signin");
+          return;
+        }
+
+        const orderType = document.getElementById("order-type")?.value;
+        const deliveryAddress =
+          document.getElementById("delivery-address")?.value;
+
+        if (cart.length === 0) {
+          showToast("Your cart is empty", "error");
+          return;
+        }
+
+        if (orderType === "delivery" && !deliveryAddress) {
+          showToast("Please enter a delivery address", "error");
+          return;
+        }
+
+        const orderDetails = {
+          items: cart,
+          total: cart.reduce((sum, item) => sum + item.price, 0).toFixed(2),
+          type: orderType || "pickup",
+          address:
+            orderType === "delivery" ? deliveryAddress : "Pickup at Cafe",
+        };
+
+        document.getElementById("booking-details").innerHTML = `
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Order Type:</span>
+                  <span class="font-medium">${
+                    orderDetails.type === "delivery" ? "Delivery" : "Pickup"
+                  }</span>
+                </div>
+                ${
+                  orderDetails.type === "delivery"
+                    ? `
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Address:</span>
+                    <span class="font-medium">${orderDetails.address}</span>
+                  </div>
+                `
+                    : ""
+                }
+                <div class="border-t border-gray-200 my-2"></div>
+                <div>
+                  <p class="text-gray-600 mb-1">Items:</p>
+                  <ul class="list-disc list-inside text-sm">
+                    ${orderDetails.items
+                      .map(
+                        (item) =>
+                          `<li>${item.name} - $${item.price.toFixed(2)}</li>`
+                      )
+                      .join("")}
+                  </ul>
+                </div>
+                <div class="border-t border-gray-200 my-2"></div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Total:</span>
+                  <span class="text-emerald-600 font-bold">$${
+                    orderDetails.total
+                  }</span>
+                </div>
+              </div>
+            `;
+
+        document.getElementById("payment-modal").classList.remove("hidden");
+      }
+
+      function completePayment() {
+        document.getElementById("payment-modal").classList.add("hidden");
+        showToast(
+          "Payment completed successfully! Your booking is confirmed.",
+          "success"
+        );
+        cart = [];
+        if (document.getElementById("delivery-address")) {
+          document.getElementById("delivery-address").value = "";
+        }
+        updateCartCount();
+        updateCartDisplay();
+      }
+
+      function closeModal() {
+        document.getElementById("payment-modal").classList.add("hidden");
+      }
+
+      // Page rendering functions
+      async function renderHomePage() {
+        const foods = await loadFoodItems();
+        const popularItems = foods
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 4);
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="space-y-16">
+                <!-- Hero Section -->
+                <section class="relative h-screen-80 rounded-2xl overflow-hidden hero-section animate__animated animate__fadeIn">
+                  <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-center px-4">
+                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 animate__animated animate__fadeInDown">Savor Exceptional Dining</h1>
+                    <p class="text-xl md:text-2xl text-white mb-8 max-w-3xl animate__animated animate__fadeIn animate__delay-1s">Experience culinary excellence with our carefully crafted menu and impeccable service</p>
+                    <div class="flex flex-col sm:flex-row gap-4 animate__animated animate__fadeInUp animate__delay-2s">
+                      <button onclick="showPage('menu')" class="btn-primary text-white px-8 py-4 rounded-xl text-lg font-medium hover:shadow-xl transition-all duration-300">
+                        <i class="fas fa-utensils mr-2"></i> Explore Menu
+                      </button>
+                      <button onclick="showPage('booking')" class="bg-white text-emerald-600 px-8 py-4 rounded-xl text-lg font-medium border-2 border-white hover:bg-transparent hover:text-white transition-all duration-300">
+                        <i class="fas fa-calendar-alt mr-2"></i> Book a Table
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Featured Categories -->
+                <section class="animate__animated animate__fadeIn">
+                  <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Our Menu Categories</h2>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('Pizza')">
+                      <div class="bg-emerald-100 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-pizza-slice text-3xl text-emerald-600"></i>
+                      </div>
+                      <h3 class="text-xl font-semibold text-center">Pizza</h3>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('Salad')">
+                      <div class="bg-emerald-100 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-leaf text-3xl text-emerald-600"></i>
+                      </div>
+                      <h3 class="text-xl font-semibold text-center">Salads</h3>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('Main')">
+                      <div class="bg-emerald-100 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-drumstick-bite text-3xl text-emerald-600"></i>
+                      </div>
+                      <h3 class="text-xl font-semibold text-center">Mains</h3>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('Dessert')">
+                      <div class="bg-emerald-100 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-ice-cream text-3xl text-emerald-600"></i>
+                      </div>
+                      <h3 class="text-xl font-semibold text-center">Desserts</h3>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Popular Dishes -->
+                  <section class="animate__animated animate__fadeIn">
+                    <div class="flex justify-between items-center mb-8">
+                      <h2 class="text-3xl font-bold gradient-text">Popular Dishes</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      ${popularItems
+                        .map(
+                          (food) => `
+                        <div class="food-card bg-white rounded-xl overflow-hidden relative">
+                          <div class="absolute top-4 right-4 z-10">
+                            <button onclick="toggleFavorite('${
+                              food.id
+                            }', this)" class="fav-icon text-2xl ${
+                            food.is_favorite ? "text-red-500" : "text-gray-300"
+                          } hover:text-red-500">
+                              <i class="fas fa-heart"></i>
+                            </button>
+                          </div>
+                          <img src="${food.image}" alt="${
+                            food.name
+                          }" class="w-full h-48 object-cover" onerror="this.src='${fallbackImage}'" />
+                          <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                              <h3 class="text-xl font-semibold">${
+                                food.name
+                              }</h3>
+                              <span class="text-emerald-600 font-bold">$${food.price.toFixed(
+                                2
+                              )}</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4">${
+                              food.description
+                            }</p>
+                            <button onclick="addToCart('${
+                              food.id
+                            }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                              <i class="fas fa-plus mr-2"></i> Add to Cart
+                            </button>
+                          </div>
+                        </div>
+                      `
+                        )
+                        .join("")}
+                    </div>
+
+                    <!-- Centered View All Button -->
+                    <div class="mt-8 flex justify-center">
+                          <button onclick="showPage('menu')" class="btn-primary text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
+                        View All
+                      </button>
+                    </div>
+                  </section>
+
+
+                <!-- Special Offers -->
+                <section class="bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-2xl p-8 text animate__animated animate__fadeIn">
+                  <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-4 text-yellow-800">Special Offers</h2>
+                    <p class="text-xl mb-6 text-yellow-700">Enjoy our exclusive deals and discounts</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      ${discounts
+                        .map(
+                          (discount) => `
+                        <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
+                          <h3 class="text-xl font-bold mb-2 text-yellow-900">${discount.occasion}</h3>
+                          <p class="mb-3 text-yellow-700">${discount.date}</p>
+                          <p class="text-lg font-bold text-yellow-800">${discount.offer}</p>
+                        </div>
+                      `
+                        )
+                        .join("")}
+                    </div>
+                  </div>
+                </section>
+
+
+                <!-- Events Section -->
+                <section class="animate__animated animate__fadeIn">
+                  <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    ${events
+                      .map(
+                        (event) => `
+                      <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                        <img src="${event.image}" alt="${
+                          event.name
+                        }" class="w-full h-64 object-cover" onerror="this.src='${fallbackImage}'" />
+                        <div class="bg-yellow-50 text-purple-600 p-6">
+                          <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                              event.type === "current"
+                                ? "bg-yellow-200 text-purple-600"
+                                : "bg-yellow-300 text-purple-600"
+                            }">
+                              ${
+                                event.type === "current"
+                                  ? "Happening Now"
+                                  : "Coming Soon"
+                              }
+                            </span>
+                            <span class="text-purple-600">${event.date}</span>
+                          </div>
+                          <h3 class="text-xl font-bold mb-2">${event.name}</h3>
+                          <p class="text-purple-600 mb-4">${
+                            event.description
+                          }</p>
+                          <button class="text-purple-600 font-medium hover:text-purple-600 flex items-center">
+                            Learn More <i class="fas fa-arrow-right ml-2"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </section>
+
+
+                <!-- Testimonials -->
+      <!-- Testimonials Section with Auto-Circulating Carousel -->
+
+      <section class="bg-gray-50 rounded-2xl p-8 overflow-hidden relative">
+        <h2 class="text-3xl font-bold text-center mb-12 gradient-text animate__animated animate__fadeInDown">What Our Customers Say</h2>
+
+        <div class="relative">
+          <!-- Testimonial Cards Container -->
+          <div class="testimonial-carousel flex overflow-x-auto snap-x snap-mandatory scroll-smooth" id="testimonial-container">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"The food was absolutely delicious! The service was impeccable and the atmosphere was perfect for our date night."</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah J."
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">Sarah J.</h4>
+                    <p class="text-gray-500 text-sm">Regular Customer</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"I've been coming here for years and the quality never disappoints. The new menu items are always exciting!"</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael T."
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:-rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">Michael T.</h4>
+                    <p class="text-gray-500 text-sm">Food Critic</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"The ambiance is perfect for business lunches. The staff is attentive and the food arrives quickly without sacrificing quality."</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Jennifer L."
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">Jennifer L.</h4>
+                    <p class="text-gray-500 text-sm">Business Client</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial 4 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"The vegan options are incredible! As someone with dietary restrictions, I appreciate how accommodating the kitchen is."</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="Emily R."
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">Emily R.</h4>
+                    <p class="text-gray-500 text-sm">Vegan Foodie</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial 5 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"Best cocktails in town! The mixologist here is a true artist. I come every Thursday for their special creations."</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="David K."
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:-rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">David K.</h4>
+                    <p class="text-gray-500 text-sm">Cocktail Enthusiast</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial 6 -->
+            <div class="testimonial-card flex-shrink-0 w-full md:w-1/3 px-4 snap-start">
+              <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2">
+                <div class="flex items-center mb-4">
+                  <div class="text-yellow-400 text-xl animate-pulse">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 mb-4 animate__animated animate__fadeIn">"We hosted our wedding reception here and it was magical! The team went above and beyond to make our day special."</p>
+                <div class="flex items-center">
+                  <div class="relative group">
+                    <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Jessica & Mark"
+                         class="w-10 h-10 rounded-full mr-3 object-cover transition-transform duration-500 group-hover:rotate-6" />
+                    <div class="absolute -inset-1 bg-yellow-200 rounded-full blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">Jessica & Mark</h4>
+                    <p class="text-gray-500 text-sm">Newlyweds</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Arrows -->
+          <button class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10 transition-all" id="prev-testimonial">
+            <i class="fas fa-chevron-left text-gray-600"></i>
+          </button>
+          <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 z-10 transition-all" id="next-testimonial">
+            <i class="fas fa-chevron-right text-gray-600"></i>
+          </button>
+
+          <!-- Subtle Rotation Animation Background Element -->
+          <div class="absolute -bottom-20 -right-20 w-40 h-40 rounded-full bg-emerald-100 opacity-20 animate-spin-slow -z-10"></div>
+        </div>
+
+        <!-- Dots Indicator -->
+        <div class="flex justify-center mt-8 space-x-2" id="testimonial-dots">
+          <!-- Dots will be added by JavaScript -->
+        </div>
+      </section>
+
+
+
+
+
+
+                <!-- Blog & Newsletter Section -->
+      <section class="bg-white rounded-2xl shadow-xl overflow-hidden animate__animated animate__fadeIn">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Recent Blogs Column -->
+          <div class="p-8 md:p-10">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-book-open text-emerald-600 mr-3"></i> Recent From Our Blog
+            </h2>
+
+            <div class="space-y-6">
+              <!-- Blog Post 1 -->
+              <div class="flex gap-4 group">
+                <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                       alt="Seasonal Ingredients"
+                       class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 group-hover:text-emerald-600 transition">
+                    <a href="#">Seasonal Ingredients for Summer Menus</a>
+                  </h3>
+                  <p class="text-gray-600 text-sm mt-1">June 15, 2023 • 5 min read</p>
+                  <p class="text-gray-700 mt-2">Discover how we're incorporating fresh summer produce into our specials...</p>
+                </div>
+              </div>
+
+              <!-- Blog Post 2 -->
+              <div class="flex gap-4 group">
+                <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                       alt="Wine Pairing"
+                       class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-gray-800 group-hover:text-emerald-600 transition">
+                    <a href="#">Perfect Wine Pairings for Our New Dishes</a>
+                  </h3>
+                  <p class="text-gray-600 text-sm mt-1">May 28, 2023 • 4 min read</p>
+                  <p class="text-gray-700 mt-2">Our sommelier shares expert recommendations for pairing wines with our...</p>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <a href="#" class="inline-flex items-center text-emerald-600 font-medium hover:text-emerald-800 transition">
+                  View All Blog Posts <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Newsletter Column -->
+          <div class="bg-gray-50 p-8 md:p-10">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              <i class="fas fa-envelope text-emerald-600 mr-3"></i> Stay Updated
+            </h2>
+
+            <p class="text-gray-700 mb-6">Subscribe to our newsletter for exclusive offers, event invites, and culinary insights.</p>
+
+            <form class="space-y-4">
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                <input type="text" id="name"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+              </div>
+
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input type="email" id="email"
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+              </div>
+
+              <div class="flex items-center">
+                <input type="checkbox" id="consent" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                <label for="consent" class="ml-2 text-sm text-gray-600">
+                  I agree to receive emails with updates and offers
+                </label>
+              </div>
+
+              <button type="submit"
+                      class="bg-green-500 w-full bg-emerald-600 hover:bg-green-700 text-white py-3.5 px-6 rounded-lg font-bold transition duration-300 flex items-center justify-center">
+                <i class="fas fa-paper-plane mr-2"></i> Subscribe Now
+              </button>
+            </form>
+
+            <p class="text-xs text-gray-500 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+          </div>
+        </div>
+      </section>
+              </div>
+            `;
+
+        // Set hero section background
+        const heroSection = document.querySelector(".hero-section");
+        if (heroSection) {
+          heroSection.style.backgroundImage =
+            "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')";
+        }
+      }
+
+      async function renderMenuPage() {
+        const foods = await loadFoodItems();
+        const categories = await loadCategories();
+        const uniqueCategories = [
+          "all",
+          ...new Set(categories.map((cat) => cat.name)),
+        ];
+        const filteredFoods =
+          selectedCategory === "all"
+            ? foods
+            : foods.filter((item) => item.category.name === selectedCategory);
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="space-y-8">
+                <!-- Menu Header -->
+                <div class="text-center animate__animated animate__fadeIn">
+                  <h1 class="text-4xl font-bold gradient-text mb-4">Our Menu</h1>
+                  <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our carefully crafted dishes made with the finest ingredients and passion</p>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-3 justify-center animate__animated animate__fadeIn">
+                  ${uniqueCategories
+                    .map(
+                      (category) => `
+                    <button onclick="filterFoods('${category}')"
+                      class="px-5 py-2.5 rounded-full transition-all duration-300 ${
+                        selectedCategory === category
+                          ? "bg-emerald-600 text-white shadow-lg"
+                          : "bg-white text-gray-700 hover:bg-gray-100 shadow"
+                      }">
+                      ${category === "all" ? "All Items" : category}
+                    </button>
+                  `
+                    )
+                    .join("")}
+                </div>
+
+                <!-- Menu Items -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate__animated animate__fadeIn">
+                  ${
+                    filteredFoods.length === 0
+                      ? `
+                    <div class="col-span-full text-center py-12">
+                      <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
+                      <h3 class="text-xl font-semibold text-gray-600">No items found in this category</h3>
+                      <button onclick="filterFoods('all')" class="text-emerald-600 font-medium mt-4 hover:text-emerald-800">
+                        View All Items
+                      </button>
+                    </div>
+                  `
+                      : filteredFoods
+                          .map(
+                            (food) => `
+                    <div class="food-card bg-white rounded-xl overflow-hidden relative">
+                      <div class="absolute top-4 right-4 z-10">
+                        <button onclick="toggleFavorite('${
+                          food.id
+                        }', this)" class="fav-icon text-2xl ${
+                              food.is_favorite
+                                ? "text-red-500"
+                                : "text-gray-300"
+                            } hover:text-red-500">
+                          <i class="fas fa-heart"></i>
+                        </button>
+                      </div>
+                      <img src="${food.image}" alt="${
+                              food.name
+                            }" class="w-full h-56 object-cover" onerror="this.src='${fallbackImage}'" />
+                      <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                          <h3 class="text-xl font-semibold">${food.name}</h3>
+                          <span class="text-emerald-600 font-bold">$${food.price.toFixed(
+                            2
+                          )}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">${
+                          food.description
+                        }</p>
+                        ${
+                          food.ingredients && food.ingredients.length > 0
+                            ? `
+                          <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500 mb-1">Ingredients:</p>
+                            <div class="flex flex-wrap gap-2">
+                              ${food.ingredients
+                                .map(
+                                  (ingredient) => `
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${ingredient}</span>
+                              `
+                                )
+                                .join("")}
+                            </div>
+                          </div>
+                        `
+                            : ""
+                        }
+                        <div class="flex gap-3">
+                          <button onclick="addToCart('${
+                            food.id
+                          }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                            <i class="fas fa-plus mr-2"></i> Add to Cart
+                          </button>
+                          <button onclick="buyNow('${
+                            food.id
+                          }')" class="flex-1 bg-white border border-emerald-600 text-emerald-600 px-4 py-2.5 rounded-lg hover:bg-emerald-50 transition-all duration-300">
+                            <i class="fas fa-bolt mr-2"></i> Buy Now
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  `
+                          )
+                          .join("")
+                  }
+                </div>
+              </div>
+            `;
+      }
+
+      function renderBookingPage() {
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="max-w-2xl mx-auto animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <!-- Booking Header -->
+                  <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-6 text-white text-center">
+                    <h2 class="text-3xl font-bold mb-2">Table Reservation</h2>
+                    <p class="opacity-90">Secure your spot for an exceptional dining experience</p>
+                  </div>
+
+                  <!-- Booking Form -->
+                  <div class="p-6 md:p-8">
+                    <div class="space-y-6">
+                      <!-- Date & Time -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                          <div class="relative">
+                            <input type="date" id="date" value="${
+                              bookingDetails.date
+                            }" onchange="updateBookingDetails('date', this.value)"
+                              class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                          </div>
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                          <select id="time" onchange="updateBookingDetails('time', this.value)"
+                            class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                            <option value="">Select time</option>
+                            ${[
+                              "12:00 PM",
+                              "1:00 PM",
+                              "2:00 PM",
+                              "6:00 PM",
+                              "7:00 PM",
+                              "8:00 PM",
+                              "9:00 PM",
+                            ]
+                              .map(
+                                (slot) => `
+                              <option value="${slot}" ${
+                                  bookingDetails.time === slot ? "selected" : ""
+                                }>${slot}</option>
+                            `
+                              )
+                              .join("")}
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Guests -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
+                        <select id="guests" onchange="updateBookingDetails('guests', this.value)"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                          ${[1, 2, 3, 4, 5, 6, 7, 8]
+                            .map(
+                              (num) => `
+                            <option value="${num}" ${
+                                bookingDetails.guests === num ? "selected" : ""
+                              }>${num} ${
+                                num === 1 ? "Guest" : "Guests"
+                              }</option>
+                          `
+                            )
+                            .join("")}
+                        </select>
+                      </div>
+
+                      <!-- Table Selection -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Select Table</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          ${[
+                            "Table 1",
+                            "Table 2",
+                            "Table 3",
+                            "Table 4",
+                            "Table 5",
+                            "Table 6",
+                          ]
+                            .map(
+                              (table) => `
+                            <div onclick="selectTable('${table}')"
+                              class="table-slot cursor-pointer p-4 text-center rounded-lg border-2 transition-all duration-300 ${
+                                selectedTable === table
+                                  ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                                  : "border-gray-200 bg-white hover:border-emerald-300"
+                              }">
+                              <i class="fas fa-chair text-2xl mb-2 ${
+                                selectedTable === table
+                                  ? "text-emerald-600"
+                                  : "text-gray-400"
+                              }"></i>
+                              <p class="font-medium">${table}</p>
+                            </div>
+                          `
+                            )
+                            .join("")}
+                        </div>
+                      </div>
+
+                      <!-- Submit Button -->
+                      <button onclick="handleBooking()"
+                        class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 mt-6">
+                        <i class="fas fa-calendar-check mr-2"></i> Confirm Reservation
+                      </button>
+
+                      ${
+                        !isLoggedIn
+                          ? `
+                        <div class="text-center text-sm text-gray-500 mt-4">
+                          You need to <a href="#" onclick="showPage('signin')" class="text-emerald-600 font-medium">sign in</a> to book a table
+                        </div>
+                      `
+                          : ""
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <div class="p-6 md:p-8">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                      <i class="fas fa-info-circle text-emerald-600 mr-2"></i> Reservation Information
+                    </h3>
+                    <ul class="space-y-3 text-gray-600">
+                      <li class="flex items-start">
+                        <i class="fas fa-clock text-emerald-500 mt-1 mr-2"></i>
+                        <span>Reservations are held for 15 minutes past the booked time</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-user-group text-emerald-500 mt-1 mr-2"></i>
+                        <span>Pricing: Rs. 200-800 based on number of guests</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-utensils text-emerald-500 mt-1 mr-2"></i>
+                        <span>Special dietary requirements can be noted during checkout</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-phone text-emerald-500 mt-1 mr-2"></i>
+                        <span>Need help? Call us at (123) 456-7890</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            `;
+      }
+
+      async function handleBooking() {
+        if (!isLoggedIn) {
+          showToast("Please log in to book a table", "error");
+          showPage("signin");
+          return;
+        }
+
+        if (!bookingDetails.date || !bookingDetails.time || !selectedTable) {
+          showToast("Please fill all booking details", "error");
+          return;
+        }
+
+        const price = bookingPrices[bookingDetails.guests] || 300;
+
+        document.getElementById("booking-details").innerHTML = `
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Date:</span>
+                  <span class="font-medium">${bookingDetails.date}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Time:</span>
+                  <span class="font-medium">${bookingDetails.time}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Guests:</span>
+                  <span class="font-medium">${bookingDetails.guests}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Table:</span>
+                  <span class="font-medium">${selectedTable}</span>
+                </div>
+                <div class="border-t border-gray-200 my-2"></div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Amount to Pay:</span>
+                  <span class="text-emerald-600 font-bold">Rs. ${price}</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Scan the QR code to complete your booking payment</p>
+              </div>
+            `;
+
+        document.getElementById("payment-modal").classList.remove("hidden");
+      }
+
+      async function renderFavouritesPage() {
+        const foods = await loadFoodItems();
+        const favoriteItems = foods.filter((item) => item.is_favorite);
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="space-y-8 animate__animated animate__fadeIn">
+                <!-- Favorites Header -->
+                <div class="text-center">
+                  <h1 class="text-4xl font-bold gradient-text mb-4">Your Favorites</h1>
+                  <p class="text-xl text-gray-600 max-w-2xl mx-auto">Your saved dishes for quick access</p>
+                </div>
+
+                <!-- Favorites Content -->
+                ${
+                  favoriteItems.length === 0
+                    ? `
+                  <div class="bg-white rounded-2xl shadow-md p-12 text-center">
+                    <i class="fas fa-heart text-5xl text-gray-300 mb-6"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-4">No favorites yet</h3>
+                    <p class="text-gray-500 mb-6">Start exploring our menu and save your favorite dishes</p>
+                    <button onclick="showPage('menu')" class="btn-primary text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300">
+                      <i class="fas fa-utensils mr-2"></i> Browse Menu
+                    </button>
+                  </div>
+                `
+                    : `
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    ${favoriteItems
+                      .map(
+                        (food) => `
+                      <div class="food-card bg-white rounded-xl overflow-hidden relative">
+                        <div class="absolute top-4 right-4 z-10">
+                          <button onclick="toggleFavorite('${
+                            food.id
+                          }', this)" class="fav-icon text-2xl text-red-500 hover:text-red-600">
+                            <i class="fas fa-heart"></i>
+                          </button>
+                        </div>
+                        <img src="${food.image}" alt="${
+                          food.name
+                        }" class="w-full h-56 object-cover" onerror="this.src='${fallbackImage}'" />
+                        <div class="p-6">
+                          <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold">${food.name}</h3>
+                            <span class="text-emerald-600 font-bold">$${food.price.toFixed(
+                              2
+                            )}</span>
+                          </div>
+                          <p class="text-gray-600 text-sm mb-4">${
+                            food.description
+                          }</p>
+                          ${
+                            food.ingredients && food.ingredients.length > 0
+                              ? `
+                            <div class="mb-4">
+                              <p class="text-sm font-medium text-gray-500 mb-1">Ingredients:</p>
+                              <div class="flex flex-wrap gap-2">
+                                ${food.ingredients
+                                  .map(
+                                    (ingredient) => `
+                                  <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${ingredient}</span>
+                                `
+                                  )
+                                  .join("")}
+                              </div>
+                            </div>
+                          `
+                              : ""
+                          }
+                          <div class="flex gap-3">
+                            <button onclick="addToCart('${
+                              food.id
+                            }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                              <i class="fas fa-plus mr-2"></i> Add to Cart
+                            </button>
+                            <button onclick="buyNow('${
+                              food.id
+                            }')" class="flex-1 bg-white border border-emerald-600 text-emerald-600 px-4 py-2.5 rounded-lg hover:bg-emerald-50 transition-all duration-300">
+                              <i class="fas fa-bolt mr-2"></i> Buy Now
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                `
+                }
+              </div>
+            `;
+      }
+
+      async function renderAddFoodPage() {
+        const categories = await loadCategories();
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="max-w-2xl mx-auto animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <!-- Form Header -->
+                  <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-6 text-white text-center">
+                    <h2 class="text-3xl font-bold mb-2">Add New Menu Item</h2>
+                    <p class="opacity-90">Expand our culinary offerings with your creations</p>
+                  </div>
+
+                  <!-- Food Form -->
+                  <div class="p-6 md:p-8">
+                    <div class="space-y-6">
+                      <!-- Name -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name</label>
+                        <input type="text" id="food-name" placeholder="e.g., Margherita Pizza"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                      </div>
+
+                      <!-- Price -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                        <input type="number" id="food-price" placeholder="e.g., 12.99" step="0.01"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                      </div>
+
+                      <!-- Description -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="food-description" placeholder="Brief description of the dish" rows="3"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"></textarea>
+                      </div>
+
+                      <!-- Ingredients -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ingredients (comma separated)</label>
+                        <input type="text" id="food-ingredients" placeholder="e.g., tomato, cheese, basil"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                      </div>
+
+                      <!-- Category -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="food-category"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200">
+                          ${categories
+                            .map(
+                              (category) => `
+                            <option value="${category.id}">${category.name}</option>
+                          `
+                            )
+                            .join("")}
+                        </select>
+                      </div>
+
+                      <!-- Image Upload (Placeholder) -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                          <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                          <p class="text-gray-500">Drag & drop your image here or click to browse</p>
+                          <input type="file" id="food-image" class="hidden" />
+                        </div>
+                      </div>
+
+                      <!-- New Category -->
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Add New Category</label>
+                        <div class="flex gap-2">
+                          <input type="text" id="new-category" placeholder="New category name"
+                            class="flex-1 input-field p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                          <button onclick="addNewCategory()"
+                            class="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-300 transition-all duration-300">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Submit Button -->
+                      <button onclick="submitFood()"
+                        class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 mt-6">
+                        <i class="fas fa-plus-circle mr-2"></i> Add Menu Item
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+      }
+
+      function renderSignInPage() {
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="max-w-md mx-auto animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <!-- Sign In Header -->
+                  <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
+                    <h2 class="text-3xl font-bold mb-2">Welcome Back</h2>
+                    <p class="opacity-90">Sign in to access your account</p>
+                  </div>
+
+                  <!-- Sign In Form -->
+                  <div class="p-8">
+                    <div class="space-y-6">
+                      <!-- Email -->
+                      <div class="relative">
+                        <input type="email" id="signin-email" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Email Address</label>
+                      </div>
+
+                      <!-- Password -->
+                      <div class="relative">
+                        <input type="password" id="signin-password" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Password</label>
+                        <button onclick="togglePasswordVisibility('signin-password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+
+                      <!-- Remember & Forgot -->
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                          <input type="checkbox" id="remember-me" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                          <label for="remember-me" class="ml-2 text-sm text-gray-600">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-emerald-600 hover:text-emerald-800">Forgot password?</a>
+                      </div>
+
+                      <!-- Error Message -->
+                      <div id="signin-error" class="hidden bg-red-50 border-l-4 border-red-500 p-4">
+                        <div class="flex">
+                          <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                          </div>
+                          <div class="ml-3">
+                            <p class="text-sm text-red-700" id="signin-error-text">Invalid credentials</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Submit Button -->
+                      <button onclick="signIn()"
+                        class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+                      </button>
+
+                      <!-- Social Login -->
+                      <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                          <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                          <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-2 gap-3">
+                        <button class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300">
+                          <i class="fab fa-google text-red-500 mr-2"></i>
+                          <span>Google</span>
+                        </button>
+                        <button class="flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-300">
+                          <i class="fab fa-facebook-f text-blue-600 mr-2"></i>
+                          <span>Facebook</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Sign Up Link -->
+                    <div class="mt-6 text-center">
+                      <p class="text-gray-600">Don't have an account? <a href="#" onclick="showPage('signup')" class="text-emerald-600 font-medium hover:text-emerald-800">Sign up</a></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+      }
+
+      function renderSignUpPage() {
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="max-w-md mx-auto animate__animated animate__fadeIn">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <!-- Sign Up Header -->
+                  <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
+                    <h2 class="text-3xl font-bold mb-2">Create Account</h2>
+                    <p class="opacity-90">Join us for an exceptional dining experience</p>
+                  </div>
+
+                  <!-- Sign Up Form -->
+                  <div class="p-8">
+                    <div class="space-y-6">
+                      <!-- Full Name -->
+                      <div class="relative">
+                        <input type="text" id="signup-fullname" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Full Name</label>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="relative">
+                        <input type="email" id="signup-email" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Email Address</label>
+                      </div>
+
+                      <!-- Password -->
+                      <div class="relative">
+                        <input type="password" id="signup-password" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Password</label>
+                        <button onclick="togglePasswordVisibility('signup-password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+
+                      <!-- Confirm Password -->
+                      <div class="relative">
+                        <input type="password" id="signup-confirm-password" placeholder=" "
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+                        <label class="floating-label peer-focus:text-emerald-600">Confirm Password</label>
+                        <button onclick="togglePasswordVisibility('signup-confirm-password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+
+                      <!-- Terms -->
+                      <div class="flex items-center">
+                        <input type="checkbox" id="terms" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                        <label for="terms" class="ml-2 text-sm text-gray-600">I agree to the <a href="#" class="text-emerald-600 hover:text-emerald-800">Terms of Service</a> and <a href="#" class="text-emerald-600 hover:text-emerald-800">Privacy Policy</a></label>
+                      </div>
+
+                      <!-- Error Message -->
+                      <div id="signup-error" class="hidden bg-red-50 border-l-4 border-red-500 p-4">
+                        <div class="flex">
+                          <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                          </div>
+                          <div class="ml-3">
+                            <p class="text-sm text-red-700" id="signup-error-text">Registration failed</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Submit Button -->
+                      <button onclick="signUp()"
+                        class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-user-plus mr-2"></i> Create Account
+                      </button>
+                    </div>
+
+                    <!-- Sign In Link -->
+                    <div class="mt-6 text-center">
+                      <p class="text-gray-600">Already have an account? <a href="#" onclick="showPage('signin')" class="text-emerald-600 font-medium hover:text-emerald-800">Sign in</a></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+      }
+
+      async function renderOrderPage() {
+        const foods = await loadFoodItems();
+        const popularItems = foods
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 2);
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+              <div class="space-y-8 animate__animated animate__fadeIn">
+                <!-- Order Header -->
+                <div class="text-center">
+                  <h1 class="text-4xl font-bold gradient-text mb-4">Order Online</h1>
+                  <p class="text-xl text-gray-600 max-w-2xl mx-auto">Enjoy our delicious food from the comfort of your home</p>
+                </div>
+
+                <!-- Order Content -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <!-- Cart Section -->
+                  <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                      <i class="fas fa-shopping-cart text-emerald-600 mr-2"></i> Your Order
+                    </h2>
+
+                    <div id="cart-items" class="mb-6">
+                      ${
+                        cart.length === 0
+                          ? `
+                        <div class="text-center py-12">
+                          <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
+                          <h3 class="text-xl font-semibold text-gray-500">Your cart is empty</h3>
+                          <button onclick="showPage('menu')" class="text-emerald-600 font-medium mt-4 hover:text-emerald-800">
+                            Browse Menu
+                          </button>
+                        </div>
+                      `
+                          : cart
+                              .map(
+                                (item, index) => `
+                        <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
+                          <div class="flex items-center">
+                            <img src="${item.image}" alt="${
+                                  item.name
+                                }" class="w-16 h-16 rounded-lg object-cover mr-4" onerror="this.src='${fallbackImage}'" />
+                            <div>
+                              <h3 class="font-medium">${item.name}</h3>
+                              <p class="text-emerald-600 font-bold">$${item.price.toFixed(
+                                2
+                              )}</p>
+                            </div>
+                          </div>
+                          <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      `
+                              )
+                              .join("")
+                      }
+                    </div>
+
+                    ${
+                      cart.length > 0
+                        ? `
+                      <div class="border-t border-gray-200 pt-4 mb-6">
+                        <div class="flex justify-between mb-2">
+                          <span class="text-gray-600">Subtotal:</span>
+                          <span class="font-medium">$${cart
+                            .reduce((sum, item) => sum + item.price, 0)
+                            .toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                          <span class="text-gray-600">Delivery Fee:</span>
+                          <span class="font-medium">$2.99</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold mt-4">
+                          <span>Total:</span>
+                          <span class="text-emerald-600">$${(
+                            cart.reduce((sum, item) => sum + item.price, 0) +
+                            2.99
+                          ).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    `
+                        : ""
+                    }
+                  </div>
+
+                  <!-- Order Details Section -->
+                  <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                      <i class="fas fa-info-circle text-emerald-600 mr-2"></i> Order Details
+                    </h2>
+
+                    <div class="space-y-6">
+                      <!-- Order Type -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Order Type</label>
+                        <div class="grid grid-cols-2 gap-3">
+                          <button id="pickup-btn" class="py-3 px-4 border rounded-lg font-medium flex items-center justify-center transition-all duration-300 bg-emerald-50 border-emerald-500 text-emerald-600">
+                            <i class="fas fa-store mr-2"></i> Pickup
+                          </button>
+                          <button id="delivery-btn" class="py-3 px-4 border rounded-lg font-medium flex items-center justify-center transition-all duration-300 border-gray-300 hover:border-emerald-300">
+                            <i class="fas fa-motorcycle mr-2"></i> Delivery
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Delivery Address -->
+                      <div id="delivery-address-container" class="hidden">
+                        <label for="delivery-address" class="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
+                        <input type="text" id="delivery-address" placeholder="Enter your full address"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+                      </div>
+
+                      <!-- Payment Method -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <div class="space-y-3">
+                          <div class="flex items-center p-3 border border-gray-300 rounded-lg">
+                            <input type="radio" id="cash-on-delivery" name="payment" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500" checked />
+                            <label for="cash-on-delivery" class="ml-3 flex items-center">
+                              <i class="fas fa-money-bill-wave text-gray-500 mr-2"></i>
+                              <span>Cash on Delivery</span>
+                            </label>
+                          </div>
+                          <div class="flex items-center p-3 border border-gray-300 rounded-lg">
+                            <input type="radio" id="credit-card" name="payment" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500" />
+                            <label for="credit-card" class="ml-3 flex items-center">
+                              <i class="fas fa-credit-card text-gray-500 mr-2"></i>
+                              <span>Credit/Debit Card</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Special Instructions -->
+                      <div>
+                        <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                        <textarea id="instructions" rows="3" placeholder="Any special requests or dietary restrictions"
+                          class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"></textarea>
+                      </div>
+
+                      <!-- Place Order Button -->
+                      <button onclick="placeOrder()"
+                        class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${
+                          cart.length === 0
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }"
+                        ${cart.length === 0 ? "disabled" : ""}>
+                        <i class="fas fa-shopping-bag mr-2"></i> Place Order
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quick Order Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                  <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Order
+                  </h2>
+
+                  <p class="text-gray-600 mb-6">Select popular items to add to your cart</p>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    ${popularItems
+                      .map(
+                        (food) => `
+                      <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-emerald-300 transition-all duration-300">
+                        <img src="${food.image}" alt="${
+                          food.name
+                        }" class="w-16 h-16 rounded-lg object-cover mr-4" onerror="this.src='${fallbackImage}'" />
+                        <div class="flex-1">
+                          <h3 class="font-semibold">${food.name}</h3>
+                          <p class="text-emerald-600 font-bold">$${food.price.toFixed(
+                            2
+                          )}</p>
+                        </div>
+                        <button onclick="addToCart('${
+                          food.id
+                        }')" class="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 transition-all duration-300">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              </div>
+            `;
+
+        // Add event listeners for order type buttons
+        const pickupBtn = document.getElementById("pickup-btn");
+        const deliveryBtn = document.getElementById("delivery-btn");
+        const deliveryAddressContainer = document.getElementById(
+          "delivery-address-container"
+        );
+
+        if (pickupBtn && deliveryBtn && deliveryAddressContainer) {
+          pickupBtn.addEventListener("click", () => {
+            pickupBtn.classList.add(
+              "bg-emerald-50",
+              "border-emerald-500",
+              "text-emerald-600"
+            );
+            pickupBtn.classList.remove("border-gray-300");
+            deliveryBtn.classList.add("border-gray-300");
+            deliveryBtn.classList.remove(
+              "bg-emerald-50",
+              "border-emerald-500",
+              "text-emerald-600"
+            );
+            deliveryAddressContainer.classList.add("hidden");
+          });
+
+          deliveryBtn.addEventListener("click", () => {
+            deliveryBtn.classList.add(
+              "bg-emerald-50",
+              "border-emerald-500",
+              "text-emerald-600"
+            );
+            deliveryBtn.classList.remove("border-gray-300");
+            pickupBtn.classList.add("border-gray-300");
+            pickupBtn.classList.remove(
+              "bg-emerald-50",
+              "border-emerald-500",
+              "text-emerald-600"
+            );
+            deliveryAddressContainer.classList.remove("hidden");
           });
         }
       }
 
-      // Table availability check
-      function checkTableAvailability(source) {
-        const date = document.getElementById("booking-date").value;
-        const time = document.getElementById("booking-time").value;
-        const grid = document.getElementById("tables-grid");
-        const details = document.getElementById("booking-details");
-        const selectedText = document.getElementById("selected-tables-text");
+      // Helper functions
+      function togglePasswordVisibility(fieldId) {
+        const field = document.getElementById(fieldId);
+        const type =
+          field.getAttribute("type") === "password" ? "text" : "password";
+        field.setAttribute("type", type);
+      }
 
-        if (!date || !time) {
-          grid.innerHTML = "Please select a valid date and time.";
-          details.style.display = "none";
+      function filterFoods(category) {
+        selectedCategory = category;
+        renderMenuPage();
+      }
+
+      function updateBookingDetails(key, value) {
+        bookingDetails[key] = value;
+      }
+
+      function selectTable(table) {
+        selectedTable = table;
+        renderBookingPage();
+      }
+
+      function buyNow(id) {
+        if (!isLoggedIn) {
+          showToast("Please log in to buy items", "error");
+          showPage("signin");
           return;
         }
 
-        grid.innerHTML = "";
-        details.style.display = "none";
-        selectedText.innerHTML = "";
+        const food = foodItems.find((item) => item.id === id);
+        if (!food) {
+          showToast("Item not found", "error");
+          return;
+        }
 
-        tables.forEach((table) => {
-          const tableDiv = document.createElement("div");
-          tableDiv.className = "table-slot";
+        cart = [food];
+        updateCartCount();
 
-          const img = document.createElement("img");
-          img.src = table.image;
-          img.alt = `Table ${table.id}`;
-          img.style.width = "100%";
-          img.style.borderRadius = "8px";
-          img.style.marginBottom = "0.5rem";
-          tableDiv.appendChild(img);
+        document.getElementById("booking-details").innerHTML = `
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Item:</span>
+                  <span class="font-medium">${food.name}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Price:</span>
+                  <span class="font-medium">$${food.price.toFixed(2)}</span>
+                </div>
+              </div>
+            `;
 
-          const label = document.createElement("div");
-          label.textContent = `Table ${table.id}`;
-          label.style.fontWeight = "600";
-          label.style.color = "#2e7d32";
-          tableDiv.appendChild(label);
+        document.getElementById("payment-modal").classList.remove("hidden");
+      }
 
-          tableDiv.onclick = () => {
-            tableDiv.classList.toggle("selected");
-            const selected = getSelectedTables();
-            if (selected.length > 0) {
-              details.style.display = "block";
-              selectedText.textContent = `Selected: ${selected.join(", ")}`;
-            } else {
-              details.style.display = "none";
+      async function signIn() {
+        const email = document.getElementById("signin-email").value;
+        const password = document.getElementById("signin-password").value;
+        const error = document.getElementById("signin-error");
+
+        if (!email || !password) {
+          error.querySelector("#signin-error-text").textContent =
+            "Please fill in all fields";
+          error.classList.remove("hidden");
+          return;
+        }
+
+        try {
+          const data = await loginUser(email, password);
+          if (data) {
+            // Check if the user is an admin (staff or superuser)
+            if (data.staff || data.superuser) {
+              error.querySelector("#signin-error-text").textContent =
+                "Admin users cannot sign in through this page. Please use the admin portal.";
+              error.classList.remove("hidden");
+              return;
             }
-          };
-          grid.appendChild(tableDiv);
-        });
+
+            // Proceed with normal user login
+            document
+              .getElementById("admin-link")
+              .classList.toggle("hidden", !isAdmin);
+            document
+              .getElementById("admin-link-mobile")
+              .classList.toggle("hidden", !isAdmin);
+            showPage("home");
+          } else {
+            error.querySelector("#signin-error-text").textContent =
+              "Invalid credentials";
+            error.classList.remove("hidden");
+          }
+        } catch (error) {
+          error.querySelector("#signin-error-text").textContent =
+            error.message || "Login failed";
+          error.classList.remove("hidden");
+        }
       }
 
-      // Get selected tables
-      function getSelectedTables() {
-        return Array.from(
-          document.querySelectorAll(".table-slot.selected")
-        ).map((el) => el.textContent);
-      }
+      async function signUp() {
+        const fullname = document.getElementById("signup-fullname").value;
+        const email = document.getElementById("signup-email").value;
+        const password = document.getElementById("signup-password").value;
+        const confirmPassword = document.getElementById(
+          "signup-confirm-password"
+        ).value;
+        const terms = document.getElementById("terms").checked;
+        const error = document.getElementById("signup-error");
 
-      // Book table function
-      function bookTable(source) {
-        const selected = getSelectedTables();
-        const date = document.getElementById("booking-date").value;
-        const time = document.getElementById("booking-time").value;
-        const name = document.getElementById("user-name").value;
-        const phone = document.getElementById("user-phone").value;
-
-        if (selected.length === 0 || !date || !time || !name || !phone) {
-          showToast(
-            "Please complete all fields and select at least one table."
-          );
+        if (!fullname || !email || !password || !confirmPassword) {
+          error.querySelector("#signup-error-text").textContent =
+            "Please fill in all fields";
+          error.classList.remove("hidden");
           return;
         }
 
-        const userDetails = {
-          name: name,
-          phone: phone,
+        if (password !== confirmPassword) {
+          error.querySelector("#signup-error-text").textContent =
+            "Passwords do not match";
+          error.classList.remove("hidden");
+          return;
+        }
+
+        if (!terms) {
+          error.querySelector("#signup-error-text").textContent =
+            "Please agree to the terms";
+          error.classList.remove("hidden");
+          return;
+        }
+
+        const data = await registerUser(email, password, fullname);
+        if (data) {
+          showPage("signin");
+        } else {
+          error.querySelector("#signup-error-text").textContent =
+            "Registration failed";
+          error.classList.remove("hidden");
+        }
+      }
+
+      async function addNewCategory() {
+        const categoryName = document.getElementById("new-category").value;
+        if (!categoryName) {
+          showToast("Please enter a category name", "error");
+          return;
+        }
+
+        const newCategory = await addCategory(categoryName);
+        if (newCategory) {
+          document.getElementById("new-category").value = "";
+          renderAddFoodPage();
+        }
+      }
+
+      async function submitFood() {
+        const name = document.getElementById("food-name").value;
+        const price = document.getElementById("food-price").value;
+        const description = document.getElementById("food-description").value;
+        const ingredients = document
+          .getElementById("food-ingredients")
+          .value.split(",")
+          .map((item) => item.trim())
+          .filter((item) => item);
+        const category_id = document.getElementById("food-category").value;
+        const error = document.getElementById("add-food-error");
+
+        if (!name || !price || !description || !category_id) {
+          showToast("Please fill in all required fields", "error");
+          return;
+        }
+
+        const foodData = {
+          name,
+          price: parseFloat(price),
+          description,
+          ingredients,
+          category_id: parseInt(category_id),
         };
 
-        // Set booking details in modal
-        document.getElementById("popup-date").textContent = date;
-        document.getElementById("popup-time").textContent = time;
-        document.getElementById("popup-tables").textContent =
-          selected.join(", ");
-        document.getElementById("payment-amount").textContent = `Amount: ₹250`;
-
-        // Set user details
-        document.getElementById("payment-user-details").innerHTML = `
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Phone:</strong> ${phone}</p>
-        `;
-
-        // Show modal
-        document.getElementById("payment-modal").style.display = "flex";
+        const result = await addFood(foodData);
+        if (result) {
+          document.getElementById("food-name").value = "";
+          document.getElementById("food-price").value = "";
+          document.getElementById("food-description").value = "";
+          document.getElementById("food-ingredients").value = "";
+          showPage("menu");
+        }
       }
 
-      // Show payment modal
-      function showPaymentModal(userDetails, amount, itemDetails = null) {
-        document.getElementById("payment-user-details").innerHTML = `
-          <p><strong>Name:</strong> ${userDetails.name}</p>
-          <p><strong>Phone:</strong> ${userDetails.phone}</p>
-          ${
-            itemDetails
-              ? `<p><strong>Item:</strong> ${itemDetails.name} (${itemDetails.price})</p>`
-              : ""
+      function logout() {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userData");
+        isLoggedIn = false;
+        isAdmin = false;
+        cart = [];
+        updateNavbar();
+        updateCartCount();
+        showToast("Logged out successfully");
+        showPage("home");
+      }
+
+      function updateNavbar() {
+        document
+          .getElementById("signin-button")
+          .classList.toggle("hidden", isLoggedIn);
+        document
+          .getElementById("signup-button")
+          .classList.toggle("hidden", isLoggedIn);
+        document
+          .getElementById("logout-button")
+          .classList.toggle("hidden", !isLoggedIn);
+        document
+          .getElementById("mobile-signin-button")
+          .classList.toggle("hidden", isLoggedIn);
+        document
+          .getElementById("mobile-signup-button")
+          .classList.toggle("hidden", isLoggedIn);
+        document
+          .getElementById("mobile-logout-button")
+          .classList.toggle("hidden", !isLoggedIn);
+        document
+          .getElementById("profile-link")
+          ?.classList.toggle("hidden", !isLoggedIn);
+        document
+          .getElementById("mobile-profile-link")
+          ?.classList.toggle("hidden", !isLoggedIn);
+      }
+
+      function checkAuthState() {
+        const accessToken = localStorage.getItem("accessToken");
+        const userData = JSON.parse(localStorage.getItem("userData") || "null");
+
+        if (accessToken && userData) {
+          isLoggedIn = true;
+          isAdmin = userData.staff || userData.superuser;
+          updateNavbar();
+        } else {
+          // Ensure profile links are hidden if not logged in
+          document.getElementById("profile-link")?.classList.add("hidden");
+          document
+            .getElementById("mobile-profile-link")
+            ?.classList.add("hidden");
+        }
+      }
+
+      // Navigation and page management
+      function showPage(page) {
+        if (page === "favourites" && !isLoggedIn) {
+          showToast("Please log in to access Favorites", "error");
+          showPage("signin");
+          return;
+        }
+
+        if (page === "order" && !isLoggedIn) {
+          showToast("Please log in to place an order", "error");
+          showPage("signin");
+          return;
+        }
+
+        currentPage = page;
+
+        // Update active nav link
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.toggle(
+            "active",
+            link.getAttribute("onclick") === `showPage('${page}')`
+          );
+        });
+
+        // Close mobile menu if open
+        document.getElementById("mobile-menu").classList.add("hidden");
+
+        // Render the appropriate page
+        switch (page) {
+          case "home":
+            renderHomePage();
+            break;
+          case "menu":
+            renderMenuPage();
+            break;
+          case "booking":
+            renderBookingPage();
+            break;
+          case "favourites":
+            renderFavouritesPage();
+            break;
+          case "profile":
+            renderProfilePage();
+            break;
+          case "edit-profile":
+            renderEditProfilePage();
+            break;
+          case "signin":
+            renderSignInPage();
+            break;
+          case "signup":
+            renderSignUpPage();
+            break;
+          case "add-food":
+            renderAddFoodPage();
+            break;
+          case "order":
+            renderOrderPage();
+            break;
+        }
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      async function renderProfilePage() {
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        const foods = await loadFoodItems();
+        const favoriteItems = foods.filter((item) => item.is_favorite);
+
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+    <div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
+          <h2 class="text-3xl font-bold mb-2">Your Profile</h2>
+          <p class="opacity-90">Manage your account and view your dining preferences</p>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="p-6 md:p-8">
+          <div class="space-y-8">
+            <!-- User Information -->
+            <div>
+              <h3 class="text-2xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-user text-emerald-600 mr-2"></i> Personal Information
+              </h3>
+              <div class="bg-gray-50 p-6 rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm text-gray-600">Full Name</p>
+                    <p class="font-medium">${userData.fullname || "Not set"}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600">Email</p>
+                    <p class="font-medium">${userData.email || "Not set"}</p>
+                  </div>
+                </div>
+                <button onclick="showPage('edit-profile')" class="mt-4 btn-primary text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
+                  <i class="fas fa-edit mr-2"></i> Edit Profile
+                </button>
+              </div>
+            </div>
+
+            <!-- Favorite Items -->
+            <div>
+              <h3 class="text-2xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-heart text-red-500 mr-2"></i> Your Favorites
+              </h3>
+              ${
+                favoriteItems.length === 0
+                  ? `
+                <div class="bg-gray-50 p-6 rounded-lg text-center">
+                  <i class="fas fa-heart text-4xl text-gray-300 mb-4"></i>
+                  <p class="text-gray-600 mb-4">You haven't added any favorites yet.</p>
+                  <button onclick="showPage('menu')" class="text-emerald-600 font-medium hover:text-emerald-800">
+                    Browse Menu
+                  </button>
+                </div>
+              `
+                  : `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  ${favoriteItems
+                    .map(
+                      (food) => `
+                    <div class="food-card bg-white rounded-xl overflow-hidden relative">
+                      <div class="absolute top-4 right-4 z-10">
+                        <button onclick="toggleFavorite('${
+                          food.id
+                        }', this)" class="fav-icon text-2xl text-red-500 hover:text-red-600">
+                          <i class="fas fa-heart"></i>
+                        </button>
+                      </div>
+                      <img src="${food.image}" alt="${
+                        food.name
+                      }" class="w-full h-48 object-cover" onerror="this.src='${fallbackImage}'" />
+                      <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                          <h3 class="text-xl font-semibold">${food.name}</h3>
+                          <span class="text-emerald-600 font-bold">$${food.price.toFixed(
+                            2
+                          )}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">${
+                          food.description
+                        }</p>
+                        <button onclick="addToCart('${
+                          food.id
+                        }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                          <i class="fas fa-plus mr-2"></i> Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              `
+              }
+            </div>
+
+            <!-- Booking History (Placeholder) -->
+            <div>
+              <h3 class="text-2xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-calendar-check text-emerald-600 mr-2"></i> Booking History
+              </h3>
+              <div class="bg-gray-50 p-6 rounded-lg text-center">
+                <i class="fas fa-calendar-alt text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600 mb-4">No bookings found.</p>
+                <button onclick="showPage('booking')" class="text-emerald-600 font-medium hover:text-emerald-800">
+                  Book a Table
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+      }
+
+      function renderEditProfilePage() {
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        const mainContent = document.getElementById("main-content");
+        mainContent.innerHTML = `
+    <div class="max-w-md mx-auto animate__animated animate__fadeIn">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Edit Profile Header -->
+        <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
+          <h2 class="text-3xl font-bold mb-2">Edit Profile</h2>
+          <p class="opacity-90">Update your account information</p>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="p-8">
+          <div class="space-y-6">
+            <!-- Full Name -->
+            <div class="relative">
+              <input type="text" id="edit-fullname" placeholder=" " value="${
+                userData.fullname || ""
+              }"
+                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+              <label class="floating-label peer-focus:text-emerald-600">Full Name</label>
+            </div>
+
+            <!-- Email (Read-only) -->
+            <div class="relative">
+              <input type="email" id="edit-email" placeholder=" " value="${
+                userData.email || ""
+              }" readonly
+                class="input-field w-full p-3 rounded-lg border border-gray-300 bg-gray-100 cursor-not-allowed" />
+              <label class="floating-label text-gray-600">Email Address</label>
+            </div>
+
+            <!-- New Password -->
+            <div class="relative">
+              <input type="password" id="edit-password" placeholder=" "
+                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+              <label class="floating-label peer-focus:text-emerald-600">New Password (leave blank to keep current)</label>
+              <button onclick="togglePasswordVisibility('edit-password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <!-- Confirm New Password -->
+            <div class="relative">
+              <input type="password" id="edit-confirm-password" placeholder=" "
+                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 peer" />
+              <label class="floating-label peer-focus:text-emerald-600">Confirm New Password</label>
+              <button onclick="togglePasswordVisibility('edit-confirm-password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <!-- Error Message -->
+            <div id="edit-profile-error" class="hidden bg-red-50 border-l-4 border-red-500 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-exclamation-circle text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-red-700" id="edit-profile-error-text">Update failed</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save and Cancel Buttons -->
+            <div class="flex gap-4">
+              <button onclick="updateProfile()"
+                class="flex-1 btn-primary text-white py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300">
+                <i class="fas fa-save mr-2"></i> Save Changes
+              </button>
+              <button onclick="showPage('profile')"
+                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all duration-300">
+                <i class="fas fa-times mr-2"></i> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+      }
+
+      async function updateProfile() {
+        const fullname = document.getElementById("edit-fullname").value;
+        const password = document.getElementById("edit-password").value;
+        const confirmPassword = document.getElementById(
+          "edit-confirm-password"
+        ).value;
+        const error = document.getElementById("edit-profile-error");
+
+        if (!fullname) {
+          error.querySelector("#edit-profile-error-text").textContent =
+            "Full name is required";
+          error.classList.remove("hidden");
+          return;
+        }
+
+        if (password && password !== confirmPassword) {
+          error.querySelector("#edit-profile-error-text").textContent =
+            "Passwords do not match";
+          error.classList.remove("hidden");
+          return;
+        }
+
+        try {
+          const updateData = { fullname };
+          if (password) {
+            updateData.password = password;
           }
-        `;
 
-        document.getElementById(
-          "payment-amount"
-        ).textContent = `Amount: ₹${amount}`;
-        document.getElementById("payment-modal").style.display = "flex";
+          const response = await makeRequest(
+            `${baseUrl}users/profile/update/`,
+            "PUT",
+            updateData,
+            true
+          );
+
+          // Update localStorage with new user data
+          const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+          userData.fullname = fullname;
+          localStorage.setItem("userData", JSON.stringify(userData));
+
+          showToast("Profile updated successfully");
+          showPage("profile");
+        } catch (error) {
+          error.querySelector("#edit-profile-error-text").textContent =
+            error.message || "Failed to update profile";
+          error.classList.remove("hidden");
+        }
       }
 
-      // Complete payment
-      function completePayment() {
-        closeModal();
-        showToast("Payment completed successfully! Thank you for your order.");
-      }
+      // Event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is already logged in
+        checkAuthState();
 
-      // Close modal
-      function closeModal() {
-        document.getElementById("payment-modal").style.display = "none";
-      }
+        // Initialize cart count
+        updateCartCount();
 
-      // Initialize
-      window.onload = function () {
-        // Set minimum date to today
-        const today = new Date().toISOString().split("T")[0];
-        document.getElementById("booking-date").min = today;
-        // Fetch food items on load
-        fetchFoods();
-      };
+        // Mobile menu toggle
+        document
+          .getElementById("mobile-menu-button")
+          .addEventListener("click", function () {
+            document.getElementById("mobile-menu").classList.toggle("hidden");
+          });
+
+        // Cart FAB click
+        document
+          .getElementById("cart-fab")
+          .addEventListener("click", function () {
+            if (cart.length > 0) {
+              showPage("order");
+            } else {
+              showToast("Your cart is empty", "error");
+              showPage("menu");
+            }
+          });
+
+        // Show home page by default
+        showPage("home");
+      });
+
+      // Close mobile menu when clicking outside
+      document.addEventListener("click", function (event) {
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+
+        if (
+          !mobileMenu.contains(event.target) &&
+          !mobileMenuButton.contains(event.target)
+        ) {
+          mobileMenu.classList.add("hidden");
+        }
+      });
+
+      // Close dropdowns when clicking outside (for future dropdowns)
+      window.addEventListener("click", function (event) {
+        if (!event.target.matches(".dropdown-toggle")) {
+          const dropdowns = document.getElementsByClassName("dropdown-menu");
+          for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (!openDropdown.classList.contains("hidden")) {
+              openDropdown.classList.add("hidden");
+            }
+          }
+        }
+      });
     </script>
   </body>
 </html>

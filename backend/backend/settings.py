@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'foods',
 
     # packages
+    'corsheaders',
     'drf_spectacular',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -88,9 +89,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
   "http://127.0.0.1:8000", # Adjust to your frontend's URL
   "http://localhost:8000",
+  "http://127.0.0.1:5500",
 ]
 
 # Database
@@ -108,9 +111,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
