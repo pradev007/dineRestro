@@ -1072,30 +1072,30 @@
       }
 
       function showToast(message, type = "success") {
-        const toastContainer = document.getElementById("toast-container");
-        const toast = document.createElement("div");
-        toast.className = `toast flex items-center p-4 rounded-lg shadow-lg ${
-          type === "success" ? "bg-emerald-600" : "bg-red-600"
-        } text-white opacity-0 transform translate-x-8`;
-        toast.innerHTML = `
-              <i class="fas ${
-                type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
-              } mr-2"></i>
-              <span>${message}</span>
-            `;
-        toastContainer.appendChild(toast);
+    const toastContainer = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast flex items-center p-4 rounded-lg shadow-lg bg-green-400 ${
+        type === "success" ? "bg-emerald-600" : type === "error" ? "bg-red-600" : "bg-blue-600"
+    } text-white opacity-0 transform translate-x-8`;
+    toast.innerHTML = `
+        <i class="fas ${
+            type === "success" ? "fa-check-circle" : type === "error" ? "fa-exclamation-circle" : "fa-info-circle"
+        } mr-2"></i>
+        <span>${message}</span>
+    `;
+    toastContainer.appendChild(toast);
 
-        setTimeout(() => {
-          toast.classList.remove("translate-x-8");
-          toast.classList.add("opacity-100");
-        }, 10);
+    setTimeout(() => {
+        toast.classList.remove("translate-x-8");
+        toast.classList.add("opacity-100");
+    }, 10);
 
-        setTimeout(() => {
-          toast.classList.add("translate-x-8");
-          toast.classList.remove("opacity-100");
-          setTimeout(() => toast.remove(), 400);
-        }, 3000);
-      }
+    setTimeout(() => {
+        toast.classList.add("translate-x-8");
+        toast.classList.remove("opacity-100");
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
 
       // API functions
       async function makeRequest(
@@ -1200,7 +1200,7 @@
         isAdmin = false;
         cart = [];
         updateNavbar();
-        showToast("Logged out successfully");
+        // showToast("Logged out successfully");
         showPage("home");
       }
 
@@ -2475,8 +2475,8 @@
                 <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                   <!-- Sign In Header -->
                   <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
-                    <h2 class="text-3xl font-bold mb-2">Welcome Back</h2>
-                    <p class="opacity-90">Sign in to access your account</p>
+                    <h2 class="text-3xl font-bold mb-2 text-green-500">Login Required</h2>
+                    <p class="opacity-100 text-green-500">Login to access your account</p>
                   </div>
 
                   <!-- Sign In Form -->
@@ -2565,8 +2565,8 @@
                 <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                   <!-- Sign Up Header -->
                   <div class="bg-gradient-to-r from-emerald-500 to-emerald-700 p-8 text-white text-center">
-                    <h2 class="text-3xl font-bold mb-2">Create Account</h2>
-                    <p class="opacity-90">Join us for an exceptional dining experience</p>
+                    <h2 class="text-3xl font-bold mb-2 text-green-500">Create Account</h2>
+                    <p class="opacity-100 text-green-500">Join us for an exceptional dining experience</p>
                   </div>
 
                   <!-- Sign Up Form -->
@@ -2944,7 +2944,7 @@
         try {
           const data = await loginUser(email, password);
           if (data) {
-            // Check if the user is an admin (staff or superuser)
+            // Check if the user is an admin
             if (data.staff || data.superuser) {
               error.querySelector("#signin-error-text").textContent =
                 "Admin users cannot sign in through this page. Please use the admin portal.";
@@ -2952,14 +2952,11 @@
               return;
             }
 
-            // Proceed with normal user login
-            document
-              .getElementById("admin-link")
-              .classList.toggle("hidden", !isAdmin);
-            document
-              .getElementById("admin-link-mobile")
-              .classList.toggle("hidden", !isAdmin);
-            showPage("home");
+            // Update auth state
+            isLoggedIn = true;
+            isAdmin = false; // Non-admin user
+            updateNavbar(); // Update navbar immediately
+            showPage("home"); // Redirect to home page
           } else {
             error.querySelector("#signin-error-text").textContent =
               "Invalid credentials";
@@ -3076,113 +3073,117 @@
       }
 
       function updateNavbar() {
-        document
-          .getElementById("signin-button")
-          .classList.toggle("hidden", isLoggedIn);
-        document
-          .getElementById("signup-button")
-          .classList.toggle("hidden", isLoggedIn);
-        document
-          .getElementById("logout-button")
-          .classList.toggle("hidden", !isLoggedIn);
-        document
-          .getElementById("mobile-signin-button")
-          .classList.toggle("hidden", isLoggedIn);
-        document
-          .getElementById("mobile-signup-button")
-          .classList.toggle("hidden", isLoggedIn);
-        document
-          .getElementById("mobile-logout-button")
-          .classList.toggle("hidden", !isLoggedIn);
-        document
-          .getElementById("profile-link")
-          ?.classList.toggle("hidden", !isLoggedIn);
-        document
-          .getElementById("mobile-profile-link")
-          ?.classList.toggle("hidden", !isLoggedIn);
-      }
+    // Desktop navbar
+    document.getElementById("signin-button")?.classList.toggle("hidden", isLoggedIn);
+    document.getElementById("signup-button")?.classList.toggle("hidden", isLoggedIn);
+    document.getElementById("logout-button")?.classList.toggle("hidden", !isLoggedIn);
+    document.getElementById("profile-link")?.classList.toggle("hidden", !isLoggedIn);
+
+    // Mobile navbar
+    document.getElementById("mobile-signin-button")?.classList.toggle("hidden", isLoggedIn);
+    document.getElementById("mobile-signup-button")?.classList.toggle("hidden", isLoggedIn);
+    document.getElementById("mobile-logout-button")?.classList.toggle("hidden", !isLoggedIn);
+    document.getElementById("mobile-profile-link")?.classList.toggle("hidden", !isLoggedIn);
+
+    // Admin links (if applicable)
+    document.getElementById("admin-link")?.classList.toggle("hidden", !isAdmin);
+    document.getElementById("admin-link-mobile")?.classList.toggle("hidden", !isAdmin);
+}
 
       function checkAuthState() {
-        const accessToken = localStorage.getItem("accessToken");
-        const userData = JSON.parse(localStorage.getItem("userData") || "null");
+    const accessToken = localStorage.getItem("accessToken");
+    const userData = JSON.parse(localStorage.getItem("userData") || "null");
 
-        if (accessToken && userData) {
-          isLoggedIn = true;
-          isAdmin = userData.staff || userData.superuser;
-          updateNavbar();
+    if (accessToken && userData) {
+        isLoggedIn = true;
+        isAdmin = userData.staff || userData.superuser;
+        updateNavbar();
+        if (currentPage === "signin" || currentPage === "signup") {
+            showPage("home"); // Redirect to home if trying to access signin/signup
         } else {
-          // Ensure profile links are hidden if not logged in
-          document.getElementById("profile-link")?.classList.add("hidden");
-          document
-            .getElementById("mobile-profile-link")
-            ?.classList.add("hidden");
+            showPage(currentPage); // Render current page with updated auth state
         }
-      }
+    } else {
+        isLoggedIn = false;
+        isAdmin = false;
+        updateNavbar();
+        document.getElementById("profile-link")?.classList.add("hidden");
+        document.getElementById("mobile-profile-link")?.classList.add("hidden");
+        document.getElementById("admin-link")?.classList.add("hidden");
+        document.getElementById("admin-link-mobile")?.classList.add("hidden");
+    }
+}
 
       // Navigation and page management
       function showPage(page) {
-        if (page === "favourites" && !isLoggedIn) {
-          showToast("Please log in to access Favorites", "error");
-          showPage("signin");
-          return;
-        }
+    if (isLoggedIn && (page === "signin" || page === "signup")) {
+        // showToast("You are already logged in", "info");
+        showPage("home");
+        return;
+    }
 
-        if (page === "order" && !isLoggedIn) {
-          showToast("Please log in to place an order", "error");
-          showPage("signin");
-          return;
-        }
+    if (page === "favourites" && !isLoggedIn) {
+        showToast("Please log in to access Favorites", "error");
+        showPage("signin");
+        return;
+    }
 
-        currentPage = page;
+    if (page === "order" && !isLoggedIn) {
+        showToast("Please log in to place an order", "error");
+        showPage("signin");
+        return;
+    }
 
-        // Update active nav link
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          link.classList.toggle(
+    currentPage = page;
+
+    // Update active nav link
+    document.querySelectorAll(".nav-link").forEach((link) => {
+        link.classList.toggle(
             "active",
             link.getAttribute("onclick") === `showPage('${page}')`
-          );
-        });
+        );
+    });
 
-        // Close mobile menu if open
-        document.getElementById("mobile-menu").classList.add("hidden");
+    // Close mobile menu if open
+    document.getElementById("mobile-menu").classList.add("hidden");
 
-        // Render the appropriate page
-        switch (page) {
-          case "home":
+    // Render the appropriate page
+    switch (page) {
+        case "home":
             renderHomePage();
             break;
-          case "menu":
+        case "menu":
             renderMenuPage();
             break;
-          case "booking":
+        case "booking":
             renderBookingPage();
             break;
-          case "favourites":
+        case "favourites":
             renderFavouritesPage();
             break;
-          case "profile":
+        case "profile":
             renderProfilePage();
             break;
-          case "edit-profile":
+        case "edit-profile":
             renderEditProfilePage();
             break;
-          case "signin":
+        case "signin":
             renderSignInPage();
             break;
-          case "signup":
+        case "signup":
             renderSignUpPage();
             break;
-          case "add-food":
+        case "add-food":
             renderAddFoodPage();
             break;
-          case "order":
+        case "order":
             renderOrderPage();
             break;
-        }
+    }
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
       async function renderProfilePage() {
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
