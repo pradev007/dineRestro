@@ -21,6 +21,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <style>
+      /* Existing styles unchanged */
       :root {
         --primary: #10b981;
         --primary-dark: #025c3f;
@@ -277,13 +278,11 @@
         fill: #ffffff;
       }
 
-      /* Hero Section Styles */
       .h-screen-80 {
         height: 80vh;
         min-height: 600px;
       }
 
-      /* Button Hover Effects */
       .btn-hover-effect {
         transition: all 0.3s ease;
       }
@@ -293,7 +292,6 @@
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
       }
 
-      /* Responsive Adjustments */
       @media (max-width: 768px) {
         .h-screen-80 {
           height: 70vh;
@@ -309,7 +307,6 @@
         }
       }
 
-      /* Custom animation classes */
       .animate-spin-slow {
         animation: spin 15s linear infinite;
       }
@@ -337,10 +334,9 @@
         }
       }
 
-      /* Carousel Styles */
       .testimonial-carousel {
         display: flex;
-        overflow-x: hidden;
+        overflow-x: auto;
         scroll-behavior: smooth;
         scroll-snap-type: x mandatory;
       }
@@ -348,6 +344,8 @@
       .testimonial-card {
         flex: 0 0 100%;
         scroll-snap-align: start;
+        padding: 1rem;
+        margin-right: 1rem;
       }
 
       @media (min-width: 768px) {
@@ -368,42 +366,6 @@
       .testimonial-dot.active {
         background-color: #4f46e5;
       }
-
-      /* Custom animation classes */
-      .animate-spin-slow {
-        animation: spin 15s linear infinite;
-      }
-
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .animate-pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.7;
-        }
-      }
-
-      .delay-100 {
-        animation-delay: 100ms;
-      }
-
-      .delay-200 {
-        animation-delay: 200ms;
-      }
     </style>
   </head>
   <body class="antialiased">
@@ -412,18 +374,18 @@
       <button
         id="cart-fab"
         class="relative bg-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+        onclick="showPage('order')"
       >
         <i class="fas fa-shopping-cart text-2xl text-emerald-600"></i>
         <span
           id="cart-count"
-          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse"
-          >0</span
-        >
+          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse hidden"
+        >0</span>
       </button>
     </div>
 
     <!-- Navigation -->
-    <nav class="navbar fixed top-0 left-0 w-full z-50">
+    <nav id="navbar" class="navbar fixed top-0 left-0 w-full z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-20">
           <div class="flex items-center">
@@ -440,41 +402,33 @@
               href="#"
               onclick="showPage('home')"
               class="nav-link text-gray-700 hover:text-emerald-600 active"
-              >Home</a
-            >
+            >Home</a>
             <a
               href="#"
               onclick="showPage('menu')"
               class="nav-link text-gray-700 hover:text-emerald-600"
-              >Menu</a
-            >
+            >Menu</a>
             <a
               href="#"
               onclick="showPage('booking')"
               class="nav-link text-gray-700 hover:text-emerald-600"
-              >Book Table</a
-            >
+            >Book Table</a>
             <a
               href="#"
               onclick="showPage('favourites')"
               class="nav-link text-gray-700 hover:text-emerald-600"
-              >Favorites</a
-            >
-
+            >Favorites</a>
             <a
               href="#"
               onclick="showPage('order')"
               class="nav-link text-gray-700 hover:text-emerald-600"
-              >Order Online</a
-            >
-
+            >Order Online</a>
             <a
               href="#"
               onclick="showPage('profile')"
               class="nav-link text-gray-700 hover:text-emerald-600"
               id="profile-link"
-              >Profile</a
-            >
+            >Profile</a>
           </div>
 
           <div class="hidden md:flex items-center space-x-4">
@@ -494,7 +448,7 @@
             </button>
             <button
               id="logout-button"
-              onclick="logout()"
+              onclick="logoutUser()"
               class="hidden text-red-600 border-2 border-red-600 px-6 py-2 rounded-lg hover:bg-red-50 transition-all duration-300"
             >
               Logout
@@ -504,6 +458,7 @@
           <div class="md:hidden flex items-center">
             <button
               id="mobile-menu-button"
+              onclick="toggleMobileMenu()"
               class="text-gray-700 hover:text-emerald-600 focus:outline-none transition-all duration-300"
             >
               <svg
@@ -528,60 +483,53 @@
         <div class="px-2 pt-2 pb-4 space-y-2 sm:px-3 glass-effect">
           <a
             href="#"
-            onclick="showPage('home')"
+            onclick="showPage('home'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            >Home</a
-          >
+          >Home</a>
           <a
             href="#"
-            onclick="showPage('menu')"
+            onclick="showPage('menu'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            >Menu</a
-          >
+          >Menu</a>
           <a
             href="#"
-            onclick="showPage('booking')"
+            onclick="showPage('booking'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            >Book Table</a
-          >
+          >Book Table</a>
           <a
             href="#"
-            onclick="showPage('favourites')"
+            onclick="showPage('favourites'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            >Favorites</a
-          >
-
+          >Favorites</a>
           <a
             href="#"
-            onclick="showPage('order')"
+            onclick="showPage('order'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            >Order Online</a
-          >
+          >Order Online</a>
           <a
             href="#"
-            onclick="showPage('profile')"
+            onclick="showPage('profile'); toggleMobileMenu()"
             class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
             id="mobile-profile-link"
-            >Profile</a
-          >
+          >Profile</a>
           <div class="pt-2 space-y-2">
             <button
               id="mobile-signin-button"
-              onclick="showPage('signin')"
+              onclick="showPage('signin'); toggleMobileMenu()"
               class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50 transition-all duration-300"
             >
               Sign In
             </button>
             <button
               id="mobile-signup-button"
-              onclick="showPage('signup')"
+              onclick="showPage('signup'); toggleMobileMenu()"
               class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium btn-primary text-white hover:shadow-lg transition-all duration-300"
             >
               Sign Up
             </button>
             <button
               id="mobile-logout-button"
-              onclick="logout()"
+              onclick="logoutUser(); toggleMobileMenu()"
               class="hidden block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all duration-300"
             >
               Logout
@@ -596,6 +544,9 @@
       id="main-content"
       class="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12"
     ></main>
+
+    <!-- Testimonial Section (Added for Carousel) -->
+    
 
     <!-- Payment Modal -->
     <div
@@ -615,7 +566,6 @@
         <p class="text-gray-600 mb-6">
           Scan QR code to complete your booking payment
         </p>
-
         <div
           class="qr-code mx-auto mb-6 p-4 bg-white rounded-lg shadow-inner flex justify-center"
         >
@@ -625,12 +575,10 @@
             class="w-48 h-48 rounded-lg"
           />
         </div>
-
         <div
           class="booking-details bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200"
           id="booking-details"
         ></div>
-
         <div class="flex justify-end space-x-3">
           <button
             onclick="closeModal()"
@@ -649,7 +597,7 @@
     </div>
 
     <!-- Toast Notifications -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-3"></div>
+    <div id="toast-container" class="fixed top-20 right-6 z-50 space-y-3"></div>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white pt-16 pb-8 relative">
@@ -663,7 +611,6 @@
           <!-- <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path> -->
         </svg>
       </div>
-
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div class="animate__animated animate__fadeIn">
@@ -699,7 +646,6 @@
               </a>
             </div>
           </div>
-
           <div class="animate__animated animate__fadeIn animate__delay-1s">
             <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
             <ul class="space-y-2">
@@ -708,36 +654,31 @@
                   href="#"
                   onclick="showPage('home')"
                   class="text-gray-400 hover:text-white transition-all duration-300"
-                  >Home</a
-                >
+                >Home</a>
               </li>
               <li>
                 <a
                   href="#"
                   onclick="showPage('menu')"
                   class="text-gray-400 hover:text-white transition-all duration-300"
-                  >Menu</a
-                >
+                >Menu</a>
               </li>
               <li>
                 <a
                   href="#"
                   onclick="showPage('booking')"
                   class="text-gray-400 hover:text-white transition-all duration-300"
-                  >Reservations</a
-                >
+                >Reservations</a>
               </li>
               <li>
                 <a
                   href="#"
                   onclick="showPage('order')"
                   class="text-gray-400 hover:text-white transition-all duration-300"
-                  >Order Online</a
-                >
+                >Order Online</a>
               </li>
             </ul>
           </div>
-
           <div class="animate__animated animate__fadeIn animate__delay-2s">
             <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
             <ul class="space-y-2">
@@ -755,7 +696,6 @@
               </li>
             </ul>
           </div>
-
           <div class="animate__animated animate__fadeIn animate__delay-3s">
             <h4 class="text-lg font-semibold mb-4">Opening Hours</h4>
             <ul class="space-y-2">
@@ -774,10 +714,7 @@
             </ul>
           </div>
         </div>
-
-        <div
-          class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500"
-        >
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
           <p>&copy; 2025 DineManager. All rights reserved.</p>
         </div>
       </div>
