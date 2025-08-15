@@ -21,14 +21,15 @@ from backend import settings
 from foods.views import FoodListCreateView
 from django.conf.urls.static import static
 
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+# from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    # path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('users/', include('accounts.urls')), 
     path('foods/', include('foods.urls')),
+    path('table-booking/', include('booking.urls')),
 ]
 
 # Serve media files during development
