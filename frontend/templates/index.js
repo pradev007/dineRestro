@@ -1,3 +1,4 @@
+
 // Global state
 let currentPage = "home";
 let isLoggedIn = false;
@@ -213,6 +214,7 @@ async function loginUser(email, password) {
       password,
     });
 
+    // Check if user is staff or superuser
     if (data.staff || data.superuser) {
       throw new Error("Staff or admin accounts cannot log in here");
     }
@@ -231,11 +233,12 @@ async function loginUser(email, password) {
     );
 
     isLoggedIn = true;
-    isAdmin = false;
+    isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
 
     updateNavbar();
     showToast(`Welcome back, ${data.fullname}!`);
 
+    // Redirect to the previous page if it's not signin/signup, otherwise go to home
     const redirectPage = ["signin", "signup"].includes(currentPage) ? "home" : currentPage;
     showPage(redirectPage);
 
@@ -272,7 +275,7 @@ async function loadCategories() {
 
 async function loadFoodItems() {
   try {
-    const data = await makeRequest(`${baseUrl}foods/list/`, "GET", null, true);
+    const data = await makeRequest(`${baseUrl}foods/foods/`, "GET", null, true);
     return data.map((item) => ({
       ...item,
       is_favorite: item.is_favorite || false,
@@ -354,22 +357,23 @@ function addToCart(id) {
   }
 
   loadFoodItems().then(foods => {
-    const food = foods.find((item) => String(item.id) === String(id));
+    const food = foods.find((item) => String(item.id) === String(id)); // Coerce to string for comparison
     if (!food) {
       showToast("Item not found", "error");
       return;
     }
 
+    // Check if item already exists in cart
     const existingItem = cart.find((item) => String(item.id) === String(id));
     if (existingItem) {
-      existingItem.quantity = (existingItem.quantity || 1) + 1;
+      existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
       showToast(`${food.name} quantity updated in cart!`, "success");
     } else {
-      cart.push({ ...food, quantity: 1 });
+      cart.push({ ...food, quantity: 1 }); // Add new item with quantity 1
       showToast(`${food.name} added to cart!`, "success");
     }
 
-    saveCartToStorage();
+    saveCartToStorage(); // Save cart to localStorage
     updateCartCount();
     updateCartDisplay();
   });
@@ -378,13 +382,13 @@ function addToCart(id) {
 function removeFromCart(index) {
   const item = cart[index];
   if (item.quantity > 1) {
-    item.quantity -= 1;
+    item.quantity -= 1; // Decrement quantity
     showToast(`${item.name} quantity reduced in cart`, "success");
   } else {
-    cart.splice(index, 1);
+    cart.splice(index, 1); // Remove item if quantity is 1
     showToast(`${item.name} removed from cart`, "success");
   }
-  saveCartToStorage();
+  saveCartToStorage(); // Save updated cart
   updateCartCount();
   updateCartDisplay();
 }
@@ -392,7 +396,7 @@ function removeFromCart(index) {
 function updateCartCount() {
   const cartCount = document.getElementById("cart-count");
   const mobileCartCount = document.getElementById("mobile-cart-count");
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
   if (cartCount) {
     cartCount.textContent = totalItems;
     cartCount.classList.toggle("hidden", totalItems === 0);
@@ -464,39 +468,19 @@ function placeOrder() {
     return;
   }
 
-  const orderType = document.querySelector('input[name="order-type"]:checked')?.value;
+  const orderType = document.querySelector('input[name="payment"]:checked')?.id === "delivery-btn" ? "delivery" : "pickup";
   const deliveryAddress = document.getElementById("delivery-address")?.value;
-  const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
-  const instructions = document.getElementById("instructions")?.value || "";
-
-  if (!orderType) {
-    showToast("Please select an order type", "error");
-    return;
-  }
 
   if (orderType === "delivery" && !deliveryAddress) {
     showToast("Please enter a delivery address", "error");
     return;
   }
 
-  if (!paymentMethod) {
-    showToast("Please select a payment method", "error");
-    return;
-  }
-
-  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const deliveryFee = orderType === "delivery" ? 2.99 : 0;
-  const total = (subtotal + deliveryFee).toFixed(2);
-
   const orderDetails = {
     items: cart,
-    subtotal: subtotal.toFixed(2),
-    deliveryFee: deliveryFee.toFixed(2),
-    total,
+    total: (cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0) + (orderType === "delivery" ? 2.99 : 0)).toFixed(2),
     type: orderType,
     address: orderType === "delivery" ? deliveryAddress : "Pickup at Cafe",
-    paymentMethod,
-    instructions,
   };
 
   document.getElementById("booking-details").innerHTML = `
@@ -511,16 +495,6 @@ function placeOrder() {
           <span class="font-medium">${orderDetails.address}</span>
         </div>
       ` : ""}
-      <div class="flex justify-between">
-        <span class="text-gray-600">Payment Method:</span>
-        <span class="font-medium">${orderDetails.paymentMethod === "cash-on-delivery" ? "Cash on Delivery" : "Credit/Debit Card"}</span>
-      </div>
-      ${instructions ? `
-        <div class="flex flex-col">
-          <span class="text-gray-600">Special Instructions:</span>
-          <span class="font-medium">${instructions}</span>
-        </div>
-      ` : ""}
       <div class="border-t border-gray-200 my-2"></div>
       <div>
         <p class="text-gray-600 mb-1">Items:</p>
@@ -530,16 +504,8 @@ function placeOrder() {
       </div>
       <div class="border-t border-gray-200 my-2"></div>
       <div class="flex justify-between">
-        <span class="text-gray-600">Subtotal:</span>
-        <span class="font-medium">$${orderDetails.subtotal}</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="text-gray-600">Delivery Fee:</span>
-        <span class="font-medium">$${orderDetails.deliveryFee}</span>
-      </div>
-      <div class="flex justify-between text-lg font-bold">
-        <span>Total:</span>
-        <span class="text-green-600">$${orderDetails.total}</span>
+        <span class="text-gray-600">Total:</span>
+        <span class="text-green-600 font-bold">$${orderDetails.total}</span>
       </div>
       <p class="text-sm text-gray-500 mt-2">Scan the QR code to complete your order payment</p>
     </div>
@@ -552,15 +518,10 @@ function completePayment() {
   document.getElementById("payment-modal").classList.add("hidden");
   showToast("Payment completed successfully! Your order is confirmed.", "success");
   cart = [];
-  saveCartToStorage();
+  saveCartToStorage(); // Save empty cart
   if (document.getElementById("delivery-address")) {
     document.getElementById("delivery-address").value = "";
   }
-  if (document.getElementById("instructions")) {
-    document.getElementById("instructions").value = "";
-  }
-  document.querySelector('input[name="order-type"][value="delivery"]').checked = true;
-  selectOrderType("delivery");
   updateCartCount();
   updateCartDisplay();
   showPage("home");
@@ -617,7 +578,7 @@ async function renderHomePage() {
 
       <!-- Popular Dishes -->
       <section class="animate__animated animate__fadeIn">
-        <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Popular Dishes</h2>
+      <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Popular Dishes</h2>
         ${popularItems.length === 0 ? `
           <div class="text-center py-12">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
@@ -987,27 +948,24 @@ async function renderFavouritesPage() {
 async function renderOrderPage() {
   const foods = await loadFoodItems();
   const popularItems = foods.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 2);
-  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0).toFixed(2);
-  const deliveryFee = 2.99;
-  const total = (parseFloat(subtotal) + deliveryFee).toFixed(2);
 
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
     <div class="space-y-8 animate__animated animate__fadeIn">
       <!-- Order Header -->
       <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
-        <h1 class="text-4xl font-bold mb-4">Your Order</h1>
-        <p class="text-xl max-w-2xl mx-auto">Review your items and place your order</p>
+        <h1 class="text-4xl font-bold mb-4">Order Online</h1>
+        <p class="text-xl max-w-2xl mx-auto">Enjoy our delicious food from the comfort of your home</p>
       </div>
 
       <!-- Order Content -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Cart Items (Left) -->
+        <!-- Cart Section -->
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6">
-          <h2 class="text-2xl font-bold mb-6 flex items-center">
-            <i class="fas fa-shopping-cart text-green-600 mr-2"></i> Your Cart
+          <h2 class="text-2xl font-semibold mb-6 flex items-center">
+            <i class="fas fa-shopping-cart text-green-600 mr-2"></i> Your Order
           </h2>
-          <div id="cart-items">
+          <div id="cart-items" class="mb-6">
             ${cart.length === 0 ? `
               <div class="text-center py-12">
                 <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
@@ -1022,7 +980,7 @@ async function renderOrderPage() {
                   ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />` : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`}
                   <div>
                     <h3 class="font-medium">${item.name}</h3>
-                    <p class="text-green-600 font-bold">$${item.price.toFixed(2)} x ${item.quantity || 1}</p>
+                    <p class="text-green-600 font-bold">$${item.price.toFixed(2)}</p>
                   </div>
                 </div>
                 <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
@@ -1031,101 +989,124 @@ async function renderOrderPage() {
               </div>
             `).join("")}
           </div>
+          ${cart.length > 0 ? `
+            <div class="border-t border-gray-200 pt-4 mb-6">
+              <div class="flex justify-between mb-2">
+                <span class="text-gray-600">Subtotal:</span>
+                <span class="font-medium">$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</span>
+              </div>
+              <div class="flex justify-between mb-2">
+                <span class="text-gray-600">Delivery Fee:</span>
+                <span class="font-medium">$2.99</span>
+              </div>
+              <div class="flex justify-between text-lg font-bold mt-4">
+                <span>Total:</span>
+                <span class="text-green-600">${(cart.reduce((sum, item) => sum + item.price, 0) + 2.99).toFixed(2)}</span>
+              </div>
+            </div>
+          ` : ""}
         </div>
 
-        <!-- Order Summary (Right) -->
+        <!-- Order Details Section -->
         <div class="bg-white rounded-2xl shadow-xl p-6">
-          <h2 class="text-2xl font-bold mb-6 flex items-center">
-            <i class="fas fa-receipt text-green-600 mr-2"></i> Order Summary
+          <h2 class="text-2xl font-semibold mb-6 flex items-center">
+            <i class="fas fa-info-circle text-green-600 mr-2"></i> Order Details
           </h2>
-          <div class="space-y-4">
-            <div class="flex justify-between">
-              <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium">$${subtotal}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Delivery Fee</span>
-              <span id="delivery-fee" class="font-medium">$2.99</span>
-            </div>
-            <div class="border-t border-gray-200 my-2"></div>
-            <div class="flex justify-between">
-              <span class="text-gray-600 font-bold">Total</span>
-              <span id="order-total" class="text-green-600 font-bold">$${total}</span>
-            </div>
-            <div class="mt-6">
-              <h3 class="text-lg font-semibold mb-2">Order Type</h3>
-              <div class="flex gap-4 mb-4">
-                <label class="flex items-center cursor-pointer">
-                  <input type="radio" name="order-type" value="delivery" checked class="input-field mr-2" onchange="selectOrderType('delivery')">
-                  <span>Delivery</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                  <input type="radio" name="order-type" value="pickup" class="input-field mr-2" onchange="selectOrderType('pickup')">
-                  <span>Pickup</span>
-                </label>
+          <div class="space-y-6">
+            <!-- Order Type -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Order Type</label>
+              <div class="grid grid-cols-2 gap-3">
+                <button id="pickup-btn" class="py-3 px-4 border rounded-lg font-medium flex items-center justify-center transition-all duration-300 bg-green-50 border-green-500 text-green-600" onclick="selectOrderType('pickup')">
+                  <i class="fas fa-store mr-2"></i> Pickup
+                </button>
+                <button id="delivery-btn" class="py-3 px-4 border rounded-lg font-medium flex items-center justify-center transition-all duration-300 border-gray-300 hover:border-green-300" onclick="selectOrderType('delivery')">
+                  <i class="fas fa-motorcycle mr-2"></i> Delivery
+                </button>
               </div>
-              <div id="delivery-address-container">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
-                <input type="text" id="delivery-address" placeholder="Enter your address" class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
-              </div>
-              <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                <div class="space-y-3">
-                  <div class="flex items-center p-3 border border-gray-300 rounded-lg">
-                    <input type="radio" id="cash-on-delivery" name="payment" value="cash-on-delivery" class="h-4 w-4 text-green-600 focus:ring-green-500" checked />
-                    <label for="cash-on-delivery" class="ml-3 flex items-center">
-                      <i class="fas fa-money-bill-wave text-gray-500 mr-2"></i>
-                      <span>Cash on Delivery</span>
-                    </label>
-                  </div>
-                  <div class="flex items-center p-3 border border-gray-300 rounded-lg">
-                    <input type="radio" id="credit-card" name="payment" value="credit-card" class="h-4 w-4 text-green-600 focus:ring-green-500" />
-                    <label for="credit-card" class="ml-3 flex items-center">
-                      <i class="fas fa-credit-card text-gray-500 mr-2"></i>
-                      <span>Credit/Debit Card</span>
-                    </label>
-                  </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div id="delivery-address-container" class="hidden">
+              <label for="delivery-address" class="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
+              <input type="text" id="delivery-address" placeholder="Enter your full address"
+                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
+            </div>
+
+            <!-- Payment Method -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+              <div class="space-y-3">
+                <div class="flex items-center p-3 border border-gray-300 rounded-lg">
+                  <input type="radio" id="cash-on-delivery" name="payment" class="h-4 w-4 text-green-600 focus:ring-green-500" checked />
+                  <label for="cash-on-delivery" class="ml-3 flex items-center">
+                    <i class="fas fa-money-bill-wave text-gray-500 mr-2"></i>
+                    <span>Cash on Delivery</span>
+                  </label>
+                </div>
+                <div class="flex items-center p-3 border border-gray-300 rounded-lg">
+                  <input type="radio" id="credit-card" name="payment" class="h-4 w-4 text-green-600 focus:ring-green-500" />
+                  <label for="credit-card" class="ml-3 flex items-center">
+                    <i class="fas fa-credit-card text-gray-500 mr-2"></i>
+                    <span>Credit/Debit Card</span>
+                  </label>
                 </div>
               </div>
-              <div class="mt-4">
-                <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
-                <textarea id="instructions" rows="3" placeholder="Any special requests or dietary restrictions" class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"></textarea>
-              </div>
             </div>
-            <button onclick="placeOrder()" class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 mt-6 ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}" ${cart.length === 0 ? "disabled" : ""}>
-              <i class="fas fa-check-circle mr-2"></i> Place Order
+
+            <!-- Special Instructions -->
+            <div>
+              <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+              <textarea id="instructions" rows="3" placeholder="Any special requests or dietary restrictions"
+                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"></textarea>
+            </div>
+
+            <!-- Place Order Button -->
+            <button onclick="placeOrder()"
+              class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}"
+              ${cart.length === 0 ? "disabled" : ""}>
+              <i class="fas fa-shopping-bag mr-2"></i> Place Order
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Popular Items -->
+      <!-- Quick Order Section -->
       <div class="bg-white rounded-2xl shadow-xl p-6">
-        <h2 class="text-2xl font-bold mb-6 flex items-center">
-          <i class="fas fa-star text-yellow-500 mr-2"></i> Popular Items
+        <h2 class="text-2xl font-semibold mb-6 flex items-center">
+          <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Order
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          ${popularItems.map(food => `
-            <div class="food-card bg-gray-50 rounded-xl overflow-hidden relative">
-              <div class="absolute top-4 right-4 z-10">
-                <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
-                  <i class="fas fa-heart"></i>
-                </button>
-              </div>
-              ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />` : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
-              <div class="p-5">
-                <div class="flex justify-between items-start mb-2">
-                  <h3 class="text-xl font-semibold">${food.name}</h3>
-                  <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+        <p class="text-gray-600 mb-6">Select popular items to add to your cart</p>
+        ${popularItems.length === 0 ? `
+          <div class="text-center py-12">
+            <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600">No popular items found</h3>
+            <p class="text-gray-500">Please try again later or contact support.</p>
+          </div>
+        ` : `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            ${popularItems.map(food => `
+              <div class="food-card bg-white rounded-xl overflow-hidden relative shadow-md">
+                <div class="absolute top-4 right-4 z-10">
+                  <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                    <i class="fas fa-heart"></i>
+                  </button>
                 </div>
-                <p class="text-gray-600 text-sm mb-4">${food.description || "No description available"}</p>
-                <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
-                  <i class="fas fa-plus mr-2"></i> Add to Cart
-                </button>
+                ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />` : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                <div class="p-5">
+                  <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-semibold">${food.name}</h3>
+                    <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+                  </div>
+                  <p class="text-gray-600 text-sm mb-4">${food.description}</p>
+                  <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i> Add to Cart
+                  </button>
+                </div>
               </div>
-            </div>
-          `).join("")}
-        </div>
+            `).join("")}
+          </div>
+        `}
       </div>
     </div>
   `;
@@ -1310,19 +1291,27 @@ function renderSignUpPage() {
   `;
 }
 
+
+
 // Helper functions
 function selectOrderType(type) {
-  const deliveryFeeElement = document.getElementById("delivery-fee");
-  const orderTotalElement = document.getElementById("order-total");
+  const pickupBtn = document.getElementById("pickup-btn");
+  const deliveryBtn = document.getElementById("delivery-btn");
   const deliveryAddressContainer = document.getElementById("delivery-address-container");
-  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0).toFixed(2);
-  const deliveryFee = type === "delivery" ? 2.99 : 0;
-  const total = (parseFloat(subtotal) + deliveryFee).toFixed(2);
 
-  deliveryFeeElement.textContent = `$${deliveryFee.toFixed(2)}`;
-  orderTotalElement.textContent = `$${total}`;
-  deliveryAddressContainer.classList.toggle("hidden", type === "pickup");
-  document.getElementById("delivery-address").required = type === "delivery";
+  if (type === "pickup") {
+    pickupBtn.classList.add("bg-green-50", "border-green-500", "text-green-600");
+    pickupBtn.classList.remove("border-gray-300", "hover:border-green-300");
+    deliveryBtn.classList.remove("bg-green-50", "border-green-500", "text-green-600");
+    deliveryBtn.classList.add("border-gray-300", "hover:border-green-300");
+    deliveryAddressContainer.classList.add("hidden");
+  } else {
+    deliveryBtn.classList.add("bg-green-50", "border-green-500", "text-green-600");
+    deliveryBtn.classList.remove("border-gray-300", "hover:border-green-300");
+    pickupBtn.classList.remove("bg-green-50", "border-green-500", "text-green-600");
+    pickupBtn.classList.add("border-gray-300", "hover:border-green-300");
+    deliveryAddressContainer.classList.remove("hidden");
+  }
 }
 
 function updateBookingDetails(key, value) {
@@ -1349,6 +1338,8 @@ function buyNow(id) {
   addToCart(id);
   showPage("order");
 }
+
+
 
 function togglePasswordVisibility(id) {
   const input = document.getElementById(id);
@@ -1381,9 +1372,10 @@ async function signIn() {
     errorText.textContent = "Invalid credentials or staff/admin accounts are not allowed";
     errorDiv.classList.remove("hidden");
   } else {
-    errorDiv.classList.add("hidden");
+    errorDiv.classList.add("hidden"); // Hide error on successful login
   }
 }
+
 
 async function signUp() {
   const fullname = document.getElementById("signup-fullname").value.trim();
@@ -1476,7 +1468,7 @@ function updateNavbar() {
         <div class="relative">
           <a href="#" onclick="showPage('order')" class="text-gray-600 hover:text-green-600">
             <i class="fas fa-shopping-cart text-xl"></i>
-            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${cart.length === 0 ? "hidden" : ""}">${cart.reduce((sum, item) => sum + (item.quantity || 1), 0)}</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${cart.length === 0 ? "hidden" : ""}">${cart.length}</span>
           </a>
         </div>
       </div>
