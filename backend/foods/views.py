@@ -9,20 +9,20 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = FoodCategories.objects.all()
     serializer_class = FoodCategoriesSerializer
    
-    # permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
 
 # Create your views here.
 class FoodListCreateView(generics.ListCreateAPIView):
     queryset = FoodModel.objects.all()
     serializer_class = FoodSerializer
-    # permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
 class CategoryRetrieveView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FoodCategories.objects.all()
     serializer_class = FoodCategoriesSerializer
     lookup_field = 'pk'
-    # permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def get_object(self):
         try:

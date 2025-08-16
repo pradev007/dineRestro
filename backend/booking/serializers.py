@@ -50,4 +50,9 @@ class BookingSerializer(serializers.ModelSerializer):
         table = validated_data.get('table')
         validated_data['guest_number'] = table.seats
         validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
+        booking = super().create(validated_data)
+         # Mark table as unavailable
+        table.is_available = False
+        table.save()
+
+        return booking

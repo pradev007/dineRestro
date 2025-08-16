@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 class TableModel(models.Model):
     table_number = models.PositiveIntegerField(unique=True)
     seats = models.PositiveIntegerField()
+    is_available = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.table_number)
@@ -27,3 +28,7 @@ class BookingModel(models.Model):
         # automatically set guest_number based on table
         self.guest_number = self.table.seats
         super().save(*args, **kwargs)
+
+        # set table unavailable when booked
+        self.table.is_available = False
+        self.table.save()
