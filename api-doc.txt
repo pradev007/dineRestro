@@ -1,0 +1,249 @@
+# DineRestro / MemberSathi API Documentation (Without Celery)
+
+## 1️⃣ Events
+
+| Endpoint                | Method    | Role  | Description                   |
+| ----------------------- | --------- | ----- | ----------------------------- |
+| `/events/list/`         | GET       | User  | List all events               |
+| `/events/details/<pk>/` | GET       | User  | Retrieve a single event by ID |
+| `/events/create/`       | POST      | Admin | Create a new event            |
+| `/events/update/<pk>/`  | PUT/PATCH | Admin | Update an existing event      |
+| `/events/delete/<pk>/`  | DELETE    | Admin | Delete an event               |
+
+---
+
+## 2️⃣ Tables & Bookings
+
+### Tables
+
+| Endpoint              | Method           | Role  | Description                                                                 |
+| --------------------- | ---------------- | ----- | --------------------------------------------------------------------------- |
+| `/tables/`            | GET              | User  | List all available tables (availability dynamically determined by bookings) |
+| `/tables/admin/`      | GET/POST         | Admin | Admin: list/create tables                                                   |
+| `/tables/admin/<pk>/` | PUT/PATCH/DELETE | Admin | Admin: update or delete a table                                             |
+
+### Bookings
+
+| Endpoint                | Method           | Role  | Description                                                           |
+| ----------------------- | ---------------- | ----- | --------------------------------------------------------------------- |
+| `/bookings/`            | GET              | User  | List own bookings                                                     |
+| `/bookings/create/`     | POST             | User  | Create a booking; table marked unavailable based on booking date/time |
+| `/bookings/admin/`      | GET/POST         | Admin | Admin: list/create bookings                                           |
+| `/bookings/admin/<pk>/` | PUT/PATCH/DELETE | Admin | Admin: update or delete bookings                                      |
+
+**Table Booking Logic:**
+
+* When a booking exists for a table at a certain date/time, it is considered unavailable.
+* Table availability is calculated dynamically on request (no Celery tasks).
+
+---
+
+## 3️⃣ Food & Food Categories
+
+### Food Categories
+
+| Endpoint                  | Method           | Role  | Description                   |
+| ------------------------- | ---------------- | ----- | ----------------------------- |
+| `/categories/`            | GET              | User  | List all food categories      |
+| `/categories/<pk>/`       | GET              | User  | Retrieve a category by ID     |
+| `/categories/admin/`      | GET/POST         | Admin | Admin: list/create categories |
+| `/categories/admin/<pk>/` | PUT/PATCH/DELETE | Admin | Admin: update/delete category |
+
+### Food Items
+
+| Endpoint             | Method           | Role  | Description                     |
+| -------------------- | ---------------- | ----- | ------------------------------- |
+| `/foods/`            | GET              | User  | List all food items             |
+| `/foods/<pk>/`       | GET              | User  | Retrieve a food item by ID      |
+| `/foods/admin/`      | GET/POST         | Admin | Admin: list/create food items   |
+| `/foods/admin/<pk>/` | PUT/PATCH/DELETE | Admin | Admin: update/delete food items |
+
+---
+
+## 4️⃣ Authentication & Permissions
+
+| Role      | Permissions                                                                        |
+| --------- | ---------------------------------------------------------------------------------- |
+| **Admin** | `IsAdminUser` → can CRUD events, tables, bookings, categories, and food            |
+| **User**  | `AllowAny` → read-only endpoints; `IsAuthenticated` required for creating bookings |
+
+
+
+
+
+# DineRestro / MemberSathi API Examples
+
+This document contains **all APIs with example POST request bodies, GET responses**, and **localhost URLs**.
+
+---
+
+## 1️⃣ Events
+
+### **Create Event**
+
+* **POST** `http://127.0.0.1:8000/events/create/`
+  **Request Body:**
+
+```json
+{
+  "event_name": "Music Night",
+  "descriptions": "A fun live concert.",
+  "is_happening": true,
+  "image": null
+}
+```
+
+### **List Events**
+
+* **GET** `http://127.0.0.1:8000/events/list/`
+  **Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "event_name": "Music Night",
+    "descriptions": "A fun live concert.",
+    "is_happening": true,
+    "event_date": "2025-08-16T06:27:03Z",
+    "image": null
+  }
+]
+```
+
+### **Retrieve Single Event**
+
+* **GET** `http://127.0.0.1:8000/events/details/<pk>/`
+  **Response:**
+
+```json
+{
+  "id": 1,
+  "event_name": "Music Night",
+  "descriptions": "A fun live concert.",
+  "is_happening": true,
+  "event_date": "2025-08-16T06:27:03Z",
+  "image": null
+}
+```
+
+---
+
+## 2️⃣ Tables & Bookings
+
+### **List Tables**
+
+* **GET** `http://127.0.0.1:8000/tables/`
+  **Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "table_number": 1,
+    "seats": 4,
+    "is_available": true
+  },
+  {
+    "id": 2,
+    "table_number": 2,
+    "seats": 6,
+    "is_available": false
+  }
+]
+```
+
+### **Create Booking**
+
+* **POST** `http://127.0.0.1:8000/bookings/create/`
+  **Request Body:**
+
+```json
+{
+  "table": 1,
+  "booking_date": "2025-08-16",
+  "booking_time": "18:30:00"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": 1,
+  "table": 1,
+  "user": 5,
+  "booking_date": "2025-08-16",
+  "booking_time": "18:30:00",
+  "guest_number": 4,
+  "created_at": "2025-08-16T06:40:00Z"
+}
+```
+
+---
+
+## 3️⃣ Food Categories
+
+### **Create Category**
+
+* **POST** `http://127.0.0.1:8000/categories/admin/`
+  **Request Body:**
+
+```json
+{
+  "name": "Appetizers",
+  "description": "Starters and small dishes"
+}
+```
+
+**Response (GET)** `http://127.0.0.1:8000/categories/` **or** `http://127.0.0.1:8000/categories/<pk>/`
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Appetizers",
+    "description": "Starters and small dishes"
+  }
+]
+```
+
+---
+
+## 4️⃣ Food Items
+
+### **Create Food**
+
+* **POST** `http://127.0.0.1:8000/foods/admin/`
+  **Request Body:**
+
+```json
+{
+  "name": "French Fries",
+  "price": 4.99,
+  "image": null,
+  "description": "Crispy fried potatoes",
+  "ingredients": "Potatoes, Oil, Salt",
+  "category_id": 1
+}
+```
+
+**Response (GET)** `http://127.0.0.1:8000/foods/` **or** `http://127.0.0.1:8000/foods/<pk>/`
+
+```json
+[
+  {
+    "id": 1,
+    "name": "French Fries",
+    "price": 4.99,
+    "image": null,
+    "description": "Crispy fried potatoes",
+    "ingredients": "Potatoes, Oil, Salt",
+    "category": {
+      "id": 1,
+      "name": "Appetizers",
+      "description": "Starters and small dishes"
+    }
+  }
+]
+```

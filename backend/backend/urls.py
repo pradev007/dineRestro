@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from backend import settings
-from foods.views import FoodListCreateView
+# from foods.views import FoodListCreateView
 from django.conf.urls.static import static
 
 # from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView

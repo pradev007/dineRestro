@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class EventsModel(models.Model):
-    event_name = models.CharField(max_length=50)
+    event_name = models.CharField(max_length=50, unique= True)
     descriptions = models.TextField(max_length=255)
     is_happening = models.BooleanField(default=False)
     event_date = models.DateTimeField(auto_now_add=True)
