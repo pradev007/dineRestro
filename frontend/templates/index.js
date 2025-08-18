@@ -6,134 +6,126 @@ let selectedCategory = "all";
 let selectedTable = null;
 let bookingDetails = { date: "", time: "", guests: 2, table: "" };
 let cart = [];
-const baseUrl = "https://dinerestro-ycpq.onrender.com/admin/";
+const baseUrl = "https://dinerestro.onrender.com/";
 
 // Booking pricing structure
 const bookingPrices = {
-  1: 200,
-  2: 300,
-  3: 400,
-  4: 500,
-  5: 600,
-  6: 700,
-  7: 800,
-  8: 800,
+    1: 200,
+    2: 300,
+    3: 400,
+    4: 500,
+    5: 600,
+    6: 700,
+    7: 800,
+    8: 800,
 };
 
 // Static data for events, discounts, and staff
-const events = [
-  {
-    id: 1,
-    type: "current",
-    name: "Live Music Night",
-    date: "August 12, 2025",
-    description: "Enjoy live jazz with local artists tonight!",
-    image:
-      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    id: 2,
-    type: "upcoming",
-    name: "Coffee Tasting Workshop",
-    date: "August 20, 2025",
-    description: "Learn about coffee origins and brewing techniques.",
-    image:
-      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-  },
+const events = [{
+        id: 1,
+        type: "current",
+        name: "Live Music Night",
+        date: "August 12, 2025",
+        description: "Enjoy live jazz with local artists tonight!",
+        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    },
+    {
+        id: 2,
+        type: "upcoming",
+        name: "Coffee Tasting Workshop",
+        date: "August 20, 2025",
+        description: "Learn about coffee origins and brewing techniques.",
+        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    },
 ];
 
-const discounts = [
-  {
-    occasion: "National Coffee Day",
-    date: "September 29, 2025",
-    offer: "50% off all coffee drinks",
-  },
-  {
-    occasion: "Cafe Anniversary",
-    date: "October 10, 2025",
-    offer: "Buy one dessert, get one free",
-  },
-  {
-    occasion: "Halloween Special",
-    date: "October 31, 2025",
-    offer: "20% off all spooky-themed drinks",
-  },
-  {
-    occasion: "Thanksgiving Week",
-    date: "November 24-30, 2025",
-    offer: "Free dessert with any main course",
-  },
-  {
-    occasion: "Christmas Celebration",
-    date: "December 20-25, 2025",
-    offer: "25% off all festive drinks and desserts",
-  },
-  {
-    occasion: "New Year Countdown",
-    date: "December 31, 2025",
-    offer: "Free champagne toast with any meal",
-  },
+const discounts = [{
+        occasion: "National Coffee Day",
+        date: "September 29, 2025",
+        offer: "50% off all coffee drinks",
+    },
+    {
+        occasion: "Cafe Anniversary",
+        date: "October 10, 2025",
+        offer: "Buy one dessert, get one free",
+    },
+    {
+        occasion: "Halloween Special",
+        date: "October 31, 2025",
+        offer: "20% off all spooky-themed drinks",
+    },
+    {
+        occasion: "Thanksgiving Week",
+        date: "November 24-30, 2025",
+        offer: "Free dessert with any main course",
+    },
+    {
+        occasion: "Christmas Celebration",
+        date: "December 20-25, 2025",
+        offer: "25% off all festive drinks and desserts",
+    },
+    {
+        occasion: "New Year Countdown",
+        date: "December 31, 2025",
+        offer: "Free champagne toast with any meal",
+    },
 ];
 
-const staff = [
-  {
-    name: "Chef Anna",
-    role: "Head Chef",
-    bio: "Anna brings 10 years of culinary expertise to our signature dishes.",
-    image:
-      "https://images.unsplash.com/photo-1583394293214-28ded15f4d90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    name: "Barista Mike",
-    role: "Lead Barista",
-    bio: "Mike's latte art and coffee blends are a guest favorite.",
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d877c6f8f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    name: "Pastry Chef Lisa",
-    role: "Pastry Chef",
-    bio: "Lisa's desserts are a sweet ending to any meal.",
-    image:
-      "https://images.unsplash.com/photo-1589927986089-358123789b8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-  },
+const staff = [{
+        name: "Chef Anna",
+        role: "Head Chef",
+        bio: "Anna brings 10 years of culinary expertise to our signature dishes.",
+        image: "https://images.unsplash.com/photo-1583394293214-28ded15f4d90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    },
+    {
+        name: "Barista Mike",
+        role: "Lead Barista",
+        bio: "Mike's latte art and coffee blends are a guest favorite.",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d877c6f8f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    },
+    {
+        name: "Pastry Chef Lisa",
+        role: "Pastry Chef",
+        bio: "Lisa's desserts are a sweet ending to any meal.",
+        image: "https://images.unsplash.com/photo-1589927986089-358123789b8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+    },
 ];
 
 // Utility functions
 function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-  }
-  return cookieValue;
+    return cookieValue;
 }
 
 function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        const r = (Math.random() * 16) | 0,
+            v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }
 
 function showToast(message, type = "success") {
-  const toastContainer = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-  toast.className = `toast flex items-center p-2 y-20 rounded-lg shadow-lg bg-green-400 ${
+    const toastContainer = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast flex items-center p-2 y-20 rounded-lg shadow-lg bg-green-400 ${
     type === "success"
       ? "bg-green-600"
       : type === "error"
       ? "bg-red-600"
       : "bg-blue-600"
   } text-white opacity-0 transform translate-x-8`;
-  toast.innerHTML = `
+    toast.innerHTML = `
     <i class="fas ${
       type === "success"
         ? "fa-check-circle"
@@ -143,293 +135,292 @@ function showToast(message, type = "success") {
     } mr-2"></i>
     <span>${message}</span>
   `;
-  toastContainer.appendChild(toast);
+    toastContainer.appendChild(toast);
 
-  setTimeout(() => {
-    toast.classList.remove("translate-x-8");
-    toast.classList.add("opacity-100");
-  }, 10);
+    setTimeout(() => {
+        toast.classList.remove("translate-x-8");
+        toast.classList.add("opacity-100");
+    }, 10);
 
-  setTimeout(() => {
-    toast.classList.add("translate-x-8");
-    toast.classList.remove("opacity-100");
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+    setTimeout(() => {
+        toast.classList.add("translate-x-8");
+        toast.classList.remove("opacity-100");
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
 }
 
 // API functions
 async function makeRequest(url, method, body = null, requiresAuth = false) {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+    const headers = {
+        "Content-Type": "application/json",
+    };
 
-  if (requiresAuth && localStorage.getItem("accessToken")) {
-    headers["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
-  }
-
-  const options = {
-    method,
-    headers,
-  };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.detail || "Something went wrong");
+    if (requiresAuth && localStorage.getItem("accessToken")) {
+        headers["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
     }
 
-    return data;
-  } catch (error) {
-    console.error("API Error:", error);
-    showToast(error.message || "API request failed", "error");
-    throw error;
-  }
+    const options = {
+        method,
+        headers,
+    };
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Something went wrong");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("API Error:", error);
+        showToast(error.message || "API request failed", "error");
+        throw error;
+    }
 }
 
 async function registerUser(email, password, fullname) {
-  try {
-    const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
-      email,
-      password,
-      fullname,
-    });
-    showToast(data.message || "Registration successful");
-    return data;
-  } catch (error) {
-    return null;
-  }
+    try {
+        const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
+            email,
+            password,
+            fullname,
+        });
+        showToast(data.message || "Registration successful");
+        return data;
+    } catch (error) {
+        return null;
+    }
 }
 
 async function loginUser(email, password) {
-  try {
-    const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
-      email,
-      password,
-    });
+    try {
+        const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
+            email,
+            password,
+        });
 
-    // Check if user is staff or superuser
-    if (data.staff || data.superuser) {
-      throw new Error("Staff or admin accounts cannot log in here");
+        // Check if user is staff or superuser
+        if (data.staff || data.superuser) {
+            throw new Error("Staff or admin accounts cannot log in here");
+        }
+
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+        localStorage.setItem(
+            "userData",
+            JSON.stringify({
+                email: data.email,
+                fullname: data.fullname,
+                staff: data.staff,
+                active: data.active,
+                superuser: data.superuser,
+            })
+        );
+
+        isLoggedIn = true;
+        isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
+
+        updateNavbar();
+        showToast(`Welcome back, ${data.fullname}!`);
+
+        // Redirect to the previous page if it's not signin/signup, otherwise go to home
+        const redirectPage = ["signin", "signup"].includes(currentPage) ?
+            "home" :
+            currentPage;
+        showPage(redirectPage);
+
+        return data;
+    } catch (error) {
+        console.error("Login error:", error);
+        showToast(error.message || "Login failed", "error");
+        return null;
     }
-
-    localStorage.setItem("accessToken", data.access);
-    localStorage.setItem("refreshToken", data.refresh);
-    localStorage.setItem(
-      "userData",
-      JSON.stringify({
-        email: data.email,
-        fullname: data.fullname,
-        staff: data.staff,
-        active: data.active,
-        superuser: data.superuser,
-      })
-    );
-
-    isLoggedIn = true;
-    isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
-
-    updateNavbar();
-    showToast(`Welcome back, ${data.fullname}!`);
-
-    // Redirect to the previous page if it's not signin/signup, otherwise go to home
-    const redirectPage = ["signin", "signup"].includes(currentPage)
-      ? "home"
-      : currentPage;
-    showPage(redirectPage);
-
-    return data;
-  } catch (error) {
-    console.error("Login error:", error);
-    showToast(error.message || "Login failed", "error");
-    return null;
-  }
 }
 
 function logoutUser() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("userData");
-  isLoggedIn = false;
-  isAdmin = false;
-  cart = [];
-  updateNavbar();
-  showToast("Logged out successfully");
-  showPage("home");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData");
+    isLoggedIn = false;
+    isAdmin = false;
+    cart = [];
+    updateNavbar();
+    showToast("Logged out successfully");
+    showPage("home");
 }
 
 async function loadCategories() {
-  try {
-    const data = await makeRequest(
-      `${baseUrl}foods/categories/`,
-      "GET",
-      null,
-      true
-    );
-    return data.filter(
-      (category) =>
-        category.name &&
-        category.name.trim() !== "" &&
-        category.name !== "string"
-    );
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    showToast("Failed to load categories", "error");
-    return [];
-  }
+    try {
+        const data = await makeRequest(
+            `${baseUrl}foods/categories/`,
+            "GET",
+            null,
+            true
+        );
+        return data.filter(
+            (category) =>
+            category.name &&
+            category.name.trim() !== "" &&
+            category.name !== "string"
+        );
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        showToast("Failed to load categories", "error");
+        return [];
+    }
 }
 
 async function loadFoodItems() {
-  try {
-    const data = await makeRequest(`${baseUrl}foods/foods/`, "GET", null, true);
-    return data.map((item) => ({
-      ...item,
-      is_favorite: item.is_favorite || false,
-      image: item.image && item.image.startsWith("http") ? item.image : null,
-      ingredients: item.ingredients || [],
-    }));
-  } catch (error) {
-    console.error("Error fetching food items:", error);
-    showToast("Failed to load menu items", "error");
-    return [];
-  }
+    try {
+        const data = await makeRequest(`${baseUrl}foods/foods/`, "GET", null, true);
+        return data.map((item) => ({
+            ...item,
+            is_favorite: item.is_favorite || false,
+            image: item.image && item.image.startsWith("http") ? item.image : null,
+            ingredients: item.ingredients || [],
+        }));
+    } catch (error) {
+        console.error("Error fetching food items:", error);
+        showToast("Failed to load menu items", "error");
+        return [];
+    }
 }
 
 async function toggleFavorite(id, element = null) {
-  try {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      showToast("Please log in to add favorites", "error");
-      showPage("signin");
-      return;
+    try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            showToast("Please log in to add favorites", "error");
+            showPage("signin");
+            return;
+        }
+
+        const response = await fetch(`${baseUrl}foods/favorites/${id}/`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update favorite");
+        }
+
+        const data = await response.json();
+
+        if (element) {
+            const isFavorite = data.is_favorite;
+            if (isFavorite) {
+                element.classList.add("text-red-500");
+                element.classList.remove("text-gray-400");
+            } else {
+                element.classList.add("text-gray-400");
+                element.classList.remove("text-red-500");
+            }
+        }
+
+        showToast(
+            data.is_favorite ? "Added to favorites" : "Removed from favorites"
+        );
+        return data;
+    } catch (error) {
+        console.error("Error toggling favorite:", error);
+        showToast(error.message || "Failed to update favorite", "error");
+        return null;
     }
-
-    const response = await fetch(`${baseUrl}foods/favorites/${id}/`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update favorite");
-    }
-
-    const data = await response.json();
-
-    if (element) {
-      const isFavorite = data.is_favorite;
-      if (isFavorite) {
-        element.classList.add("text-red-500");
-        element.classList.remove("text-gray-400");
-      } else {
-        element.classList.add("text-gray-400");
-        element.classList.remove("text-red-500");
-      }
-    }
-
-    showToast(
-      data.is_favorite ? "Added to favorites" : "Removed from favorites"
-    );
-    return data;
-  } catch (error) {
-    console.error("Error toggling favorite:", error);
-    showToast(error.message || "Failed to update favorite", "error");
-    return null;
-  }
 }
 
 async function addCategory(name) {
-  if (!isAdmin) {
-    showToast("Admin access required to add categories", "error");
-    return null;
-  }
+    if (!isAdmin) {
+        showToast("Admin access required to add categories", "error");
+        return null;
+    }
 
-  try {
-    const data = await makeRequest(
-      `${baseUrl}foods/categories/`,
-      "POST",
-      { name },
-      true
-    );
-    showToast("Category added successfully");
-    return data;
-  } catch (error) {
-    console.error("Error adding category:", error);
-    showToast("Failed to add category", "error");
-    return null;
-  }
+    try {
+        const data = await makeRequest(
+            `${baseUrl}foods/categories/`,
+            "POST", { name },
+            true
+        );
+        showToast("Category added successfully");
+        return data;
+    } catch (error) {
+        console.error("Error adding category:", error);
+        showToast("Failed to add category", "error");
+        return null;
+    }
 }
 
 function addToCart(id) {
-  if (!isLoggedIn) {
-    showToast("Please log in to add items to cart", "error");
-    showPage("signin");
-    return;
-  }
-
-  loadFoodItems().then((foods) => {
-    const food = foods.find((item) => String(item.id) === String(id)); // Coerce to string for comparison
-    if (!food) {
-      showToast("Item not found", "error");
-      return;
+    if (!isLoggedIn) {
+        showToast("Please log in to add items to cart", "error");
+        showPage("signin");
+        return;
     }
 
-    // Check if item already exists in cart
-    const existingItem = cart.find((item) => String(item.id) === String(id));
-    if (existingItem) {
-      existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
-      showToast(`${food.name} quantity updated in cart!`, "success");
-    } else {
-      cart.push({ ...food, quantity: 1 }); // Add new item with quantity 1
-      showToast(`${food.name} added to cart!`, "success");
-    }
+    loadFoodItems().then((foods) => {
+        const food = foods.find((item) => String(item.id) === String(id)); // Coerce to string for comparison
+        if (!food) {
+            showToast("Item not found", "error");
+            return;
+        }
 
-    saveCartToStorage(); // Save cart to localStorage
-    updateCartCount();
-    updateCartDisplay();
-  });
+        // Check if item already exists in cart
+        const existingItem = cart.find((item) => String(item.id) === String(id));
+        if (existingItem) {
+            existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
+            showToast(`${food.name} quantity updated in cart!`, "success");
+        } else {
+            cart.push({...food, quantity: 1 }); // Add new item with quantity 1
+            showToast(`${food.name} added to cart!`, "success");
+        }
+
+        saveCartToStorage(); // Save cart to localStorage
+        updateCartCount();
+        updateCartDisplay();
+    });
 }
 
 function removeFromCart(index) {
-  const item = cart[index];
-  if (item.quantity > 1) {
-    item.quantity -= 1; // Decrement quantity
-    showToast(`${item.name} quantity reduced in cart`, "success");
-  } else {
-    cart.splice(index, 1); // Remove item if quantity is 1
-    showToast(`${item.name} removed from cart`, "success");
-  }
-  saveCartToStorage(); // Save updated cart
-  updateCartCount();
-  updateCartDisplay();
+    const item = cart[index];
+    if (item.quantity > 1) {
+        item.quantity -= 1; // Decrement quantity
+        showToast(`${item.name} quantity reduced in cart`, "success");
+    } else {
+        cart.splice(index, 1); // Remove item if quantity is 1
+        showToast(`${item.name} removed from cart`, "success");
+    }
+    saveCartToStorage(); // Save updated cart
+    updateCartCount();
+    updateCartDisplay();
 }
 
 function updateCartCount() {
-  const cartCount = document.getElementById("cart-count");
-  const mobileCartCount = document.getElementById("mobile-cart-count");
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
-  if (cartCount) {
-    cartCount.textContent = totalItems;
-    cartCount.classList.toggle("hidden", totalItems === 0);
-  }
-  if (mobileCartCount) {
-    mobileCartCount.textContent = totalItems;
-    mobileCartCount.classList.toggle("hidden", totalItems === 0);
-  }
+    const cartCount = document.getElementById("cart-count");
+    const mobileCartCount = document.getElementById("mobile-cart-count");
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
+    if (cartCount) {
+        cartCount.textContent = totalItems;
+        cartCount.classList.toggle("hidden", totalItems === 0);
+    }
+    if (mobileCartCount) {
+        mobileCartCount.textContent = totalItems;
+        mobileCartCount.classList.toggle("hidden", totalItems === 0);
+    }
 }
 
 function updateCartDisplay() {
-  const cartItemsDiv = document.getElementById("cart-items");
-  if (cartItemsDiv) {
-    if (cart.length === 0) {
-      cartItemsDiv.innerHTML = `
+    const cartItemsDiv = document.getElementById("cart-items");
+    if (cartItemsDiv) {
+        if (cart.length === 0) {
+            cartItemsDiv.innerHTML = `
         <div class="text-center py-12">
           <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
           <h3 class="text-xl font-semibold text-gray-500">Your cart is empty</h3>
@@ -438,10 +429,10 @@ function updateCartDisplay() {
           </button>
         </div>
       `;
-    } else {
-      cartItemsDiv.innerHTML = cart
-        .map(
-          (item, index) => `
+        } else {
+            cartItemsDiv.innerHTML = cart
+                .map(
+                    (item, index) => `
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
               <div class="flex items-center">
                 ${

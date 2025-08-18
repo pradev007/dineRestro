@@ -1,382 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DineManager | Modern Restaurant Management</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
     <style>
-      /* Existing styles unchanged */
-      :root {
-        --primary: #10b981;
-        --primary-dark: #025c3f;
-        --secondary: #3b82f6;
-        --dark: #1f2937;
-        --light: #fbf9fb;
-        --accent: #f59e0b;
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: var(--light);
-        color: var(--dark);
-      }
-
-      .navbar {
-        backdrop-filter: blur(10px);
-        background-color: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-      }
-
-      .nav-link {
-        position: relative;
-        transition: all 0.3s ease;
-      }
-
-      .nav-link::after {
-        content: "";
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background-color: var(--primary);
-        transition: width 0.3s ease;
-      }
-
-      .nav-link:hover::after,
-      .nav-link.active::after {
-        width: 100%;
-      }
-
-      .nav-link.active {
-        color: var(--primary);
-        font-weight: 600;
-      }
-
-      .card {
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        overflow: hidden;
-      }
-
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      }
-
-      .food-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .food-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-      }
-
-      .fav-icon {
-        transition: all 0.2s ease;
-      }
-
-      .fav-icon:hover {
-        transform: scale(1.2);
-      }
-
-      .toast {
-        transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
-      }
-
-      .modal-content {
-        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      }
-
-      @keyframes slideIn {
-        from {
-          transform: translateY(-30px);
-          opacity: 0;
+        /* Existing styles unchanged */
+        
+         :root {
+            --primary: #10b981;
+            --primary-dark: #025c3f;
+            --secondary: #3b82f6;
+            --dark: #1f2937;
+            --light: #fbf9fb;
+            --accent: #f59e0b;
         }
-        to {
-          transform: translateY(0);
-          opacity: 1;
+        
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
         }
-      }
-
-      .table-slot {
-        transition: all 0.3s ease;
-      }
-
-      .table-slot:hover {
-        transform: scale(1.05);
-      }
-
-      .hero-section {
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-      }
-
-      .gradient-text {
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      .btn-primary {
-        background: linear-gradient(
-          135deg,
-          var(--primary),
-          var(--primary-dark)
-        );
-        transition: all 0.3s ease;
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
-      }
-
-      .btn-secondary {
-        background: linear-gradient(135deg, var(--secondary), #2563eb);
-        transition: all 0.3s ease;
-      }
-
-      .btn-secondary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
-      }
-
-      .input-field {
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
-      }
-
-      .input-field:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-      }
-
-      .floating-label {
-        position: absolute;
-        top: 50%;
-        left: 1rem;
-        transform: translateY(-50%);
-        transition: all 0.3s ease;
-        pointer-events: none;
-        color: #9ca3af;
-      }
-
-      .input-field:focus + .floating-label,
-      .input-field:not(:placeholder-shown) + .floating-label {
-        top: 0;
-        left: 0.75rem;
-        transform: translateY(-50%) scale(0.85);
-        background-color: white;
-        padding: 0 0.25rem;
-        color: var(--primary);
-      }
-
-      .parallax {
-        background-attachment: fixed;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-      }
-
-      .glass-effect {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
-      .pulse-animation {
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
+        
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-        50% {
-          transform: scale(1.05);
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
         }
-        100% {
-          transform: scale(1);
+        
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
         }
-      }
-
-      .rotate-animation {
-        animation: rotate 10s linear infinite;
-      }
-
-      @keyframes rotate {
-        0% {
-          transform: rotate(0deg);
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
         }
-        100% {
-          transform: rotate(360deg);
+        
+        .nav-link.active {
+            color: var(--primary);
+            font-weight: 600;
         }
-      }
-
-      .scroll-snap-container {
-        scroll-snap-type: y mandatory;
-        overflow-y: scroll;
-        height: 100vh;
-      }
-
-      .scroll-snap-child {
-        scroll-snap-align: start;
-      }
-
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: #f3f4f6;
-      }
-
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: var(--primary);
-        border-radius: 4px;
-      }
-
-      .wave-shape {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-        line-height: 0;
-      }
-
-      .wave-shape svg {
-        position: relative;
-        display: block;
-        width: calc(100% + 1.3px);
-        height: 150px;
-      }
-
-      .wave-shape .shape-fill {
-        fill: #ffffff;
-      }
-
-      .h-screen-80 {
-        height: 80vh;
-        min-height: 600px;
-      }
-
-      .btn-hover-effect {
-        transition: all 0.3s ease;
-      }
-
-      .btn-hover-effect:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      }
-
-      @media (max-width: 768px) {
+        
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .food-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .food-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .fav-icon {
+            transition: all 0.2s ease;
+        }
+        
+        .fav-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .toast {
+            transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+        
+        .modal-content {
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .table-slot {
+            transition: all 0.3s ease;
+        }
+        
+        .table-slot:hover {
+            transform: scale(1.05);
+        }
+        
+        .hero-section {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .btn-primary {
+            background: linear-gradient( 135deg, var(--primary), var(--primary-dark));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #2563eb);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        
+        .floating-label {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: #9ca3af;
+        }
+        
+        .input-field:focus+.floating-label,
+        .input-field:not(:placeholder-shown)+.floating-label {
+            top: 0;
+            left: 0.75rem;
+            transform: translateY(-50%) scale(0.85);
+            background-color: white;
+            padding: 0 0.25rem;
+            color: var(--primary);
+        }
+        
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .rotate-animation {
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .scroll-snap-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+        }
+        
+        .scroll-snap-child {
+            scroll-snap-align: start;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .wave-shape {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+        
+        .wave-shape svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 150px;
+        }
+        
+        .wave-shape .shape-fill {
+            fill: #ffffff;
+        }
+        
         .h-screen-80 {
-          height: 70vh;
-          min-height: 500px;
+            height: 80vh;
+            min-height: 600px;
         }
-
-        .hero-content h1 {
-          font-size: 2.5rem;
+        
+        .btn-hover-effect {
+            transition: all 0.3s ease;
         }
-
-        .hero-content p {
-          font-size: 1.1rem;
+        
+        .btn-hover-effect:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-      }
-
-      .animate-spin-slow {
-        animation: spin 15s linear infinite;
-      }
-
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
+        
+        @media (max-width: 768px) {
+            .h-screen-80 {
+                height: 70vh;
+                min-height: 500px;
+            }
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .hero-content p {
+                font-size: 1.1rem;
+            }
         }
-        to {
-          transform: rotate(360deg);
+        
+        .animate-spin-slow {
+            animation: spin 15s linear infinite;
         }
-      }
-
-      .animate-pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
-        50% {
-          opacity: 0.7;
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-      }
-
-      .testimonial-carousel {
-        display: flex;
-        overflow-x: auto;
-        scroll-behavior: smooth;
-        scroll-snap-type: x mandatory;
-      }
-
-      .testimonial-card {
-        flex: 0 0 100%;
-        scroll-snap-align: start;
-        padding: 1rem;
-        margin-right: 1rem;
-      }
-
-      @media (min-width: 768px) {
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .testimonial-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+        }
+        
         .testimonial-card {
-          flex: 0 0 calc(33.333% - 1rem);
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            padding: 1rem;
+            margin-right: 1rem;
         }
-      }
-
-      .testimonial-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: #ccc;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      .testimonial-dot.active {
-        background-color: #4f46e5;
-      }
+        
+        @media (min-width: 768px) {
+            .testimonial-card {
+                flex: 0 0 calc(33.333% - 1rem);
+            }
+        }
+        
+        .testimonial-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .testimonial-dot.active {
+            background-color: #4f46e5;
+        }
     </style>
-  </head>
-  <body class="antialiased">
+</head>
+
+<body class="antialiased">
     <!-- Floating Action Button -->
     <div class="fixed bottom-8 right-8 z-40">
-      <button
-        id="cart-fab"
-        class="relative bg-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
-        onclick="showPage('order')"
-      >
+        <button id="cart-fab" class="relative bg-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110" onclick="showPage('order')">
         <i class="fas fa-shopping-cart text-2xl text-emerald-600"></i>
         <span
           id="cart-count"
@@ -387,81 +368,40 @@
 
     <!-- Navigation -->
     <nav id="navbar" class="navbar fixed top-0 left-0 w-full z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-          <div class="flex items-center">
-            <div class="flex items-center space-x-3">
-              <div class="bg-emerald-600 text-white p-2 rounded-lg">
-                <i class="fas fa-utensils text-xl"></i>
-              </div>
-              <span class="text-2xl font-bold gradient-text">DineManager</span>
-            </div>
-          </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-emerald-600 text-white p-2 rounded-lg">
+                            <i class="fas fa-utensils text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold gradient-text">DineManager</span>
+                    </div>
+                </div>
 
-          <div class="hidden md:flex items-center space-x-8">
-            <a
-              href="#"
-              onclick="showPage('home')"
-              class="nav-link text-gray-700 hover:text-emerald-600 active"
-            >Home</a>
-            <a
-              href="#"
-              onclick="showPage('menu')"
-              class="nav-link text-gray-700 hover:text-emerald-600"
-            >Menu</a>
-            <a
-              href="#"
-              onclick="showPage('booking')"
-              class="nav-link text-gray-700 hover:text-emerald-600"
-            >Book Table</a>
-            <a
-              href="#"
-              onclick="showPage('favourites')"
-              class="nav-link text-gray-700 hover:text-emerald-600"
-            >Favorites</a>
-            <a
-              href="#"
-              onclick="showPage('order')"
-              class="nav-link text-gray-700 hover:text-emerald-600"
-            >Order Online</a>
-            <a
-              href="#"
-              onclick="showPage('profile')"
-              class="nav-link text-gray-700 hover:text-emerald-600"
-              id="profile-link"
-            >Profile</a>
-          </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" onclick="showPage('home')" class="nav-link text-gray-700 hover:text-emerald-600 active">Home</a>
+                    <a href="#" onclick="showPage('menu')" class="nav-link text-gray-700 hover:text-emerald-600">Menu</a>
+                    <a href="#" onclick="showPage('booking')" class="nav-link text-gray-700 hover:text-emerald-600">Book Table</a>
+                    <a href="#" onclick="showPage('favourites')" class="nav-link text-gray-700 hover:text-emerald-600">Favorites</a>
+                    <a href="#" onclick="showPage('order')" class="nav-link text-gray-700 hover:text-emerald-600">Order Online</a>
+                    <a href="#" onclick="showPage('profile')" class="nav-link text-gray-700 hover:text-emerald-600" id="profile-link">Profile</a>
+                </div>
 
-          <div class="hidden md:flex items-center space-x-4">
-            <button
-              id="signin-button"
-              onclick="showPage('signin')"
-              class="text-emerald-600 border-2 border-emerald-600 px-6 py-2 rounded-lg hover:bg-emerald-50 transition-all duration-300"
-            >
+                <div class="hidden md:flex items-center space-x-4">
+                    <button id="signin-button" onclick="showPage('signin')" class="text-emerald-600 border-2 border-emerald-600 px-6 py-2 rounded-lg hover:bg-emerald-50 transition-all duration-300">
               Sign In
             </button>
-            <button
-              id="signup-button"
-              onclick="showPage('signup')"
-              class="btn-primary text-white px-6 py-2 rounded-lg transition-all duration-300"
-            >
+                    <button id="signup-button" onclick="showPage('signup')" class="btn-primary text-white px-6 py-2 rounded-lg transition-all duration-300">
               Sign Up
             </button>
-            <button
-              id="logout-button"
-              onclick="logoutUser()"
-              class="hidden text-red-600 border-2 border-red-600 px-6 py-2 rounded-lg hover:bg-red-50 transition-all duration-300"
-            >
+                    <button id="logout-button" onclick="logoutUser()" class="hidden text-red-600 border-2 border-red-600 px-6 py-2 rounded-lg hover:bg-red-50 transition-all duration-300">
               Logout
             </button>
-          </div>
+                </div>
 
-          <div class="md:hidden flex items-center">
-            <button
-              id="mobile-menu-button"
-              onclick="toggleMobileMenu()"
-              class="text-gray-700 hover:text-emerald-600 focus:outline-none transition-all duration-300"
-            >
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" onclick="toggleMobileMenu()" class="text-gray-700 hover:text-emerald-600 focus:outline-none transition-all duration-300">
               <svg
                 class="w-8 h-8"
                 fill="none"
@@ -476,125 +416,64 @@
                 />
               </svg>
             </button>
-          </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="hidden md:hidden" id="mobile-menu">
-        <div class="px-2 pt-2 pb-4 space-y-2 sm:px-3 glass-effect">
-          <a
-            href="#"
-            onclick="showPage('home'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-          >Home</a>
-          <a
-            href="#"
-            onclick="showPage('menu'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-          >Menu</a>
-          <a
-            href="#"
-            onclick="showPage('booking'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-          >Book Table</a>
-          <a
-            href="#"
-            onclick="showPage('favourites'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-          >Favorites</a>
-          <a
-            href="#"
-            onclick="showPage('order'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-          >Order Online</a>
-          <a
-            href="#"
-            onclick="showPage('profile'); toggleMobileMenu()"
-            class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-            id="mobile-profile-link"
-          >Profile</a>
-          <div class="pt-2 space-y-2">
-            <button
-              id="mobile-signin-button"
-              onclick="showPage('signin'); toggleMobileMenu()"
-              class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50 transition-all duration-300"
-            >
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-4 space-y-2 sm:px-3 glass-effect">
+                <a href="#" onclick="showPage('home'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Home</a>
+                <a href="#" onclick="showPage('menu'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Menu</a>
+                <a href="#" onclick="showPage('booking'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Book Table</a>
+                <a href="#" onclick="showPage('favourites'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Favorites</a>
+                <a href="#" onclick="showPage('order'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50">Order Online</a>
+                <a href="#" onclick="showPage('profile'); toggleMobileMenu()" class="nav-link block px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50" id="mobile-profile-link">Profile</a>
+                <div class="pt-2 space-y-2">
+                    <button id="mobile-signin-button" onclick="showPage('signin'); toggleMobileMenu()" class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-50 transition-all duration-300">
               Sign In
             </button>
-            <button
-              id="mobile-signup-button"
-              onclick="showPage('signup'); toggleMobileMenu()"
-              class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium btn-primary text-white hover:shadow-lg transition-all duration-300"
-            >
+                    <button id="mobile-signup-button" onclick="showPage('signup'); toggleMobileMenu()" class="block w-full text-left px-3 py-3 rounded-lg text-base font-medium btn-primary text-white hover:shadow-lg transition-all duration-300">
               Sign Up
             </button>
-            <button
-              id="mobile-logout-button"
-              onclick="logoutUser(); toggleMobileMenu()"
-              class="hidden block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all duration-300"
-            >
+                    <button id="mobile-logout-button" onclick="logoutUser(); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 border-2 border-red-600 hover:bg-red-50 transition-all duration-300">
               Logout
             </button>
-          </div>
+                </div>
+            </div>
         </div>
-      </div>
     </nav>
 
     <!-- Main Content -->
-    <main
-      id="main-content"
-      class="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12"
-    ></main>
+    <main id="main-content" class="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12"></main>
 
     <!-- Testimonial Section (Added for Carousel) -->
-    
+
 
     <!-- Payment Modal -->
-    <div
-      id="payment-modal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
-    >
-      <div class="modal-content bg-white rounded-xl p-8 w-full max-w-md mx-4">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-2xl font-bold text-emerald-600">Complete Payment</h3>
-          <button
-            onclick="closeModal()"
-            class="text-gray-500 hover:text-gray-700 transition-all duration-300"
-          >
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content bg-white rounded-xl p-8 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-emerald-600">Complete Payment</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 transition-all duration-300">
             <i class="fas fa-times text-xl"></i>
           </button>
-        </div>
-        <p class="text-gray-600 mb-6">
-          Scan QR code to complete your booking payment
-        </p>
-        <div
-          class="qr-code mx-auto mb-6 p-4 bg-white rounded-lg shadow-inner flex justify-center"
-        >
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://dinemanager.com/pay"
-            alt="Scan to Pay"
-            class="w-48 h-48 rounded-lg"
-          />
-        </div>
-        <div
-          class="booking-details bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200"
-          id="booking-details"
-        ></div>
-        <div class="flex justify-end space-x-3">
-          <button
-            onclick="closeModal()"
-            class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition-all duration-300"
-          >
+            </div>
+            <p class="text-gray-600 mb-6">
+                Scan QR code to complete your booking payment
+            </p>
+            <div class="qr-code mx-auto mb-6 p-4 bg-white rounded-lg shadow-inner flex justify-center">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://dinemanager.com/pay" alt="Scan to Pay" class="w-48 h-48 rounded-lg" />
+            </div>
+            <div class="booking-details bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200" id="booking-details"></div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeModal()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition-all duration-300">
             Cancel
           </button>
-          <button
-            onclick="completePayment()"
-            class="btn-primary text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300"
-          >
+                <button onclick="completePayment()" class="btn-primary text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
             <i class="fas fa-check-circle mr-2"></i> Payment Done
           </button>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Toast Notifications -->
@@ -602,125 +481,92 @@
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white pt-16 pb-8 relative">
-      <div class="wave-shape">
-        <svg
-          data-name="Layer 1"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
+        <div class="wave-shape">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
           <!-- <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path> -->
         </svg>
-      </div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div class="animate__animated animate__fadeIn">
-            <h3 class="text-xl font-bold mb-4 gradient-text">DineManager</h3>
-            <p class="text-gray-400">
-              Revolutionizing restaurant management with modern technology and
-              exceptional service.
-            </p>
-            <div class="flex space-x-4 mt-4">
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition-all duration-300"
-              >
-                <i class="fab fa-facebook-f"></i>
-              </a>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition-all duration-300"
-              >
-                <i class="fab fa-twitter"></i>
-              </a>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition-all duration-300"
-              >
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a
-                href="#"
-                class="text-gray-400 hover:text-white transition-all duration-300"
-              >
-                <i class="fab fa-linkedin-in"></i>
-              </a>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="animate__animated animate__fadeIn">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">DineManager</h3>
+                    <p class="text-gray-400">
+                        Revolutionizing restaurant management with modern technology and exceptional service.
+                    </p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate__animated animate__fadeIn animate__delay-1s">
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" onclick="showPage('home')" class="text-gray-400 hover:text-white transition-all duration-300">Home</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showPage('menu')" class="text-gray-400 hover:text-white transition-all duration-300">Menu</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showPage('booking')" class="text-gray-400 hover:text-white transition-all duration-300">Reservations</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="showPage('order')" class="text-gray-400 hover:text-white transition-all duration-300">Order Online</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate__animated animate__fadeIn animate__delay-2s">
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt text-emerald-500"></i>
+                            <span class="text-gray-400">123 Restaurant St, Foodville</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone-alt text-emerald-500"></i>
+                            <span class="text-gray-400">(123) 456-7890</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope text-emerald-500"></i>
+                            <span class="text-gray-400">info@dinemanager.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate__animated animate__fadeIn animate__delay-3s">
+                    <h4 class="text-lg font-semibold mb-4">Opening Hours</h4>
+                    <ul class="space-y-2">
+                        <li class="flex justify-between">
+                            <span class="text-gray-400">Monday - Friday</span>
+                            <span class="text-white">9:00 AM - 10:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-gray-400">Saturday</span>
+                            <span class="text-white">10:00 AM - 11:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-gray-400">Sunday</span>
+                            <span class="text-white">10:00 AM - 9:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </div>
-          <div class="animate__animated animate__fadeIn animate__delay-1s">
-            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  onclick="showPage('home')"
-                  class="text-gray-400 hover:text-white transition-all duration-300"
-                >Home</a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  onclick="showPage('menu')"
-                  class="text-gray-400 hover:text-white transition-all duration-300"
-                >Menu</a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  onclick="showPage('booking')"
-                  class="text-gray-400 hover:text-white transition-all duration-300"
-                >Reservations</a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  onclick="showPage('order')"
-                  class="text-gray-400 hover:text-white transition-all duration-300"
-                >Order Online</a>
-              </li>
-            </ul>
-          </div>
-          <div class="animate__animated animate__fadeIn animate__delay-2s">
-            <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
-            <ul class="space-y-2">
-              <li class="flex items-center space-x-2">
-                <i class="fas fa-map-marker-alt text-emerald-500"></i>
-                <span class="text-gray-400">123 Restaurant St, Foodville</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i class="fas fa-phone-alt text-emerald-500"></i>
-                <span class="text-gray-400">(123) 456-7890</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i class="fas fa-envelope text-emerald-500"></i>
-                <span class="text-gray-400">info@dinemanager.com</span>
-              </li>
-            </ul>
-          </div>
-          <div class="animate__animated animate__fadeIn animate__delay-3s">
-            <h4 class="text-lg font-semibold mb-4">Opening Hours</h4>
-            <ul class="space-y-2">
-              <li class="flex justify-between">
-                <span class="text-gray-400">Monday - Friday</span>
-                <span class="text-white">9:00 AM - 10:00 PM</span>
-              </li>
-              <li class="flex justify-between">
-                <span class="text-gray-400">Saturday</span>
-                <span class="text-white">10:00 AM - 11:00 PM</span>
-              </li>
-              <li class="flex justify-between">
-                <span class="text-gray-400">Sunday</span>
-                <span class="text-white">10:00 AM - 9:00 PM</span>
-              </li>
-            </ul>
-          </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+                <p>&copy; 2025 DineManager. All rights reserved.</p>
+            </div>
         </div>
-        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
-          <p>&copy; 2025 DineManager. All rights reserved.</p>
-        </div>
-      </div>
     </footer>
 
     <script src="/frontend/templates/index.js"></script>
-  </body>
+</body>
+
 </html>
