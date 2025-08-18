@@ -1,4 +1,3 @@
-
 // Global state
 let currentPage = "home";
 let isLoggedIn = false;
@@ -7,7 +6,7 @@ let selectedCategory = "all";
 let selectedTable = null;
 let bookingDetails = { date: "", time: "", guests: 2, table: "" };
 let cart = [];
-const baseUrl = "http://127.0.0.1:8000/";
+const baseUrl = "https://dinerestro-ycpq.onrender.com/admin/";
 
 // Booking pricing structure
 const bookingPrices = {
@@ -239,7 +238,9 @@ async function loginUser(email, password) {
     showToast(`Welcome back, ${data.fullname}!`);
 
     // Redirect to the previous page if it's not signin/signup, otherwise go to home
-    const redirectPage = ["signin", "signup"].includes(currentPage) ? "home" : currentPage;
+    const redirectPage = ["signin", "signup"].includes(currentPage)
+      ? "home"
+      : currentPage;
     showPage(redirectPage);
 
     return data;
@@ -264,8 +265,18 @@ function logoutUser() {
 
 async function loadCategories() {
   try {
-    const data = await makeRequest(`${baseUrl}foods/categories/`, "GET", null, true);
-    return data.filter(category => category.name && category.name.trim() !== "" && category.name !== "string");
+    const data = await makeRequest(
+      `${baseUrl}foods/categories/`,
+      "GET",
+      null,
+      true
+    );
+    return data.filter(
+      (category) =>
+        category.name &&
+        category.name.trim() !== "" &&
+        category.name !== "string"
+    );
   } catch (error) {
     console.error("Error fetching categories:", error);
     showToast("Failed to load categories", "error");
@@ -323,7 +334,9 @@ async function toggleFavorite(id, element = null) {
       }
     }
 
-    showToast(data.is_favorite ? "Added to favorites" : "Removed from favorites");
+    showToast(
+      data.is_favorite ? "Added to favorites" : "Removed from favorites"
+    );
     return data;
   } catch (error) {
     console.error("Error toggling favorite:", error);
@@ -339,7 +352,12 @@ async function addCategory(name) {
   }
 
   try {
-    const data = await makeRequest(`${baseUrl}foods/categories/`, "POST", { name }, true);
+    const data = await makeRequest(
+      `${baseUrl}foods/categories/`,
+      "POST",
+      { name },
+      true
+    );
     showToast("Category added successfully");
     return data;
   } catch (error) {
@@ -356,7 +374,7 @@ function addToCart(id) {
     return;
   }
 
-  loadFoodItems().then(foods => {
+  loadFoodItems().then((foods) => {
     const food = foods.find((item) => String(item.id) === String(id)); // Coerce to string for comparison
     if (!food) {
       showToast("Item not found", "error");
@@ -426,10 +444,16 @@ function updateCartDisplay() {
           (item, index) => `
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
               <div class="flex items-center">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />` : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`}
+                ${
+                  item.image
+                    ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />`
+                    : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`
+                }
                 <div>
                   <h3 class="font-medium">${item.name}</h3>
-                  <p class="text-green-600 font-bold">$${item.price.toFixed(2)} x ${item.quantity || 1}</p>
+                  <p class="text-green-600 font-bold">$${item.price.toFixed(
+                    2
+                  )} x ${item.quantity || 1}</p>
                 </div>
               </div>
               <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
@@ -468,7 +492,11 @@ function placeOrder() {
     return;
   }
 
-  const orderType = document.querySelector('input[name="payment"]:checked')?.id === "delivery-btn" ? "delivery" : "pickup";
+  const orderType =
+    document.querySelector('input[name="payment"]:checked')?.id ===
+    "delivery-btn"
+      ? "delivery"
+      : "pickup";
   const deliveryAddress = document.getElementById("delivery-address")?.value;
 
   if (orderType === "delivery" && !deliveryAddress) {
@@ -478,7 +506,10 @@ function placeOrder() {
 
   const orderDetails = {
     items: cart,
-    total: (cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0) + (orderType === "delivery" ? 2.99 : 0)).toFixed(2),
+    total: (
+      cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0) +
+      (orderType === "delivery" ? 2.99 : 0)
+    ).toFixed(2),
     type: orderType,
     address: orderType === "delivery" ? deliveryAddress : "Pickup at Cafe",
   };
@@ -487,19 +518,32 @@ function placeOrder() {
     <div class="space-y-2">
       <div class="flex justify-between">
         <span class="text-gray-600">Order Type:</span>
-        <span class="font-medium">${orderDetails.type === "delivery" ? "Delivery" : "Pickup"}</span>
+        <span class="font-medium">${
+          orderDetails.type === "delivery" ? "Delivery" : "Pickup"
+        }</span>
       </div>
-      ${orderDetails.type === "delivery" ? `
+      ${
+        orderDetails.type === "delivery"
+          ? `
         <div class="flex justify-between">
           <span class="text-gray-600">Address:</span>
           <span class="font-medium">${orderDetails.address}</span>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
       <div class="border-t border-gray-200 my-2"></div>
       <div>
         <p class="text-gray-600 mb-1">Items:</p>
         <ul class="list-disc list-inside text-sm">
-          ${orderDetails.items.map(item => `<li>${item.name} (x${item.quantity || 1}) - $${(item.price * (item.quantity || 1)).toFixed(2)}</li>`).join("")}
+          ${orderDetails.items
+            .map(
+              (item) =>
+                `<li>${item.name} (x${item.quantity || 1}) - $${(
+                  item.price * (item.quantity || 1)
+                ).toFixed(2)}</li>`
+            )
+            .join("")}
         </ul>
       </div>
       <div class="border-t border-gray-200 my-2"></div>
@@ -516,7 +560,10 @@ function placeOrder() {
 
 function completePayment() {
   document.getElementById("payment-modal").classList.add("hidden");
-  showToast("Payment completed successfully! Your order is confirmed.", "success");
+  showToast(
+    "Payment completed successfully! Your order is confirmed.",
+    "success"
+  );
   cart = [];
   saveCartToStorage(); // Save empty cart
   if (document.getElementById("delivery-address")) {
@@ -535,7 +582,9 @@ function closeModal() {
 async function renderHomePage() {
   const foods = await loadFoodItems();
   const categories = await loadCategories();
-  const popularItems = foods.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 4);
+  const popularItems = foods
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 4);
 
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
@@ -559,61 +608,89 @@ async function renderHomePage() {
       <!-- Featured Categories -->
       <section class="animate__animated animate__fadeIn">
         <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Our Menu Categories</h2>
-        ${categories.length === 0 ? `
+        ${
+          categories.length === 0
+            ? `
           <div class="text-center py-12">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600">No categories found</h3>
             <p class="text-gray-500">Please try again later or contact support.</p>
           </div>
-        ` : `
+        `
+            : `
           <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
-            ${categories.map(category => `
+            ${categories
+              .map(
+                (category) => `
               <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('${category.name}')">
                 <h3 class="text-xl font-semibold text-center">${category.name}</h3>
               </div>
-            `).join("")}
+            `
+              )
+              .join("")}
           </div>
-        `}
+        `
+        }
       </section>
 
       <!-- Popular Dishes -->
       <section class="animate__animated animate__fadeIn">
       <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Popular Dishes</h2>
-        ${popularItems.length === 0 ? `
+        ${
+          popularItems.length === 0
+            ? `
           <div class="text-center py-12">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600">No popular dishes found</h3>
             <p class="text-gray-500">Please try again later or contact support.</p>
           </div>
-        ` : `
+        `
+            : `
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            ${popularItems.map(food => `
+            ${popularItems
+              .map(
+                (food) => `
               <div class="food-card bg-white rounded-xl overflow-hidden relative">
                 <div class="absolute top-4 right-4 z-10">
-                  <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                  <button onclick="toggleFavorite('${
+                    food.id
+                  }', this)" class="fav-icon text-2xl ${
+                  food.is_favorite ? "text-red-500" : "text-gray-300"
+                } hover:text-red-500">
                     <i class="fas fa-heart"></i>
                   </button>
                 </div>
-                ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />` : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                ${
+                  food.image
+                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />`
+                    : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                }
                 <div class="p-5">
                   <div class="flex justify-between items-start mb-2">
                     <h3 class="text-xl font-semibold">${food.name}</h3>
-                    <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+                    <span class="text-green-600 font-bold">$${food.price.toFixed(
+                      2
+                    )}</span>
                   </div>
                   <p class="text-gray-600 text-sm mb-4">${food.description}</p>
-                  <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                  <button onclick="addToCart('${
+                    food.id
+                  }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
                     <i class="fas fa-plus mr-2"></i> Add to Cart
                   </button>
                 </div>
               </div>
-            `).join("")}
+            `
+              )
+              .join("")}
           </div>
           <div class="mt-8 flex justify-center">
             <button onclick="showPage('menu')" class="btn-primary text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
               View All
             </button>
           </div>
-        `}
+        `
+        }
       </section>
 
       <!-- Special Offers -->
@@ -622,13 +699,17 @@ async function renderHomePage() {
           <h2 class="text-3xl font-bold mb-4 text-yellow-800">Special Offers</h2>
           <p class="text-xl mb-6 text-yellow-700">Enjoy our exclusive deals and discounts</p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            ${discounts.map(discount => `
+            ${discounts
+              .map(
+                (discount) => `
               <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
                 <h3 class="text-xl font-bold mb-2 text-yellow-900">${discount.occasion}</h3>
                 <p class="mb-3 text-yellow-700">${discount.date}</p>
                 <p class="text-lg font-bold text-yellow-800">${discount.offer}</p>
               </div>
-            `).join("")}
+            `
+              )
+              .join("")}
           </div>
         </div>
       </section>
@@ -637,13 +718,25 @@ async function renderHomePage() {
       <section class="animate__animated animate__fadeIn">
         <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          ${events.map(event => `
+          ${events
+            .map(
+              (event) => `
             <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              ${event.image ? `<img src="${event.image}" alt="${event.name}" class="w-full h-64 object-cover" />` : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+              ${
+                event.image
+                  ? `<img src="${event.image}" alt="${event.name}" class="w-full h-64 object-cover" />`
+                  : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+              }
               <div class="bg-yellow-50 text-purple-600 p-6">
                 <div class="flex justify-between items-center mb-3">
-                  <span class="px-3 py-1 rounded-full text-sm font-medium ${event.type === "current" ? "bg-yellow-200 text-purple-600" : "bg-yellow-300 text-purple-600"}">
-                    ${event.type === "current" ? "Happening Now" : "Coming Soon"}
+                  <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                    event.type === "current"
+                      ? "bg-yellow-200 text-purple-600"
+                      : "bg-yellow-300 text-purple-600"
+                  }">
+                    ${
+                      event.type === "current" ? "Happening Now" : "Coming Soon"
+                    }
                   </span>
                   <span class="text-purple-600">${event.date}</span>
                 </div>
@@ -654,7 +747,9 @@ async function renderHomePage() {
                 </button>
               </div>
             </div>
-          `).join("")}
+          `
+            )
+            .join("")}
         </div>
       </section>
     </div>
@@ -662,15 +757,22 @@ async function renderHomePage() {
 
   const heroSection = document.querySelector(".hero-section");
   if (heroSection) {
-    heroSection.style.backgroundImage = "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')";
+    heroSection.style.backgroundImage =
+      "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')";
   }
 }
 
 async function renderMenuPage() {
   const foods = await loadFoodItems();
   const categories = await loadCategories();
-  const uniqueCategories = ["all", ...new Set(categories.map(cat => cat.name))];
-  const filteredFoods = selectedCategory === "all" ? foods : foods.filter(item => item.category.name === selectedCategory);
+  const uniqueCategories = [
+    "all",
+    ...new Set(categories.map((cat) => cat.name)),
+  ];
+  const filteredFoods =
+    selectedCategory === "all"
+      ? foods
+      : foods.filter((item) => item.category.name === selectedCategory);
 
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
@@ -680,13 +782,18 @@ async function renderMenuPage() {
         <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our carefully crafted dishes made with the finest ingredients and passion</p>
       </div>
       <div class="flex flex-wrap gap-3 justify-center animate__animated animate__fadeIn">
-        ${uniqueCategories.length <= 1 ? `
+        ${
+          uniqueCategories.length <= 1
+            ? `
           <div class="text-center py-12 col-span-full">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600">No categories found</h3>
             <p class="text-gray-500">Please try again later or contact support.</p>
           </div>
-        ` : uniqueCategories.map(category => `
+        `
+            : uniqueCategories
+                .map(
+                  (category) => `
           <button onclick="filterFoods('${category}')"
             class="px-5 py-2.5 rounded-full transition-all duration-300 ${
               selectedCategory === category
@@ -695,10 +802,15 @@ async function renderMenuPage() {
             }">
             ${category === "all" ? "All Items" : category}
           </button>
-        `).join("")}
+        `
+                )
+                .join("")
+        }
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate__animated animate__fadeIn">
-        ${filteredFoods.length === 0 ? `
+        ${
+          filteredFoods.length === 0
+            ? `
           <div class="col-span-full text-center py-12">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600">No items found in this category</h3>
@@ -706,41 +818,69 @@ async function renderMenuPage() {
               View All Items
             </button>
           </div>
-        ` : filteredFoods.map(food => `
+        `
+            : filteredFoods
+                .map(
+                  (food) => `
           <div class="food-card bg-white rounded-xl overflow-hidden relative">
             <div class="absolute top-4 right-4 z-10">
-              <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+              <button onclick="toggleFavorite('${
+                food.id
+              }', this)" class="fav-icon text-2xl ${
+                    food.is_favorite ? "text-red-500" : "text-gray-300"
+                  } hover:text-red-500">
                 <i class="fas fa-heart"></i>
               </button>
             </div>
-            ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />` : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+            ${
+              food.image
+                ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />`
+                : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+            }
             <div class="p-6">
               <div class="flex justify-between items-start mb-3">
                 <h3 class="text-xl font-semibold">${food.name}</h3>
-                <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+                <span class="text-green-600 font-bold">$${food.price.toFixed(
+                  2
+                )}</span>
               </div>
               <p class="text-gray-600 text-sm mb-4">${food.description}</p>
-              ${food.ingredients && food.ingredients.length > 0 ? `
+              ${
+                food.ingredients && food.ingredients.length > 0
+                  ? `
                 <div class="mb-4">
                   <p class="text-sm font-medium text-gray-500 mb-1">Ingredients:</p>
                   <div class="flex flex-wrap gap-2">
-                    ${food.ingredients.map(ingredient => `
+                    ${food.ingredients
+                      .map(
+                        (ingredient) => `
                       <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${ingredient}</span>
-                    `).join("")}
+                    `
+                      )
+                      .join("")}
                   </div>
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
               <div class="flex gap-3">
-                <button onclick="addToCart('${food.id}')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                <button onclick="addToCart('${
+                  food.id
+                }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
                   <i class="fas fa-plus mr-2"></i> Add to Cart
                 </button>
-                <button onclick="buyNow('${food.id}')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
+                <button onclick="buyNow('${
+                  food.id
+                }')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
                   <i class="fas fa-bolt mr-2"></i> Buy Now
                 </button>
               </div>
             </div>
           </div>
-        `).join("")}
+        `
+                )
+                .join("")
+        }
       </div>
     </div>
   `;
@@ -763,7 +903,9 @@ function renderBookingPage() {
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
                   <div class="relative">
-                    <input type="date" id="date" value="${bookingDetails.date}" onchange="updateBookingDetails('date', this.value)"
+                    <input type="date" id="date" value="${
+                      bookingDetails.date
+                    }" onchange="updateBookingDetails('date', this.value)"
                       class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
                   </div>
                 </div>
@@ -772,9 +914,23 @@ function renderBookingPage() {
                   <select id="time" onchange="updateBookingDetails('time', this.value)"
                     class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200">
                     <option value="">Select time</option>
-                    ${["12:00 PM", "1:00 PM", "2:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM"].map(slot => `
-                      <option value="${slot}" ${bookingDetails.time === slot ? "selected" : ""}>${slot}</option>
-                    `).join("")}
+                    ${[
+                      "12:00 PM",
+                      "1:00 PM",
+                      "2:00 PM",
+                      "6:00 PM",
+                      "7:00 PM",
+                      "8:00 PM",
+                      "9:00 PM",
+                    ]
+                      .map(
+                        (slot) => `
+                      <option value="${slot}" ${
+                          bookingDetails.time === slot ? "selected" : ""
+                        }>${slot}</option>
+                    `
+                      )
+                      .join("")}
                   </select>
                 </div>
               </div>
@@ -782,34 +938,61 @@ function renderBookingPage() {
                 <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
                 <select id="guests" onchange="updateBookingDetails('guests', this.value)"
                   class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200">
-                  ${[1, 2, 3, 4, 5, 6, 7, 8].map(num => `
-                    <option value="${num}" ${bookingDetails.guests === num ? "selected" : ""}>${num} ${num === 1 ? "Guest" : "Guests"}</option>
-                  `).join("")}
+                  ${[1, 2, 3, 4, 5, 6, 7, 8]
+                    .map(
+                      (num) => `
+                    <option value="${num}" ${
+                        bookingDetails.guests === num ? "selected" : ""
+                      }>${num} ${num === 1 ? "Guest" : "Guests"}</option>
+                  `
+                    )
+                    .join("")}
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Select Table</label>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  ${["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6"].map(table => `
+                  ${[
+                    "Table 1",
+                    "Table 2",
+                    "Table 3",
+                    "Table 4",
+                    "Table 5",
+                    "Table 6",
+                  ]
+                    .map(
+                      (table) => `
                     <div onclick="selectTable('${table}')"
                       class="table-slot cursor-pointer p-4 text-center rounded-lg border-2 transition-all duration-300 ${
-                        selectedTable === table ? "border-green-500 bg-green-500 text-white" : "border-gray-200 bg-white hover:border-green-300"
+                        selectedTable === table
+                          ? "border-green-500 bg-green-500 text-white"
+                          : "border-gray-200 bg-white hover:border-green-300"
                       }">
-                      <i class="fas fa-chair text-2xl mb-2 ${selectedTable === table ? "text-green-600" : "text-gray-400"}"></i>
+                      <i class="fas fa-chair text-2xl mb-2 ${
+                        selectedTable === table
+                          ? "text-green-600"
+                          : "text-gray-400"
+                      }"></i>
                       <p class="font-medium">${table}</p>
                     </div>
-                  `).join("")}
+                  `
+                    )
+                    .join("")}
                 </div>
               </div>
               <button onclick="handleBooking()"
                 class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 mt-6">
                 <i class="fas fa-calendar-check mr-2"></i> Confirm Reservation
               </button>
-              ${!isLoggedIn ? `
+              ${
+                !isLoggedIn
+                  ? `
                 <div class="text-center text-sm text-gray-500 mt-4">
                   You need to <a href="#" onclick="showPage('signin')" class="text-red-600 font-bold">sign in</a> to book a table
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
             </div>
           </div>
         </div>
@@ -894,7 +1077,7 @@ async function handleBooking() {
 
 async function renderFavouritesPage() {
   const foods = await loadFoodItems();
-  const favoriteItems = foods.filter(item => item.is_favorite);
+  const favoriteItems = foods.filter((item) => item.is_favorite);
 
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
@@ -903,51 +1086,79 @@ async function renderFavouritesPage() {
         <h1 class="text-4xl font-bold mb-4">Your Favorites</h1>
         <p class="text-xl max-w-2xl mx-auto">Your saved dishes for quick access</p>
       </div>
-      ${favoriteItems.length === 0 ? `
+      ${
+        favoriteItems.length === 0
+          ? `
         <div class="bg-white rounded-2xl shadow-md p-12 text-center">
           <i class="fas fa-heart text-5xl text-gray-300 mb-6"></i>
-          <h3 class="text-xl font-semibold text-gray-600">${foods.length === 0 ? "No items found" : "No favorites yet"}</h3>
-          <p class="text-gray-500 mb-6">${foods.length === 0 ? "Please try again later or contact support." : "Start exploring our menu and save your favorite dishes"}</p>
+          <h3 class="text-xl font-semibold text-gray-600">${
+            foods.length === 0 ? "No items found" : "No favorites yet"
+          }</h3>
+          <p class="text-gray-500 mb-6">${
+            foods.length === 0
+              ? "Please try again later or contact support."
+              : "Start exploring our menu and save your favorite dishes"
+          }</p>
           <button onclick="showPage('menu')" class="btn-primary text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300">
             <i class="fas fa-utensils mr-2"></i> Browse Menu
           </button>
         </div>
-      ` : `
+      `
+          : `
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          ${favoriteItems.map(food => `
+          ${favoriteItems
+            .map(
+              (food) => `
             <div class="food-card bg-white rounded-xl overflow-hidden relative">
               <div class="absolute top-4 right-4 z-10">
-                <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl text-red-500 hover:text-red-600">
+                <button onclick="toggleFavorite('${
+                  food.id
+                }', this)" class="fav-icon text-2xl text-red-500 hover:text-red-600">
                   <i class="fas fa-heart"></i>
                 </button>
               </div>
-              ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />` : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+              ${
+                food.image
+                  ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />`
+                  : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+              }
               <div class="p-6">
                 <div class="flex justify-between items-start mb-3">
                   <h3 class="text-xl font-semibold">${food.name}</h3>
-                  <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+                  <span class="text-green-600 font-bold">$${food.price.toFixed(
+                    2
+                  )}</span>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">${food.description}</p>
                 <div class="flex gap-3">
-                  <button onclick="addToCart('${food.id}')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                  <button onclick="addToCart('${
+                    food.id
+                  }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
                     <i class="fas fa-plus mr-2"></i> Add to Cart
                   </button>
-                  <button onclick="buyNow('${food.id}')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
+                  <button onclick="buyNow('${
+                    food.id
+                  }')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
                     <i class="fas fa-bolt mr-2"></i> Buy Now
                   </button>
                 </div>
               </div>
             </div>
-          `).join("")}
+          `
+            )
+            .join("")}
         </div>
-      `}
+      `
+      }
     </div>
   `;
 }
 
 async function renderOrderPage() {
   const foods = await loadFoodItems();
-  const popularItems = foods.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 2);
+  const popularItems = foods
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 2);
 
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
@@ -966,7 +1177,9 @@ async function renderOrderPage() {
             <i class="fas fa-shopping-cart text-green-600 mr-2"></i> Your Order
           </h2>
           <div id="cart-items" class="mb-6">
-            ${cart.length === 0 ? `
+            ${
+              cart.length === 0
+                ? `
               <div class="text-center py-12">
                 <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-500">Your cart is empty</h3>
@@ -974,26 +1187,42 @@ async function renderOrderPage() {
                   Browse Menu
                 </button>
               </div>
-            ` : cart.map((item, index) => `
+            `
+                : cart
+                    .map(
+                      (item, index) => `
               <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
                 <div class="flex items-center">
-                  ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />` : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`}
+                  ${
+                    item.image
+                      ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />`
+                      : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`
+                  }
                   <div>
                     <h3 class="font-medium">${item.name}</h3>
-                    <p class="text-green-600 font-bold">$${item.price.toFixed(2)}</p>
+                    <p class="text-green-600 font-bold">$${item.price.toFixed(
+                      2
+                    )}</p>
                   </div>
                 </div>
                 <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
-            `).join("")}
+            `
+                    )
+                    .join("")
+            }
           </div>
-          ${cart.length > 0 ? `
+          ${
+            cart.length > 0
+              ? `
             <div class="border-t border-gray-200 pt-4 mb-6">
               <div class="flex justify-between mb-2">
                 <span class="text-gray-600">Subtotal:</span>
-                <span class="font-medium">$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</span>
+                <span class="font-medium">$${cart
+                  .reduce((sum, item) => sum + item.price, 0)
+                  .toFixed(2)}</span>
               </div>
               <div class="flex justify-between mb-2">
                 <span class="text-gray-600">Delivery Fee:</span>
@@ -1001,10 +1230,14 @@ async function renderOrderPage() {
               </div>
               <div class="flex justify-between text-lg font-bold mt-4">
                 <span>Total:</span>
-                <span class="text-green-600">${(cart.reduce((sum, item) => sum + item.price, 0) + 2.99).toFixed(2)}</span>
+                <span class="text-green-600">${(
+                  cart.reduce((sum, item) => sum + item.price, 0) + 2.99
+                ).toFixed(2)}</span>
               </div>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
 
         <!-- Order Details Section -->
@@ -1063,7 +1296,9 @@ async function renderOrderPage() {
 
             <!-- Place Order Button -->
             <button onclick="placeOrder()"
-              class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}"
+              class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${
+                cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+              }"
               ${cart.length === 0 ? "disabled" : ""}>
               <i class="fas fa-shopping-bag mr-2"></i> Place Order
             </button>
@@ -1077,36 +1312,56 @@ async function renderOrderPage() {
           <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Order
         </h2>
         <p class="text-gray-600 mb-6">Select popular items to add to your cart</p>
-        ${popularItems.length === 0 ? `
+        ${
+          popularItems.length === 0
+            ? `
           <div class="text-center py-12">
             <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600">No popular items found</h3>
             <p class="text-gray-500">Please try again later or contact support.</p>
           </div>
-        ` : `
+        `
+            : `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            ${popularItems.map(food => `
+            ${popularItems
+              .map(
+                (food) => `
               <div class="food-card bg-white rounded-xl overflow-hidden relative shadow-md">
                 <div class="absolute top-4 right-4 z-10">
-                  <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                  <button onclick="toggleFavorite('${
+                    food.id
+                  }', this)" class="fav-icon text-2xl ${
+                  food.is_favorite ? "text-red-500" : "text-gray-300"
+                } hover:text-red-500">
                     <i class="fas fa-heart"></i>
                   </button>
                 </div>
-                ${food.image ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />` : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                ${
+                  food.image
+                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />`
+                    : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                }
                 <div class="p-5">
                   <div class="flex justify-between items-start mb-2">
                     <h3 class="text-xl font-semibold">${food.name}</h3>
-                    <span class="text-green-600 font-bold">$${food.price.toFixed(2)}</span>
+                    <span class="text-green-600 font-bold">$${food.price.toFixed(
+                      2
+                    )}</span>
                   </div>
                   <p class="text-gray-600 text-sm mb-4">${food.description}</p>
-                  <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                  <button onclick="addToCart('${
+                    food.id
+                  }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
                     <i class="fas fa-plus mr-2"></i> Add to Cart
                   </button>
                 </div>
               </div>
-            `).join("")}
+            `
+              )
+              .join("")}
           </div>
-        `}
+        `
+        }
       </div>
     </div>
   `;
@@ -1134,8 +1389,12 @@ function renderProfilePage() {
                   <i class="fas fa-user text-2xl text-gray-400"></i>
                 </div>
                 <div>
-                  <h3 class="text-xl font-semibold">${userData.fullname || "User"}</h3>
-                  <p class="text-gray-600">${userData.email || "No email provided"}</p>
+                  <h3 class="text-xl font-semibold">${
+                    userData.fullname || "User"
+                  }</h3>
+                  <p class="text-gray-600">${
+                    userData.email || "No email provided"
+                  }</p>
                 </div>
               </div>
               <button onclick="logoutUser()" class="text-red-500 hover:text-red-700 font-medium">
@@ -1157,11 +1416,19 @@ function renderProfilePage() {
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-600">Account Status:</span>
-                  <span class="font-medium ${userData.active ? "text-green-600" : "text-red-600"}">${userData.active ? "Active" : "Inactive"}</span>
+                  <span class="font-medium ${
+                    userData.active ? "text-green-600" : "text-red-600"
+                  }">${userData.active ? "Active" : "Inactive"}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-gray-600">Role:</span>
-                  <span class="font-medium">${userData.superuser ? "Superuser" : userData.staff ? "Staff" : "Customer"}</span>
+                  <span class="font-medium">${
+                    userData.superuser
+                      ? "Superuser"
+                      : userData.staff
+                      ? "Staff"
+                      : "Customer"
+                  }</span>
                 </div>
               </div>
             </div>
@@ -1172,12 +1439,16 @@ function renderProfilePage() {
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input type="text" id="profile-fullname" value="${userData.fullname || ""}"
+                  <input type="text" id="profile-fullname" value="${
+                    userData.fullname || ""
+                  }"
                     class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input type="email" id="profile-email" value="${userData.email || ""}"
+                  <input type="email" id="profile-email" value="${
+                    userData.email || ""
+                  }"
                     class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
                 </div>
                 <button onclick="updateProfile()"
@@ -1291,24 +1562,40 @@ function renderSignUpPage() {
   `;
 }
 
-
-
 // Helper functions
 function selectOrderType(type) {
   const pickupBtn = document.getElementById("pickup-btn");
   const deliveryBtn = document.getElementById("delivery-btn");
-  const deliveryAddressContainer = document.getElementById("delivery-address-container");
+  const deliveryAddressContainer = document.getElementById(
+    "delivery-address-container"
+  );
 
   if (type === "pickup") {
-    pickupBtn.classList.add("bg-green-50", "border-green-500", "text-green-600");
+    pickupBtn.classList.add(
+      "bg-green-50",
+      "border-green-500",
+      "text-green-600"
+    );
     pickupBtn.classList.remove("border-gray-300", "hover:border-green-300");
-    deliveryBtn.classList.remove("bg-green-50", "border-green-500", "text-green-600");
+    deliveryBtn.classList.remove(
+      "bg-green-50",
+      "border-green-500",
+      "text-green-600"
+    );
     deliveryBtn.classList.add("border-gray-300", "hover:border-green-300");
     deliveryAddressContainer.classList.add("hidden");
   } else {
-    deliveryBtn.classList.add("bg-green-50", "border-green-500", "text-green-600");
+    deliveryBtn.classList.add(
+      "bg-green-50",
+      "border-green-500",
+      "text-green-600"
+    );
     deliveryBtn.classList.remove("border-gray-300", "hover:border-green-300");
-    pickupBtn.classList.remove("bg-green-50", "border-green-500", "text-green-600");
+    pickupBtn.classList.remove(
+      "bg-green-50",
+      "border-green-500",
+      "text-green-600"
+    );
     pickupBtn.classList.add("border-gray-300", "hover:border-green-300");
     deliveryAddressContainer.classList.remove("hidden");
   }
@@ -1339,8 +1626,6 @@ function buyNow(id) {
   showPage("order");
 }
 
-
-
 function togglePasswordVisibility(id) {
   const input = document.getElementById(id);
   const icon = input.nextElementSibling.querySelector("i");
@@ -1369,19 +1654,21 @@ async function signIn() {
 
   const data = await loginUser(email, password);
   if (!data) {
-    errorText.textContent = "Invalid credentials or staff/admin accounts are not allowed";
+    errorText.textContent =
+      "Invalid credentials or staff/admin accounts are not allowed";
     errorDiv.classList.remove("hidden");
   } else {
     errorDiv.classList.add("hidden"); // Hide error on successful login
   }
 }
 
-
 async function signUp() {
   const fullname = document.getElementById("signup-fullname").value.trim();
   const email = document.getElementById("signup-email").value.trim();
   const password = document.getElementById("signup-password").value;
-  const confirmPassword = document.getElementById("signup-confirm-password").value;
+  const confirmPassword = document.getElementById(
+    "signup-confirm-password"
+  ).value;
   const terms = document.getElementById("terms").checked;
   const errorDiv = document.getElementById("signup-error");
   const errorText = document.getElementById("signup-error-text");
@@ -1423,8 +1710,20 @@ async function updateProfile() {
   }
 
   try {
-    const data = await makeRequest(`${baseUrl}users/profile/`, "PUT", { fullname, email }, true);
-    localStorage.setItem("userData", JSON.stringify({ ...JSON.parse(localStorage.getItem("userData")), fullname, email }));
+    const data = await makeRequest(
+      `${baseUrl}users/profile/`,
+      "PUT",
+      { fullname, email },
+      true
+    );
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({
+        ...JSON.parse(localStorage.getItem("userData")),
+        fullname,
+        email,
+      })
+    );
     showToast("Profile updated successfully");
     renderProfilePage();
   } catch (error) {
@@ -1441,7 +1740,10 @@ function updateNavbar() {
     { name: "Booking", page: "booking" },
     { name: "Order", page: "order" },
     { name: "Favourites", page: "favourites", requiresAuth: true },
-    { name: isLoggedIn ? "Profile" : "Sign In", page: isLoggedIn ? "profile" : "signin" },
+    {
+      name: isLoggedIn ? "Profile" : "Sign In",
+      page: isLoggedIn ? "profile" : "signin",
+    },
     { name: "Sign Up", page: "signup", hideWhenLoggedIn: true },
   ];
 
@@ -1453,22 +1755,35 @@ function updateNavbar() {
       <!-- Desktop Menu -->
       <div class="hidden md:flex items-center space-x-6">
         ${navItems
-          .filter(item => !item.hideWhenLoggedIn || !isLoggedIn)
-          .filter(item => !item.requiresAuth || isLoggedIn)
-          .map(item => `
-            <a href="#" onclick="showPage('${item.page}')" class="nav-link text-gray-600 hover:text-green-600 font-medium transition-colors duration-300 ${currentPage === item.page ? "text-green-600" : ""}">
+          .filter((item) => !item.hideWhenLoggedIn || !isLoggedIn)
+          .filter((item) => !item.requiresAuth || isLoggedIn)
+          .map(
+            (item) => `
+            <a href="#" onclick="showPage('${
+              item.page
+            }')" class="nav-link text-gray-600 hover:text-green-600 font-medium transition-colors duration-300 ${
+              currentPage === item.page ? "text-green-600" : ""
+            }">
               ${item.name}
             </a>
-          `).join("")}
-        ${isLoggedIn ? `
+          `
+          )
+          .join("")}
+        ${
+          isLoggedIn
+            ? `
           <button onclick="logoutUser()" class="text-red-500 hover:text-red-700 font-medium">
             <i class="fas fa-sign-out-alt mr-1"></i> Log Out
           </button>
-        ` : ""}
+        `
+            : ""
+        }
         <div class="relative">
           <a href="#" onclick="showPage('order')" class="text-gray-600 hover:text-green-600">
             <i class="fas fa-shopping-cart text-xl"></i>
-            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${cart.length === 0 ? "hidden" : ""}">${cart.length}</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${
+              cart.length === 0 ? "hidden" : ""
+            }">${cart.length}</span>
           </a>
         </div>
       </div>
@@ -1485,21 +1800,34 @@ function updateNavbar() {
     <div id="mobile-menu" class="md:hidden hidden">
       <div class="bg-white shadow-lg p-4">
         ${navItems
-          .filter(item => !item.hideWhenLoggedIn || !isLoggedIn)
-          .filter(item => !item.requiresAuth || isLoggedIn)
-          .map(item => `
-            <a href="#" onclick="showPage('${item.page}'); toggleMobileMenu()" class="block py-2 px-4 text-gray-600 hover:text-green-600 hover:bg-gray-100 rounded ${currentPage === item.page ? "text-green-600 bg-gray-100" : ""}">
+          .filter((item) => !item.hideWhenLoggedIn || !isLoggedIn)
+          .filter((item) => !item.requiresAuth || isLoggedIn)
+          .map(
+            (item) => `
+            <a href="#" onclick="showPage('${
+              item.page
+            }'); toggleMobileMenu()" class="block py-2 px-4 text-gray-600 hover:text-green-600 hover:bg-gray-100 rounded ${
+              currentPage === item.page ? "text-green-600 bg-gray-100" : ""
+            }">
               ${item.name}
             </a>
-          `).join("")}
-        ${isLoggedIn ? `
+          `
+          )
+          .join("")}
+        ${
+          isLoggedIn
+            ? `
           <button onclick="logoutUser(); toggleMobileMenu()" class="block w-full text-left py-2 px-4 text-red-500 hover:bg-gray-100 rounded">
             <i class="fas fa-sign-out-alt mr-1"></i> Log Out
           </button>
-        ` : ""}
+        `
+            : ""
+        }
         <a href="#" onclick="showPage('order'); toggleMobileMenu()" class="block py-2 px-4 text-gray-600 hover:text-green-600 hover:bg-gray-100 rounded relative">
           <i class="fas fa-shopping-cart mr-2"></i> Cart
-          <span id="mobile-cart-count" class="absolute right-4 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${cart.length === 0 ? "hidden" : ""}">${cart.length}</span>
+          <span id="mobile-cart-count" class="absolute right-4 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ${
+            cart.length === 0 ? "hidden" : ""
+          }">${cart.length}</span>
         </a>
       </div>
     </div>
