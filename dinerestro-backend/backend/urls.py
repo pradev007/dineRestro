@@ -9,5 +9,5 @@ urlpatterns = [
     path("foods/", include("foods.urls")),
     path("table-booking/", include("booking.urls")),
     path("events/", include("events.urls")),
-    path("api/", include("payment.urls")),
+    # path("api/", include("payment.urls")),
 ]
