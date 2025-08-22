@@ -24,14 +24,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Static files (CSS, JS, Images)
-STATICFILES_DIRS = [
-    BASE_DIR.parent / "frontend" / "static",   # 👈 look here
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"  # for collectstatic (Render will need this)
+# STATICFILES_DIRS = [
+#     BASE_DIR.parent / "frontend" / "static",   # 👈 look here
+# ]
+# STATIC_ROOT = BASE_DIR / "staticfiles"  # for collectstatic (Render will need this)
 
 
-# WhiteNoise storage
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# # WhiteNoise storage
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
