@@ -137,16 +137,16 @@ function showToast(message, type = "success") {
   `;
     toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-        toast.classList.remove("translate-x-8");
-        toast.classList.add("opacity-100");
-    }, 10);
+    // setTimeout(() => {
+    //     toast.classList.remove("translate-x-8");
+    //     toast.classList.add("opacity-100");
+    // }, 10);
 
-    setTimeout(() => {
-        toast.classList.add("translate-x-8");
-        toast.classList.remove("opacity-100");
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
+    // setTimeout(() => {
+    //     toast.classList.add("translate-x-8");
+    //     toast.classList.remove("opacity-100");
+    //     setTimeout(() => toast.remove(), 400);
+    // }, 3000);
 }
 
 // API functions
