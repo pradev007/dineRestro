@@ -68,6 +68,7 @@ INSTALLED_APPS = [
 
     # packages
     'corsheaders',
+    'csp',
     'drf_spectacular',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -114,6 +115,15 @@ CORS_ALLOWED_ORIGINS = [
   'https://dinerestro-ycpq.onrender.com',
 ]
 
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-eval'", "https://dinerestro.onrender.com")
+CSP_DEFAULT_SRC = ("'self'", "https://dinerestro.onrender.com", "https://dinerestro-ycpq.onrender.com")
+# CSP_IMG_SRC = ("'self'", "https://dinerestro.onrender.com", "https://images.unsplash.com")
+CSP_IMG_SRC = (
+    "'self'",
+    "https://dinerestro.onrender.com",
+    "https://dinerestro-ycpq.onrender.com",
+    "https://images.unsplash.com",  # For static images
+)
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

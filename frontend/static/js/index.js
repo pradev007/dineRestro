@@ -115,39 +115,7 @@ function generateUUID() {
     });
 }
 
-function showToast(message, type = "success") {
-    const toastContainer = document.getElementById("toast-container");
-    const toast = document.createElement("div");
-    toast.className = `toast flex items-center p-2 y-20 rounded-lg shadow-lg bg-green-400 ${
-    type === "success"
-      ? "bg-green-600"
-      : type === "error"
-      ? "bg-red-600"
-      : "bg-blue-600"
-  } text-white opacity-0 transform translate-x-8`;
-    toast.innerHTML = `
-    <i class="fas ${
-      type === "success"
-        ? "fa-check-circle"
-        : type === "error"
-        ? "fa-exclamation-circle"
-        : "fa-info-circle"
-    } mr-2"></i>
-    <span>${message}</span>
-  `;
-    toastContainer.appendChild(toast);
 
-    // setTimeout(() => {
-    //     toast.classList.remove("translate-x-8");
-    //     toast.classList.add("opacity-100");
-    // }, 10);
-
-    // setTimeout(() => {
-    //     toast.classList.add("translate-x-8");
-    //     toast.classList.remove("opacity-100");
-    //     setTimeout(() => toast.remove(), 400);
-    // }, 3000);
-}
 
 // API functions
 async function makeRequest(url, method, body = null, requiresAuth = false) {
@@ -1832,6 +1800,38 @@ function toggleMobileMenu() {
 }
 
 function showPage(page) {
+  currentPage = page;
+  updateNavbar();
+  const renderFunctions = {
+    home: renderHomePage,
+    menu: renderMenuPage,
+    booking: renderBookingPage,
+    favourites: renderFavouritesPage,
+    order: renderOrderPage,
+    profile: renderProfilePage,
+    signin: renderSignInPage,
+    signup: renderSignUpPage,
+  };
+  const renderFunction = renderFunctions[page];
+  if (renderFunction) {
+    renderFunction();
+  } else {
+    console.error(`Page ${page} not found`);
+  }
+}
+
+// Initialize
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("accessToken");
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  if (token && userData) {
+    isLoggedIn = true;
+    isAdmin = userData.staff || userData.superuser;
+  }
+  loadCartFromStorage();
+  updateNavbar();
+  showPage("home");
+});ction showPage(page) {
   currentPage = page;
   updateNavbar();
   const renderFunctions = {
