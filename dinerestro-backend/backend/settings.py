@@ -115,15 +115,13 @@ CORS_ALLOWED_ORIGINS = [
   'https://dinerestro-ycpq.onrender.com',
 ]
 
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-eval'", "https://dinerestro.onrender.com")
-CSP_DEFAULT_SRC = ("'self'", "https://dinerestro.onrender.com", "https://dinerestro-ycpq.onrender.com")
-# CSP_IMG_SRC = ("'self'", "https://dinerestro.onrender.com", "https://images.unsplash.com")
-CSP_IMG_SRC = (
-    "'self'",
-    "https://dinerestro.onrender.com",
-    "https://dinerestro-ycpq.onrender.com",
-    "https://images.unsplash.com",  # For static images
-)
+# CSP Settings
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+CSP_IMG_SRC = ("'self'", "https://images.unsplash.com")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com")
+CSP_CONNECT_SRC = ("'self'",)
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
