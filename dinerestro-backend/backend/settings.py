@@ -108,13 +108,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-  "http://127.0.0.1:8000", # Adjust to your frontend's URL
-  "http://localhost:8000",
-  "http://127.0.0.1:5500",
-  'https://dinerestro-ycpq.onrender.com',
-  "https://dinerestro.onrender.com",
-]
+# CORS_ALLOWED_ORIGINS = [
+#   "http://127.0.0.1:8000", # Adjust to your frontend's URL
+#   "http://localhost:8000",
+#   "http://127.0.0.1:5500",
+#   'https://dinerestro-ycpq.onrender.com',
+#   "https://dinerestro.onrender.com",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # CSP Settings
 CSP_DEFAULT_SRC = ("'self'",)

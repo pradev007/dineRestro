@@ -6,7 +6,8 @@ let selectedCategory = "all";
 let selectedTable = null;
 let bookingDetails = { date: "", time: "", guests: 2, table: "" };
 let cart = [];
-const baseUrl = "https://dinerestro.onrender.com/";
+// const baseUrl = "https://dinerestro.onrender.com/";
+const baseUrl = "https://dinerestro-ycpq.onrender.com/";
 
 // Booking pricing structure
 const bookingPrices = {
