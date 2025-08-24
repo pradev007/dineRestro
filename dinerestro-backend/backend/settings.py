@@ -21,7 +21,7 @@ MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media" 
 # STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -111,6 +111,7 @@ CORS_ALLOWED_ORIGINS = [
   "http://127.0.0.1:8000", # Adjust to your frontend's URL
   "http://localhost:8000",
   "http://127.0.0.1:5500",
+  'https://dinerestro-ycpq.onrender.com',
 ]
 
 # Database
