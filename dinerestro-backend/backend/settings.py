@@ -119,12 +119,12 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
 # CSP Settings
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
-CSP_IMG_SRC = ("'self'", "https://images.unsplash.com")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com")
-CSP_CONNECT_SRC = ("'self'",)
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+# CSP_IMG_SRC = ("'self'", "https://images.unsplash.com")
+# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+# CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com")
+# CSP_CONNECT_SRC = ("'self'",)
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
