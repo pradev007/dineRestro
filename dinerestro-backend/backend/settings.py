@@ -112,7 +112,8 @@ CORS_ALLOWED_ORIGINS = [
   "http://127.0.0.1:8000", # Adjust to your frontend's URL
   "http://localhost:8000",
   "http://127.0.0.1:5500",
-  'https://dinerestro-ycpq.onrender.com',
+#   'https://dinerestro-ycpq.onrender.com',
+  "https://dinerestro.onrender.com",
 ]
 
 # CSP Settings
@@ -122,6 +123,7 @@ CSP_IMG_SRC = ("'self'", "https://images.unsplash.com")
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com")
 CSP_CONNECT_SRC = ("'self'",)
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
