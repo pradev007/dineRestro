@@ -120,19 +120,19 @@ function showToast(message, type = "success") {
     const toastContainer = document.getElementById("toast-container");
     const toast = document.createElement("div");
     toast.className = `toast flex items-center p-2 rounded-lg shadow-lg bg-green-400 ${
-        type === "success"
-            ? "bg-green-600"
-            : type === "error"
-            ? "bg-red-600"
-            : "bg-blue-600"
-    } text-white opacity-0 transform translate-x-8`;
+    type === "success"
+      ? "bg-green-600"
+      : type === "error"
+      ? "bg-red-600"
+      : "bg-blue-600"
+  } text-white opacity-0 transform translate-x-8`;
     toast.innerHTML = `
         <i class="fas ${
-            type === "success"
-                ? "fa-check-circle"
-                : type === "error"
-                ? "fa-exclamation-circle"
-                : "fa-info-circle"
+          type === "success"
+            ? "fa-check-circle"
+            : type === "error"
+            ? "fa-exclamation-circle"
+            : "fa-info-circle"
         } mr-2"></i>
         <span>${message}</span>
     `;
@@ -283,7 +283,11 @@ async function loadFoodItems() {
         return data.map((item) => ({
             ...item,
             is_favorite: item.is_favorite || false,
-            image: item.image && item.image.startsWith("http") ? item.image : null,
+            image: item.image ?
+                item.image.startsWith("http") ?
+                item.image :
+                `${baseUrl}${item.image.startsWith("/") ? "" : "/"}${item.image}` :
+                null,
             ingredients: item.ingredients || [],
         }));
     } catch (error) {
@@ -654,8 +658,8 @@ async function renderHomePage() {
                 </div>
                 ${
                   food.image
-                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />`
-                    : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
+                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
                 }
                 <div class="p-5">
                   <div class="flex justify-between items-start mb-2">
@@ -826,7 +830,7 @@ async function renderMenuPage() {
             </div>
             ${
               food.image
-                ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />`
+                ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
                 : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
             }
             <div class="p-6">
@@ -1111,7 +1115,7 @@ async function renderFavouritesPage() {
               </div>
               ${
                 food.image
-                  ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" />`
+                  ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
                   : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
               }
               <div class="p-6">
@@ -1330,8 +1334,8 @@ async function renderOrderPage() {
                 </div>
                 ${
                   food.image
-                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-48 object-cover" />`
-                    : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                    ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
+                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
                 }
                 <div class="p-5">
                   <div class="flex justify-between items-start mb-2">
