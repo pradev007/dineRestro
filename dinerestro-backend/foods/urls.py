@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     CategoryAdminView, CategoryAdminDetailView,
-    CategoryListView, CategoryDetailView,
+    CategoryListView, CategoryDetailView, FavouriteDeleteView, FavouriteListCreateView,
     FoodAdminView, FoodAdminDetailView,
     FoodListView, FoodDetailView
 )
@@ -22,4 +22,8 @@ urlpatterns = [
     # Food items - user
     path("foods/", FoodListView.as_view(), name="food-list"),
     path("foods/<int:pk>/", FoodDetailView.as_view(), name="food-detail"),
+
+    # New favorites endpoints
+    path('favourites/', FavouriteListCreateView.as_view(), name='favourite-list-create'),
+    path('favourites/<int:food_id>/', FavouriteDeleteView.as_view(), name='favourite-delete'),
 ]
