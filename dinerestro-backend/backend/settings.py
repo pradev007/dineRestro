@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR/'media'
 
 
 # Static files (CSS, JS, Images)
@@ -31,7 +31,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-lun^bfw^lekqje%im*-%_l^hmxf3sy8la!yr#bvoay618bf!0o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 
     # packages
     'corsheaders',
+    'datetimewidget',
     'csp',
     'drf_spectacular',
     'rest_framework',

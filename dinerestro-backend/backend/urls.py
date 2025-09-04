@@ -12,9 +12,5 @@ urlpatterns = [
     path("table-booking/", include("booking.urls")),
     path("events/", include("events.urls")),
     # path("api/", include("payment.urls")),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
-# Serve media files
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

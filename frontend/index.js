@@ -6,6 +6,7 @@ let selectedCategory = "all";
 let selectedTable = null;
 let bookingDetails = { date: "", time: "", guests: 2, table: "" };
 let cart = [];
+let currentEvent = null;
 let foodItems = []; // Add foodItems to global state
 let favoriteItems = []; // Initialize favoriteItems
 const baseUrl = "http://127.0.0.1:8000/";
@@ -13,122 +14,110 @@ const baseUrl = "http://127.0.0.1:8000/";
 
 // Booking pricing structure
 const bookingPrices = {
-    1: 200,
-    2: 300,
-    3: 400,
-    4: 500,
-    5: 600,
-    6: 700,
-    7: 800,
-    8: 800,
+  1: 200,
+  2: 300,
+  3: 400,
+  4: 500,
+  5: 600,
+  6: 700,
+  7: 800,
+  8: 800,
 };
 
 // Static data for events, discounts, and staff
-const events = [{
-        id: 1,
-        type: "current",
-        name: "Live Music Night",
-        date: "August 12, 2025",
-        description: "Enjoy live jazz with local artists tonight!",
-        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-    },
-    {
-        id: 2,
-        type: "upcoming",
-        name: "Coffee Tasting Workshop",
-        date: "August 20, 2025",
-        description: "Learn about coffee origins and brewing techniques.",
-        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-    },
+
+const discounts = [
+  {
+    occasion: "National Coffee Day",
+    date: "September 29, 2025",
+    offer: "50% off all coffee drinks",
+  },
+  {
+    occasion: "Cafe Anniversary",
+    date: "October 10, 2025",
+    offer: "Buy one dessert, get one free",
+  },
+  {
+    occasion: "Halloween Special",
+    date: "October 31, 2025",
+    offer: "20% off all spooky-themed drinks",
+  },
+  {
+    occasion: "Thanksgiving Week",
+    date: "November 24-30, 2025",
+    offer: "Free dessert with any main course",
+  },
+  {
+    occasion: "Christmas Celebration",
+    date: "December 20-25, 2025",
+    offer: "25% off all festive drinks and desserts",
+  },
+  {
+    occasion: "New Year Countdown",
+    date: "December 31, 2025",
+    offer: "Free champagne toast with any meal",
+  },
 ];
 
-const discounts = [{
-        occasion: "National Coffee Day",
-        date: "September 29, 2025",
-        offer: "50% off all coffee drinks",
-    },
-    {
-        occasion: "Cafe Anniversary",
-        date: "October 10, 2025",
-        offer: "Buy one dessert, get one free",
-    },
-    {
-        occasion: "Halloween Special",
-        date: "October 31, 2025",
-        offer: "20% off all spooky-themed drinks",
-    },
-    {
-        occasion: "Thanksgiving Week",
-        date: "November 24-30, 2025",
-        offer: "Free dessert with any main course",
-    },
-    {
-        occasion: "Christmas Celebration",
-        date: "December 20-25, 2025",
-        offer: "25% off all festive drinks and desserts",
-    },
-    {
-        occasion: "New Year Countdown",
-        date: "December 31, 2025",
-        offer: "Free champagne toast with any meal",
-    },
-];
-
-const staff = [{
-        name: "Chef Anna",
-        role: "Head Chef",
-        bio: "Anna brings 10 years of culinary expertise to our signature dishes.",
-        image: "https://images.unsplash.com/photo-1583394293214-28ded15f4d90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-    },
-    {
-        name: "Barista Mike",
-        role: "Lead Barista",
-        bio: "Mike's latte art and coffee blends are a guest favorite.",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d877c6f8f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-    },
-    {
-        name: "Pastry Chef Lisa",
-        role: "Pastry Chef",
-        bio: "Lisa's desserts are a sweet ending to any meal.",
-        image: "https://images.unsplash.com/photo-1589927986089-358123789b8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
-    },
+const staff = [
+  {
+    name: "Chef Anna",
+    role: "Head Chef",
+    bio: "Anna brings 10 years of culinary expertise to our signature dishes.",
+    image:
+      "https://images.unsplash.com/photo-1583394293214-28ded15f4d90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    name: "Barista Mike",
+    role: "Lead Barista",
+    bio: "Mike's latte art and coffee blends are a guest favorite.",
+    image:
+      "https://images.unsplash.com/photo-1573496359142-b8d877c6f8f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    name: "Pastry Chef Lisa",
+    role: "Pastry Chef",
+    bio: "Lisa's desserts are a sweet ending to any meal.",
+    image:
+      "https://images.unsplash.com/photo-1589927986089-358123789b8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60",
+  },
 ];
 
 // Utility functions
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === name + "=") {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-    return cookieValue;
+  }
+  return cookieValue;
 }
 
 function generateUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-        const r = (Math.random() * 16) | 0,
-            v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 function showToast(message, type = "success") {
-    const toastContainer = document.getElementById("toast-container");
-    const toast = document.createElement("div");
-    toast.className = `toast flex items-center p-2 rounded-lg shadow-lg bg-green-400 ${
+  const toastContainer = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast flex items-center p-2 rounded-lg shadow-lg bg-green-400 ${
     type === "success"
       ? "bg-green-600"
       : type === "error"
       ? "bg-red-600"
       : "bg-blue-600"
   } text-white opacity-0 transform translate-x-8`;
-    toast.innerHTML = `
+  toast.innerHTML = `
         <i class="fas ${
           type === "success"
             ? "fa-check-circle"
@@ -138,329 +127,352 @@ function showToast(message, type = "success") {
         } mr-2"></i>
         <span>${message}</span>
     `;
-    toastContainer.appendChild(toast);
+  toastContainer.appendChild(toast);
 
-    setTimeout(() => {
-        toast.classList.remove("translate-x-8");
-        toast.classList.add("opacity-100");
-    }, 10);
+  setTimeout(() => {
+    toast.classList.remove("translate-x-8");
+    toast.classList.add("opacity-100");
+  }, 10);
 
-    setTimeout(() => {
-        toast.classList.add("translate-x-8");
-        toast.classList.remove("opacity-100");
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
+  setTimeout(() => {
+    toast.classList.add("translate-x-8");
+    toast.classList.remove("opacity-100");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
 }
 
 // API functions
 async function makeRequest(url, method, body = null, requiresAuth = false) {
-    const headers = {
-        "Content-Type": "application/json",
-    };
+  const headers = {
+    "Content-Type": "application/json",
+  };
 
-    if (requiresAuth && localStorage.getItem("accessToken")) {
-        headers["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
+  if (requiresAuth && localStorage.getItem("accessToken")) {
+    headers["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
+  }
+
+  const options = {
+    method,
+    headers,
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Something went wrong");
     }
 
-    const options = {
-        method,
-        headers,
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const response = await fetch(url, options);
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.detail || "Something went wrong");
-        }
-
-        return data;
-    } catch (error) {
-        console.error("API Error:", error);
-        showToast(error.message || "API request failed", "error");
-        throw error;
-    }
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    showToast(error.message || "API request failed", "error");
+    throw error;
+  }
 }
 
 async function registerUser(email, password, fullname) {
-    try {
-        const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
-            email,
-            password,
-            fullname,
-        });
-        showToast(data.message || "Registration successful");
-        return data;
-    } catch (error) {
-        return null;
-    }
+  try {
+    const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
+      email,
+      password,
+      fullname,
+    });
+    showToast(data.message || "Registration successful");
+    return data;
+  } catch (error) {
+    return null;
+  }
 }
 
 async function loginUser(email, password) {
-    try {
-        const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
-            email,
-            password,
-        });
+  try {
+    const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
+      email,
+      password,
+    });
 
-        // Check if user is staff or superuser
-        if (data.staff || data.superuser) {
-            throw new Error("Staff or admin accounts cannot log in here");
-        }
-
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        localStorage.setItem(
-            "userData",
-            JSON.stringify({
-                email: data.email,
-                fullname: data.fullname,
-                staff: data.staff,
-                active: data.active,
-                superuser: data.superuser,
-            })
-        );
-
-        isLoggedIn = true;
-        isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
-
-        updateNavbar();
-        showToast(`Welcome back, ${data.fullname}!`);
-
-        // Redirect to the previous page if it's not signin/signup, otherwise go to home
-        const redirectPage = ["signin", "signup"].includes(currentPage) ?
-            "home" :
-            currentPage;
-        showPage(redirectPage);
-
-        return data;
-    } catch (error) {
-        console.error("Login error:", error);
-        showToast(error.message || "Login failed", "error");
-        return null;
+    // Check if user is staff or superuser
+    if (data.staff || data.superuser) {
+      throw new Error("Staff or admin accounts cannot log in here");
     }
+
+    localStorage.setItem("accessToken", data.access);
+    localStorage.setItem("refreshToken", data.refresh);
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({
+        email: data.email,
+        fullname: data.fullname,
+        staff: data.staff,
+        active: data.active,
+        superuser: data.superuser,
+      })
+    );
+
+    isLoggedIn = true;
+    isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
+
+    updateNavbar();
+    showToast(`Welcome back, ${data.fullname}!`);
+
+    // Redirect to the previous page if it's not signin/signup, otherwise go to home
+    const redirectPage = ["signin", "signup"].includes(currentPage)
+      ? "home"
+      : currentPage;
+    showPage(redirectPage);
+
+    return data;
+  } catch (error) {
+    console.error("Login error:", error);
+    showToast(error.message || "Login failed", "error");
+    return null;
+  }
 }
 
 function logoutUser() {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userData");
-    isLoggedIn = false;
-    isAdmin = false;
-    cart = [];
-    updateNavbar();
-    showToast("Logged out successfully");
-    showPage("home");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("userData");
+  isLoggedIn = false;
+  isAdmin = false;
+  cart = [];
+  updateNavbar();
+  showToast("Logged out successfully");
+  showPage("home");
 }
 
 async function loadCategories() {
-    try {
-        const data = await makeRequest(
-            `${baseUrl}foods/categories/`,
+  try {
+    const data = await makeRequest(
+      `${baseUrl}foods/categories/`,
+      "GET",
+      null,
+      true
+    );
+    return data.filter(
+      (category) =>
+        category.name &&
+        category.name.trim() !== "" &&
+        category.name !== "string"
+    );
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    showToast("Failed to load categories", "error");
+    return [];
+  }
+}
+
+async function loadFoodItems() {
+  try {
+    const response = await makeRequest(`${baseUrl}foods/foods/`, "GET");
+    console.log("Food Items API Response:", response);
+    foodItems = (response || []).map((item) => ({
+      ...item,
+      price: isValidNumber(item.price) ? parseFloat(item.price) : 0,
+    }));
+
+    // Load favorites from backend if logged in
+    if (isLoggedIn) {
+      try {
+        favoriteItems =
+          (await makeRequest(
+            `${baseUrl}foods/favourites/`,
             "GET",
             null,
             true
-        );
-        return data.filter(
-            (category) =>
-            category.name &&
-            category.name.trim() !== "" &&
-            category.name !== "string"
-        );
-    } catch (error) {
-        console.error("Error fetching categories:", error);
-        showToast("Failed to load categories", "error");
-        return [];
+          )) || [];
+        console.log("Favorites API Response:", favoriteItems);
+        localStorage.setItem("favoriteItems", JSON.stringify(favoriteItems));
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+        favoriteItems = JSON.parse(localStorage.getItem("favoriteItems")) || [];
+        console.log("Loaded favorites from localStorage:", favoriteItems);
+      }
+    } else {
+      favoriteItems = JSON.parse(localStorage.getItem("favoriteItems")) || [];
+      console.log(
+        "Loaded favorites from localStorage (not logged in):",
+        favoriteItems
+      );
     }
-}
 
-
-async function loadFoodItems() {
-    try {
-        const response = await makeRequest(`${baseUrl}foods/foods/`, 'GET');
-        console.log('Food Items API Response:', response);
-        foodItems = (response || []).map(item => ({
-            ...item,
-            price: isValidNumber(item.price) ? parseFloat(item.price) : 0,
-        }));
-
-        // Load favorites from backend if logged in
-        if (isLoggedIn) {
-            try {
-                favoriteItems = await makeRequest(`${baseUrl}foods/favourites/`, 'GET', null, true) || [];
-                console.log('Favorites API Response:', favoriteItems);
-                localStorage.setItem('favoriteItems', JSON.stringify(favoriteItems));
-            } catch (error) {
-                console.error('Error fetching favorites:', error);
-                favoriteItems = JSON.parse(localStorage.getItem('favoriteItems')) || [];
-                console.log('Loaded favorites from localStorage:', favoriteItems);
-            }
-        } else {
-            favoriteItems = JSON.parse(localStorage.getItem('favoriteItems')) || [];
-            console.log('Loaded favorites from localStorage (not logged in):', favoriteItems);
-        }
-
-        // Add is_favorite flag to foodItems
-        foodItems = foodItems.map(food => ({
-            ...food,
-            is_favorite: favoriteItems.some(fav => fav.food?.id === food.id)
-        }));
-        console.log('Updated foodItems with is_favorite:', foodItems);
-        return foodItems;
-    } catch (error) {
-        console.error('Error fetching food items:', error);
-        showToast('Failed to load food items', 'error');
-        return [];
-    }
+    // Add is_favorite flag to foodItems
+    foodItems = foodItems.map((food) => ({
+      ...food,
+      is_favorite: favoriteItems.some((fav) => fav.food?.id === food.id),
+    }));
+    console.log("Updated foodItems with is_favorite:", foodItems);
+    return foodItems;
+  } catch (error) {
+    console.error("Error fetching food items:", error);
+    showToast("Failed to load food items", "error");
+    return [];
+  }
 }
 
 async function toggleFavorite(id, element = null) {
-    if (!isLoggedIn) {
-        showToast("Please log in to add favorites", "error");
-        showPage("signin");
-        return;
-    }
+  if (!isLoggedIn) {
+    showToast("Please log in to add favorites", "error");
+    showPage("signin");
+    return;
+  }
 
-    const food = foodItems.find(item => String(item.id) === String(id));
-    if (!food) {
-        showToast("Food item not found", "error");
-        return;
-    }
+  const food = foodItems.find((item) => String(item.id) === String(id));
+  if (!food) {
+    showToast("Food item not found", "error");
+    return;
+  }
 
-    const isFavorite = favoriteItems.some(fav => fav.food.id === parseInt(id));
-    try {
-        if (!isFavorite) {
-            const response = await makeRequest(`${baseUrl}foods/favourites/`, 'POST', { food_id: id }, true);
-            favoriteItems.push(response);
-            if (element) {
-                element.classList.add("text-red-500");
-                element.classList.remove("text-gray-300");
-            }
-            showToast(`${food.name} added to favorites`, "success");
-        } else {
-            const favorite = favoriteItems.find(fav => fav.food.id === parseInt(id));
-            if (!favorite) {
-                showToast("Favorite not found", "error");
-                return;
-            }
-            await makeRequest(`${baseUrl}foods/favourites/${favorite.id}/`, 'DELETE', null, true);
-            favoriteItems = favoriteItems.filter(fav => fav.food.id !== parseInt(id));
-            if (element) {
-                element.classList.add("text-gray-300");
-                element.classList.remove("text-red-500");
-            }
-            showToast(`${food.name} removed from favorites`, "success");
-        }
-        localStorage.setItem('favoriteItems', JSON.stringify(favoriteItems));
-        foodItems = foodItems.map(item => ({
-            ...item,
-            is_favorite: favoriteItems.some(fav => fav.food.id === item.id)
-        }));
-        if (currentPage === "favourites") {
-            await renderFavouritesPage();
-        }
-    } catch (error) {
-        console.error("Error toggling favorite:", error);
-        showToast("Failed to update favorite", "error");
+  const isFavorite = favoriteItems.some((fav) => fav.food.id === parseInt(id));
+  try {
+    if (!isFavorite) {
+      const response = await makeRequest(
+        `${baseUrl}foods/favourites/`,
+        "POST",
+        { food_id: id },
+        true
+      );
+      favoriteItems.push(response);
+      if (element) {
+        element.classList.add("text-red-500");
+        element.classList.remove("text-gray-300");
+      }
+      showToast(`${food.name} added to favorites`, "success");
+    } else {
+      const favorite = favoriteItems.find(
+        (fav) => fav.food.id === parseInt(id)
+      );
+      if (!favorite) {
+        showToast("Favorite not found", "error");
+        return;
+      }
+      await makeRequest(
+        `${baseUrl}foods/favourites/${favorite.id}/`,
+        "DELETE",
+        null,
+        true
+      );
+      favoriteItems = favoriteItems.filter(
+        (fav) => fav.food.id !== parseInt(id)
+      );
+      if (element) {
+        element.classList.add("text-gray-300");
+        element.classList.remove("text-red-500");
+      }
+      showToast(`${food.name} removed from favorites`, "success");
     }
+    localStorage.setItem("favoriteItems", JSON.stringify(favoriteItems));
+    foodItems = foodItems.map((item) => ({
+      ...item,
+      is_favorite: favoriteItems.some((fav) => fav.food.id === item.id),
+    }));
+    if (currentPage === "favourites") {
+      await renderFavouritesPage();
+    }
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+    showToast("Failed to update favorite", "error");
+  }
 }
 
 async function addCategory(name) {
-    if (!isAdmin) {
-        showToast("Admin access required to add categories", "error");
-        return null;
-    }
+  if (!isAdmin) {
+    showToast("Admin access required to add categories", "error");
+    return null;
+  }
 
-    try {
-        const data = await makeRequest(
-            `${baseUrl}foods/categories/`,
-            "POST", { name },
-            true
-        );
-        showToast("Category added successfully");
-        return data;
-    } catch (error) {
-        console.error("Error adding category:", error);
-        showToast("Failed to add category", "error");
-        return null;
-    }
+  try {
+    const data = await makeRequest(
+      `${baseUrl}foods/categories/`,
+      "POST",
+      { name },
+      true
+    );
+    showToast("Category added successfully");
+    return data;
+  } catch (error) {
+    console.error("Error adding category:", error);
+    showToast("Failed to add category", "error");
+    return null;
+  }
 }
 
 function addToCart(id) {
-    if (!isLoggedIn) {
-        showToast("Please log in to add items to cart", "error");
-        showPage("signin");
-        return;
+  if (!isLoggedIn) {
+    showToast("Please log in to add items to cart", "error");
+    showPage("signin");
+    return;
+  }
+
+  loadFoodItems().then((foods) => {
+    const food = foods.find((item) => String(item.id) === String(id));
+    if (!food) {
+      showToast("Item not found", "error");
+      return;
     }
 
-    loadFoodItems().then((foods) => {
-        const food = foods.find((item) => String(item.id) === String(id));
-        if (!food) {
-            showToast("Item not found", "error");
-            return;
-        }
+    // Ensure price is a number
+    const price = parseFloat(food.price);
+    if (isNaN(price)) {
+      showToast(`Invalid price for ${food.name}`, "error");
+      return;
+    }
 
-        // Ensure price is a number
-        const price = parseFloat(food.price);
-        if (isNaN(price)) {
-            showToast(`Invalid price for ${food.name}`, "error");
-            return;
-        }
+    // Check if item already exists in cart
+    const existingItem = cart.find((item) => String(item.id) === String(id));
+    if (existingItem) {
+      existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
+      showToast(`${food.name} quantity updated in cart!`, "success");
+    } else {
+      cart.push({ ...food, price: price, quantity: 1 }); // Add new item with numeric price
+      showToast(`${food.name} added to cart!`, "success");
+    }
 
-        // Check if item already exists in cart
-        const existingItem = cart.find((item) => String(item.id) === String(id));
-        if (existingItem) {
-            existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
-            showToast(`${food.name} quantity updated in cart!`, "success");
-        } else {
-            cart.push({ ...food, price: price, quantity: 1 }); // Add new item with numeric price
-            showToast(`${food.name} added to cart!`, "success");
-        }
-
-        saveCartToStorage(); // Save cart to localStorage
-        updateCartCount();
-        updateCartDisplay();
-    });
+    saveCartToStorage(); // Save cart to localStorage
+    updateCartCount();
+    updateCartDisplay();
+  });
 }
 
 function removeFromCart(index) {
-    const item = cart[index];
-    if (item.quantity > 1) {
-        item.quantity -= 1; // Decrement quantity
-        showToast(`${item.name} quantity reduced in cart`, "success");
-    } else {
-        cart.splice(index, 1); // Remove item if quantity is 1
-        showToast(`${item.name} removed from cart`, "success");
-    }
-    saveCartToStorage(); // Save updated cart
-    updateCartCount();
-    updateCartDisplay();
+  const item = cart[index];
+  if (item.quantity > 1) {
+    item.quantity -= 1; // Decrement quantity
+    showToast(`${item.name} quantity reduced in cart`, "success");
+  } else {
+    cart.splice(index, 1); // Remove item if quantity is 1
+    showToast(`${item.name} removed from cart`, "success");
+  }
+  saveCartToStorage(); // Save updated cart
+  updateCartCount();
+  updateCartDisplay();
 }
 
 function updateCartCount() {
-    const cartCount = document.getElementById("cart-count");
-    const mobileCartCount = document.getElementById("mobile-cart-count");
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
-    if (cartCount) {
-        cartCount.textContent = totalItems;
-        cartCount.classList.toggle("hidden", totalItems === 0);
-    }
-    if (mobileCartCount) {
-        mobileCartCount.textContent = totalItems;
-        mobileCartCount.classList.toggle("hidden", totalItems === 0);
-    }
+  const cartCount = document.getElementById("cart-count");
+  const mobileCartCount = document.getElementById("mobile-cart-count");
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
+  if (cartCount) {
+    cartCount.textContent = totalItems;
+    cartCount.classList.toggle("hidden", totalItems === 0);
+  }
+  if (mobileCartCount) {
+    mobileCartCount.textContent = totalItems;
+    mobileCartCount.classList.toggle("hidden", totalItems === 0);
+  }
 }
 
 function updateCartDisplay() {
-    const cartItemsDiv = document.getElementById("cart-items");
-    if (cartItemsDiv) {
-        if (cart.length === 0) {
-            cartItemsDiv.innerHTML = `
+  const cartItemsDiv = document.getElementById("cart-items");
+  if (cartItemsDiv) {
+    if (cart.length === 0) {
+      cartItemsDiv.innerHTML = `
                 <div class="text-center py-12">
                     <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-500">Your cart is empty</h3>
@@ -469,22 +481,26 @@ function updateCartDisplay() {
                     </button>
                 </div>
             `;
-        } else {
-            cartItemsDiv.innerHTML = cart
-                .map((item, index) => {
-                    // Safely convert price to a number or use a fallback
-                    const price = isValidNumber(item.price) ? parseFloat(item.price).toFixed(2) : "N/A";
-                    return `
+    } else {
+      cartItemsDiv.innerHTML = cart
+        .map((item, index) => {
+          // Safely convert price to a number or use a fallback
+          const price = isValidNumber(item.price)
+            ? parseFloat(item.price).toFixed(2)
+            : "N/A";
+          return `
                         <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
                             <div class="flex items-center">
                                 ${
-                                    item.image
-                                        ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />`
-                                        : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`
+                                  item.image
+                                    ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />`
+                                    : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`
                                 }
                                 <div>
                                     <h3 class="font-medium">${item.name}</h3>
-                                    <p class="text-green-600 font-bold">$${price} x ${item.quantity || 1}</p>
+                                    <p class="text-green-600 font-bold">$${price} x ${
+            item.quantity || 1
+          }</p>
                                 </div>
                             </div>
                             <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
@@ -492,10 +508,10 @@ function updateCartDisplay() {
                             </button>
                         </div>
                     `;
-                })
-                .join("");
-        }
+        })
+        .join("");
     }
+  }
 }
 
 function saveCartToStorage() {
@@ -503,15 +519,15 @@ function saveCartToStorage() {
 }
 
 function loadCartFromStorage() {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-        cart = JSON.parse(storedCart).map(item => ({
-            ...item,
-            price: isValidNumber(item.price) ? parseFloat(item.price) : 0, // Fallback to 0 if invalid
-        }));
-        updateCartCount();
-        updateCartDisplay();
-    }
+  const storedCart = localStorage.getItem("cart");
+  if (storedCart) {
+    cart = JSON.parse(storedCart).map((item) => ({
+      ...item,
+      price: isValidNumber(item.price) ? parseFloat(item.price) : 0, // Fallback to 0 if invalid
+    }));
+    updateCartCount();
+    updateCartDisplay();
+  }
 }
 
 function placeOrder() {
@@ -612,16 +628,210 @@ function closeModal() {
   document.getElementById("payment-modal").classList.add("hidden");
 }
 
+function showEventDetails(event) {
+  currentEvent = event;
+  showPage("event-details");
+}
+
+// Add this function to render event details page
+function renderEventDetailsPage() {
+  if (!currentEvent) {
+    showToast("Event not found", "error");
+    showPage("home");
+    return;
+  }
+
+  // Format the date from API response
+  const eventDate = new Date(currentEvent.event_date);
+  const formattedDate = eventDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const mainContent = document.getElementById("main-content");
+  mainContent.innerHTML = `
+        <div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+            <button onclick="showPage('home')" class="mb-6 text-green-600 hover:text-green-800 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </button>
+            
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <!-- Event Image -->
+                <div class="relative h-96">
+                    ${
+                      currentEvent.image
+                        ? `<img src="${currentEvent.image}" alt="${currentEvent.event_name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80';" />`
+                        : `<div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <span class="text-gray-500 text-xl">Event Image Not Available</span>
+                          </div>`
+                    }
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-end">
+                        <div class="p-8 text-white">
+                            <span class="px-4 py-2 rounded-full text-sm font-medium ${
+                              currentEvent.is_happening
+                                ? "bg-green-500"
+                                : "bg-yellow-500"
+                            }">
+                                ${
+                                  currentEvent.is_happening
+                                    ? "Happening Now"
+                                    : "Upcoming Event"
+                                }
+                            </span>
+                            <h1 class="text-4xl font-bold mt-4">${
+                              currentEvent.event_name
+                            }</h1>
+                            <p class="text-xl mt-2">${formattedDate}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Main Content -->
+                        <div class="md:col-span-2">
+                            <h2 class="text-2xl font-bold mb-4">Event Description</h2>
+                            <p class="text-gray-700 text-lg leading-relaxed">
+                                ${
+                                  currentEvent.descriptions ||
+                                  "No detailed description available."
+                                }
+                            </p>
+                            
+                            <div class="mt-8">
+                                <h3 class="text-xl font-bold mb-4">What to Expect</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <span>Exceptional culinary experience</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <span>Live entertainment and activities</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <span>Special menu offerings</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                        <span>Memorable dining atmosphere</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="text-xl font-bold mb-4">Event Information</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-700">Date & Time</h4>
+                                    <p class="text-gray-900">${formattedDate}</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-semibold text-gray-700">Location</h4>
+                                    <p class="text-gray-900">DineManager Restaurant</p>
+                                    <p class="text-gray-600">123 Restaurant St, Foodville</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-semibold text-gray-700">Status</h4>
+                                    <p class="${
+                                      currentEvent.is_happening
+                                        ? "text-green-600"
+                                        : "text-yellow-600"
+                                    } font-medium">
+                                        ${
+                                          currentEvent.is_happening
+                                            ? "Currently Happening"
+                                            : "Upcoming Event"
+                                        }
+                                    </p>
+                                </div>
+                                
+                                <div class="pt-4 border-t border-gray-200">
+                                    <h4 class="font-semibold text-gray-700 mb-2">Reservations</h4>
+                                    <p class="text-gray-600 mb-4">Book your table in advance for this special event</p>
+                                    <button onclick="showPage('booking')" class="w-full btn-primary text-white py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300">
+                                        <i class="fas fa-calendar-check mr-2"></i> Book Table
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="mt-12 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
+                        <h3 class="text-xl font-bold mb-4">Additional Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Dress Code</h4>
+                                <p class="text-gray-600">Smart casual attire recommended</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Special Notes</h4>
+                                <p class="text-gray-600">Please inform us of any dietary restrictions when booking</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Contact</h4>
+                                <p class="text-gray-600">(123) 456-7890 or events@dinemanager.com</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-2">Cancellation Policy</h4>
+                                <p class="text-gray-600">24 hours notice required for cancellations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call to Action -->
+                    <div class="mt-8 text-center">
+                        <p class="text-gray-600 mb-4">Don't miss out on this exciting event!</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="showPage('booking')" class="btn-primary text-white px-8 py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300">
+                                <i class="fas fa-ticket-alt mr-2"></i> Reserve Your Spot
+                            </button>
+                            <button onclick="showPage('menu')" class="bg-white border border-green-600 text-green-600 px-8 py-3 rounded-lg font-bold hover:bg-green-50 transition-all duration-300">
+                                <i class="fas fa-utensils mr-2"></i> View Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Page rendering functions
 async function renderHomePage() {
-    const foods = await loadFoodItems() || [];
-    const categories = await loadCategories() || [];
-    const popularItems = (foods.length > 0
-        ? foods.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 4)
-        : []);
+  const foods = (await loadFoodItems()) || [];
+  const categories = (await loadCategories()) || [];
+  const popularItems =
+    foods.length > 0
+      ? foods
+          .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+          .slice(0, 4)
+      : [];
 
-    const mainContent = document.getElementById("main-content");
-    mainContent.innerHTML = `
+  // Load events from API
+  let apiEvents = [];
+  try {
+    apiEvents = await makeRequest(`${baseUrl}events/list/`, "GET");
+    console.log("Events API Response:", apiEvents);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    // Fallback to static events if API fails
+    apiEvents = events;
+  }
+
+  const mainContent = document.getElementById("main-content");
+  mainContent.innerHTML = `
         <div class="space-y-16">
             <!-- Hero Section -->
             <section class="relative h-screen-80 rounded-2xl overflow-hidden hero-section animate__animated animate__fadeIn">
@@ -642,63 +852,98 @@ async function renderHomePage() {
             <!-- Featured Categories -->
             <section class="animate__animated animate__fadeIn">
                 <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Our Menu Categories</h2>
-                ${categories.length === 0 ? `
+                ${
+                  categories.length === 0
+                    ? `
                     <div class="text-center py-12">
                         <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600">No categories found</h3>
                         <p class="text-gray-500">Please try again later or contact support.</p>
                     </div>
-                ` : `
+                `
+                    : `
                     <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
-                        ${categories.map(category => `
+                        ${categories
+                          .map(
+                            (category) => `
                             <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="filterFoods('${category.name}')">
                                 <h3 class="text-xl font-semibold text-center">${category.name}</h3>
                             </div>
-                        `).join("")}
+                        `
+                          )
+                          .join("")}
                     </div>
-                `}
+                `
+                }
             </section>
 
             <!-- Popular Dishes -->
             <section class="animate__animated animate__fadeIn">
                 <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Popular Dishes</h2>
-                ${popularItems.length === 0 ? `
+                ${
+                  popularItems.length === 0
+                    ? `
                     <div class="text-center py-12">
                         <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600">No popular dishes found</h3>
                         <p class="text-gray-500">Please try again later or contact support.</p>
                     </div>
-                ` : `
+                `
+                    : `
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        ${popularItems.map(food => `
+                        ${popularItems
+                          .map(
+                            (food) => `
                             <div class="food-card bg-white rounded-xl overflow-hidden relative">
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                                    <button onclick="toggleFavorite('${
+                                      food.id
+                                    }', this)" class="fav-icon text-2xl ${
+                              food.is_favorite
+                                ? "text-red-500"
+                                : "text-gray-300"
+                            } hover:text-red-500">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
-                                ${food.image
+                                ${
+                                  food.image
                                     ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                                }
                                 <div class="p-5">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="text-xl font-semibold">${food.name}</h3>
-                                        <span class="text-green-600 font-bold">$${isValidNumber(food.price) ? parseFloat(food.price).toFixed(2) : "N/A"}</span>
+                                        <h3 class="text-xl font-semibold">${
+                                          food.name
+                                        }</h3>
+                                        <span class="text-green-600 font-bold">$${
+                                          isValidNumber(food.price)
+                                            ? parseFloat(food.price).toFixed(2)
+                                            : "N/A"
+                                        }</span>
                                     </div>
-                                    <p class="text-gray-600 text-sm mb-4">${food.description || 'No description available'}</p>
-                                    <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                                    <p class="text-gray-600 text-sm mb-4">${
+                                      food.description ||
+                                      "No description available"
+                                    }</p>
+                                    <button onclick="addToCart('${
+                                      food.id
+                                    }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
                                         <i class="fas fa-plus mr-2"></i> Add to Cart
                                     </button>
                                 </div>
                             </div>
-                        `).join("")}
+                        `
+                          )
+                          .join("")}
                     </div>
                     <div class="mt-8 flex justify-center">
                         <button onclick="showPage('menu')" class="btn-primary text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300">
                             View All
                         </button>
                     </div>
-                `}
+                `
+                }
             </section>
 
             <!-- Special Offers -->
@@ -707,88 +952,153 @@ async function renderHomePage() {
                     <h2 class="text-3xl font-bold mb-4 text-yellow-800">Special Offers</h2>
                     <p class="text-xl mb-6 text-yellow-700">Enjoy our exclusive deals and discounts</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        ${discounts.map(discount => `
+                        ${discounts
+                          .map(
+                            (discount) => `
                             <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
                                 <h3 class="text-xl font-bold mb-2 text-yellow-900">${discount.occasion}</h3>
                                 <p class="mb-3 text-yellow-700">${discount.date}</p>
                                 <p class="text-lg font-bold text-yellow-800">${discount.offer}</p>
                             </div>
-                        `).join("")}
+                        `
+                          )
+                          .join("")}
                     </div>
                 </div>
             </section>
 
-            <!-- Events Section -->
-            <section class="animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    ${events.map(event => `
-                        <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-                            ${event.image
-                                ? `<img src="${event.image}" alt="${event.name}" class="w-full h-64 object-cover" />`
-                                : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
-                            <div class="bg-yellow-50 text-purple-600 p-6">
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="px-3 py-1 rounded-full text-sm font-medium ${event.type === "current" ? "bg-yellow-200 text-purple-600" : "bg-yellow-300 text-purple-600"}">
-                                        ${event.type === "current" ? "Happening Now" : "Coming Soon"}
-                                    </span>
-                                    <span class="text-purple-600">${event.date}</span>
-                                </div>
-                                <h3 class="text-xl font-bold mb-2">${event.name}</h3>
-                                <p class="text-purple-600 mb-4">${event.description}</p>
-                                <button class="text-purple-600 font-medium hover:text-purple-600 flex items-center">
-                                    Learn More <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
+            
+<section class="animate__animated animate__fadeIn">
+    <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        ${
+          apiEvents.length === 0
+            ? `
+            <div class="col-span-2 text-center py-12">
+                <i class="fas fa-calendar text-5xl text-gray-400 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600">No events scheduled</h3>
+                <p class="text-gray-500">Check back later for upcoming events!</p>
+            </div>
+        `
+            : apiEvents
+                .map((event) => {
+                  // Format the date from API response
+                  const eventDate = new Date(event.event_date);
+                  const formattedDate = eventDate.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  });
+
+                  return `
+                <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                    ${
+                      event.image
+                        ? `<img src="${event.image}" alt="${event.event_name}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-64 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
+                        : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                    }
+                    <div class="bg-yellow-50 text-purple-600 p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                              event.is_happening
+                                ? "bg-yellow-200 text-purple-600"
+                                : "bg-yellow-300 text-purple-600"
+                            }">
+                                ${
+                                  event.is_happening
+                                    ? "Happening Now"
+                                    : "Coming Soon"
+                                }
+                            </span>
+                            <span class="text-purple-600">${formattedDate}</span>
                         </div>
-                    `).join("")}
+                        <h3 class="text-xl font-bold mb-2">${
+                          event.event_name
+                        }</h3>
+                        <p class="text-purple-600 mb-4">${
+                          event.descriptions || "No description available"
+                        }</p>
+                        <button onclick="showEventDetails(${JSON.stringify(
+                          event
+                        ).replace(
+                          /"/g,
+                          "&quot;"
+                        )})" class="text-purple-600 font-medium hover:text-purple-800 flex items-center transition-all duration-300">
+                            Learn More <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
                 </div>
-            </section>
+            `;
+                })
+                .join("")
+        }
+    </div>
+</section>
+
         </div>
     `;
 
-    const heroSection = document.querySelector(".hero-section");
-    if (heroSection) {
-        heroSection.style.backgroundImage = "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')";
-    }
+  const heroSection = document.querySelector(".hero-section");
+  if (heroSection) {
+    heroSection.style.backgroundImage =
+      "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')";
+  }
 }
 
 // Helper function to validate numbers
 function isValidNumber(value) {
-    return !isNaN(parseFloat(value)) && isFinite(value);
+  return !isNaN(parseFloat(value)) && isFinite(value);
 }
 
 async function renderMenuPage() {
-    const foods = await loadFoodItems() || [];
-    const categories = await loadCategories() || [];
-    const uniqueCategories = ["all", ...new Set(categories.map(cat => cat.name))];
-    const filteredFoods = selectedCategory === "all"
-        ? foods
-        : foods.filter(item => item.category?.name === selectedCategory);
+  const foods = (await loadFoodItems()) || [];
+  const categories = (await loadCategories()) || [];
+  const uniqueCategories = [
+    "all",
+    ...new Set(categories.map((cat) => cat.name)),
+  ];
+  const filteredFoods =
+    selectedCategory === "all"
+      ? foods
+      : foods.filter((item) => item.category?.name === selectedCategory);
 
-    const mainContent = document.getElementById("main-content");
-    mainContent.innerHTML = `
+  const mainContent = document.getElementById("main-content");
+  mainContent.innerHTML = `
         <div class="space-y-8">
             <div class="text-center animate__animated animate__fadeIn">
                 <h1 class="text-4xl font-bold gradient-text mb-4">Our Menu</h1>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our carefully crafted dishes made with the finest ingredients and passion</p>
             </div>
             <div class="flex flex-wrap gap-3 justify-center animate__animated animate__fadeIn">
-                ${uniqueCategories.length <= 1 ? `
+                ${
+                  uniqueCategories.length <= 1
+                    ? `
                     <div class="text-center py-12 col-span-full">
                         <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600">No categories found</h3>
                         <p class="text-gray-500">Please try again later or contact support.</p>
                     </div>
-                ` : uniqueCategories.map(category => `
+                `
+                    : uniqueCategories
+                        .map(
+                          (category) => `
                     <button onclick="filterFoods('${category}')"
-                        class="px-5 py-2.5 rounded-full transition-all duration-300 ${selectedCategory === category ? "bg-green-600 text-white shadow-lg" : "bg-white text-gray-700 hover:bg-red-100 shadow"}">
+                        class="px-5 py-2.5 rounded-full transition-all duration-300 ${
+                          selectedCategory === category
+                            ? "bg-green-600 text-white shadow-lg"
+                            : "bg-white text-gray-700 hover:bg-red-100 shadow"
+                        }">
                         ${category === "all" ? "All Items" : category}
                     </button>
-                `).join("")}
+                `
+                        )
+                        .join("")
+                }
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate__animated animate__fadeIn">
-                ${filteredFoods.length === 0 ? `
+                ${
+                  filteredFoods.length === 0
+                    ? `
                     <div class="col-span-full text-center py-12">
                         <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600">No items found in this category</h3>
@@ -796,56 +1106,91 @@ async function renderMenuPage() {
                             View All Items
                         </button>
                     </div>
-                ` : filteredFoods.map(food => `
+                `
+                    : filteredFoods
+                        .map(
+                          (food) => `
                     <div class="food-card bg-white rounded-xl overflow-hidden relative">
                         <div class="absolute top-4 right-4 z-10">
-                            <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                            <button onclick="toggleFavorite('${
+                              food.id
+                            }', this)" class="fav-icon text-2xl ${
+                            food.is_favorite ? "text-red-500" : "text-gray-300"
+                          } hover:text-red-500">
                                 <i class="fas fa-heart"></i>
                             </button>
                         </div>
-                        ${food.image
+                        ${
+                          food.image
                             ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                            : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                            : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                        }
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-3">
-                                <h3 class="text-xl font-semibold">${food.name}</h3>
-                                <span class="text-green-600 font-bold">$${isValidNumber(food.price) ? parseFloat(food.price).toFixed(2) : "N/A"}</span>
+                                <h3 class="text-xl font-semibold">${
+                                  food.name
+                                }</h3>
+                                <span class="text-green-600 font-bold">$${
+                                  isValidNumber(food.price)
+                                    ? parseFloat(food.price).toFixed(2)
+                                    : "N/A"
+                                }</span>
                             </div>
-                            <p class="text-gray-600 text-sm mb-4">${food.description || 'No description available'}</p>
-                            ${food.ingredients && food.ingredients.length > 0 ? `
+                            <p class="text-gray-600 text-sm mb-4">${
+                              food.description || "No description available"
+                            }</p>
+                            ${
+                              food.ingredients && food.ingredients.length > 0
+                                ? `
                                 <div class="mb-4">
                                     <p class="text-sm font-medium text-gray-500 mb-1">Ingredients:</p>
                                     <div class="flex flex-wrap gap-2">
-                                        ${food.ingredients.map(ingredient => `
+                                        ${food.ingredients
+                                          .map(
+                                            (ingredient) => `
                                             <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${ingredient}</span>
-                                        `).join("")}
+                                        `
+                                          )
+                                          .join("")}
                                     </div>
                                 </div>
-                            ` : ""}
+                            `
+                                : ""
+                            }
                             <div class="flex gap-3">
-                                <button onclick="addToCart('${food.id}')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                                <button onclick="addToCart('${
+                                  food.id
+                                }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
                                     <i class="fas fa-plus mr-2"></i> Add to Cart
                                 </button>
-                                <button onclick="buyNow('${food.id}')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
+                                <button onclick="buyNow('${
+                                  food.id
+                                }')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
                                     <i class="fas fa-bolt mr-2"></i> Buy Now
                                 </button>
                             </div>
                         </div>
                     </div>
-                `).join("")}
+                `
+                        )
+                        .join("")
+                }
             </div>
         </div>
     `;
 }
 
 async function renderOrderPage() {
-    const foods = await loadFoodItems() || [];
-    const popularItems = (foods.length > 0
-        ? foods.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 2)
-        : []);
+  const foods = (await loadFoodItems()) || [];
+  const popularItems =
+    foods.length > 0
+      ? foods
+          .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+          .slice(0, 2)
+      : [];
 
-    const mainContent = document.getElementById("main-content");
-    mainContent.innerHTML = `
+  const mainContent = document.getElementById("main-content");
+  mainContent.innerHTML = `
         <div class="space-y-8 animate__animated animate__fadeIn">
             <!-- Order Header -->
             <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
@@ -861,7 +1206,9 @@ async function renderOrderPage() {
                         <i class="fas fa-shopping-cart text-green-600 mr-2"></i> Your Order
                     </h2>
                     <div id="cart-items" class="mb-6">
-                        ${cart.length === 0 ? `
+                        ${
+                          cart.length === 0
+                            ? `
                             <div class="text-center py-12">
                                 <i class="fas fa-shopping-basket text-5xl text-gray-300 mb-4"></i>
                                 <h3 class="text-xl font-semibold text-gray-500">Your cart is empty</h3>
@@ -869,28 +1216,53 @@ async function renderOrderPage() {
                                     Browse Menu
                                 </button>
                             </div>
-                        ` : cart.map((item, index) => `
+                        `
+                            : cart
+                                .map(
+                                  (item, index) => `
                             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 last:border-0">
                                 <div class="flex items-center">
-                                    ${item.image
+                                    ${
+                                      item.image
                                         ? `<img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover mr-4" />`
-                                        : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`}
+                                        : `<div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-lg mr-4"><span class="text-gray-500 text-xs">Not Available</span></div>`
+                                    }
                                     <div>
-                                        <h3 class="font-medium">${item.name}</h3>
-                                        <p class="text-green-600 font-bold">$${isValidNumber(item.price) ? parseFloat(item.price).toFixed(2) : "N/A"}</p>
+                                        <h3 class="font-medium">${
+                                          item.name
+                                        }</h3>
+                                        <p class="text-green-600 font-bold">$${
+                                          isValidNumber(item.price)
+                                            ? parseFloat(item.price).toFixed(2)
+                                            : "N/A"
+                                        }</p>
                                     </div>
                                 </div>
                                 <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
-                        `).join("")}
+                        `
+                                )
+                                .join("")
+                        }
                     </div>
-                    ${cart.length > 0 ? `
+                    ${
+                      cart.length > 0
+                        ? `
                         <div class="border-t border-gray-200 pt-4 mb-6">
                             <div class="flex justify-between mb-2">
                                 <span class="text-gray-600">Subtotal:</span>
-                                <span class="font-medium">$${cart.reduce((sum, item) => sum + (isValidNumber(item.price) ? parseFloat(item.price) : 0), 0).toFixed(2)}</span>
+                                <span class="font-medium">$${cart
+                                  .reduce(
+                                    (sum, item) =>
+                                      sum +
+                                      (isValidNumber(item.price)
+                                        ? parseFloat(item.price)
+                                        : 0),
+                                    0
+                                  )
+                                  .toFixed(2)}</span>
                             </div>
                             <div class="flex justify-between mb-2">
                                 <span class="text-gray-600">Delivery Fee:</span>
@@ -898,10 +1270,21 @@ async function renderOrderPage() {
                             </div>
                             <div class="flex justify-between text-lg font-bold mt-4">
                                 <span>Total:</span>
-                                <span class="text-green-600">$${(cart.reduce((sum, item) => sum + (isValidNumber(item.price) ? parseFloat(item.price) : 0), 0) + 2.99).toFixed(2)}</span>
+                                <span class="text-green-600">$${(
+                                  cart.reduce(
+                                    (sum, item) =>
+                                      sum +
+                                      (isValidNumber(item.price)
+                                        ? parseFloat(item.price)
+                                        : 0),
+                                    0
+                                  ) + 2.99
+                                ).toFixed(2)}</span>
                             </div>
                         </div>
-                    ` : ""}
+                    `
+                        : ""
+                    }
                 </div>
 
                 <!-- Order Details Section -->
@@ -960,7 +1343,11 @@ async function renderOrderPage() {
 
                         <!-- Place Order Button -->
                         <button onclick="placeOrder()"
-                            class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${cart.length === 0 ? "opacity-50 cursor-not-allowed" : ""}"
+                            class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${
+                              cart.length === 0
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }"
                             ${cart.length === 0 ? "disabled" : ""}>
                             <i class="fas fa-shopping-bag mr-2"></i> Place Order
                         </button>
@@ -974,38 +1361,65 @@ async function renderOrderPage() {
                     <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Order
                 </h2>
                 <p class="text-gray-600 mb-6">Select popular items to add to your cart</p>
-                ${popularItems.length === 0 ? `
+                ${
+                  popularItems.length === 0
+                    ? `
                     <div class="text-center py-12">
                         <i class="fas fa-utensils text-5xl text-gray-400 mb-4"></i>
                         <h3 class="text-xl font-semibold text-gray-600">No popular items found</h3>
                         <p class="text-gray-500">Please try again later or contact support.</p>
                     </div>
-                ` : `
+                `
+                    : `
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        ${popularItems.map(food => `
+                        ${popularItems
+                          .map(
+                            (food) => `
                             <div class="food-card bg-white rounded-xl overflow-hidden relative shadow-md">
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button onclick="toggleFavorite('${food.id}', this)" class="fav-icon text-2xl ${food.is_favorite ? "text-red-500" : "text-gray-300"} hover:text-red-500">
+                                    <button onclick="toggleFavorite('${
+                                      food.id
+                                    }', this)" class="fav-icon text-2xl ${
+                              food.is_favorite
+                                ? "text-red-500"
+                                : "text-gray-300"
+                            } hover:text-red-500">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
-                                ${food.image
+                                ${
+                                  food.image
                                     ? `<img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                                }
                                 <div class="p-5">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="text-xl font-semibold">${food.name}</h3>
-                                        <span class="text-green-600 font-bold">$${isValidNumber(food.price) ? parseFloat(food.price).toFixed(2) : "N/A"}</span>
+                                        <h3 class="text-xl font-semibold">${
+                                          food.name
+                                        }</h3>
+                                        <span class="text-green-600 font-bold">$${
+                                          isValidNumber(food.price)
+                                            ? parseFloat(food.price).toFixed(2)
+                                            : "N/A"
+                                        }</span>
                                     </div>
-                                    <p class="text-gray-600 text-sm mb-4">${food.description || 'No description available'}</p>
-                                    <button onclick="addToCart('${food.id}')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+                                    <p class="text-gray-600 text-sm mb-4">${
+                                      food.description ||
+                                      "No description available"
+                                    }</p>
+                                    <button onclick="addToCart('${
+                                      food.id
+                                    }')" class="btn-primary text-white px-4 py-2 rounded-lg w-full hover:shadow-lg transition-all duration-300">
                                         <i class="fas fa-plus mr-2"></i> Add to Cart
                                     </button>
                                 </div>
                             </div>
-                        `).join("")}
+                        `
+                          )
+                          .join("")}
                     </div>
-                `}
+                `
+                }
             </div>
         </div>
     `;
@@ -1201,23 +1615,25 @@ async function handleBooking() {
 }
 
 async function renderFavouritesPage() {
-    if (!isLoggedIn) {
-        showToast("Please log in to view favorites", "error");
-        showPage("signin");
-        return;
-    }
+  if (!isLoggedIn) {
+    showToast("Please log in to view favorites", "error");
+    showPage("signin");
+    return;
+  }
 
-    await loadFoodItems();
-    console.log('Rendering favorites page with favoriteItems:', favoriteItems);
+  await loadFoodItems();
+  console.log("Rendering favorites page with favoriteItems:", favoriteItems);
 
-    const mainContent = document.getElementById("main-content");
-    mainContent.innerHTML = `
+  const mainContent = document.getElementById("main-content");
+  mainContent.innerHTML = `
         <div class="space-y-8 animate__animated animate__fadeIn">
             <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
                 <h1 class="text-4xl font-bold mb-4">Your Favorites</h1>
                 <p class="text-xl max-w-2xl mx-auto">Your saved dishes for quick access</p>
             </div>
-            ${favoriteItems.length === 0 ? `
+            ${
+              favoriteItems.length === 0
+                ? `
                 <div class="bg-white rounded-2xl shadow-md p-12 text-center">
                     <i class="fas fa-heart text-5xl text-gray-300 mb-6"></i>
                     <h3 class="text-xl font-semibold text-gray-600">No favorites yet</h3>
@@ -1226,61 +1642,92 @@ async function renderFavouritesPage() {
                         <i class="fas fa-utensils mr-2"></i> Browse Menu
                     </button>
                 </div>
-            ` : `
+            `
+                : `
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    ${favoriteItems.map(fav => {
+                    ${favoriteItems
+                      .map((fav) => {
                         if (!fav.food) {
-                            console.warn('Invalid favorite item:', fav);
-                            return '';
+                          console.warn("Invalid favorite item:", fav);
+                          return "";
                         }
-                        const imageUrl = fav.food.image && !fav.food.image.startsWith('http')
-                            ? `${baseUrl}${fav.food.image.replace(/^\/+/, '')}` // Remove leading slashes
-                            : fav.food.image || '';
+                        const imageUrl =
+                          fav.food.image && !fav.food.image.startsWith("http")
+                            ? `${baseUrl}${fav.food.image.replace(/^\/+/, "")}` // Remove leading slashes
+                            : fav.food.image || "";
                         return `
                             <div class="food-card bg-white rounded-xl overflow-hidden relative">
                                 <div class="absolute top-4 right-4 z-10">
-                                    <button onclick="toggleFavorite('${fav.food.id}', this)" class="fav-icon text-2xl text-red-500 hover:text-gray-300">
+                                    <button onclick="toggleFavorite('${
+                                      fav.food.id
+                                    }', this)" class="fav-icon text-2xl text-red-500 hover:text-gray-300">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
-                                ${imageUrl
+                                ${
+                                  imageUrl
                                     ? `<img src="${imageUrl}" alt="${fav.food.name}" class="w-full h-56 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-56 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`}
+                                    : `<div class="w-full h-56 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                                }
                                 <div class="p-6">
                                     <div class="flex justify-between items-start mb-3">
-                                        <h3 class="text-xl font-semibold">${fav.food.name}</h3>
-                                        <span class="text-green-600 font-bold">$${isValidNumber(fav.food.price) ? parseFloat(fav.food.price).toFixed(2) : "N/A"}</span>
+                                        <h3 class="text-xl font-semibold">${
+                                          fav.food.name
+                                        }</h3>
+                                        <span class="text-green-600 font-bold">$${
+                                          isValidNumber(fav.food.price)
+                                            ? parseFloat(
+                                                fav.food.price
+                                              ).toFixed(2)
+                                            : "N/A"
+                                        }</span>
                                     </div>
-                                    <p class="text-gray-600 text-sm mb-4">${fav.food.description || 'No description available'}</p>
-                                    ${fav.food.ingredients && fav.food.ingredients.length > 0 ? `
+                                    <p class="text-gray-600 text-sm mb-4">${
+                                      fav.food.description ||
+                                      "No description available"
+                                    }</p>
+                                    ${
+                                      fav.food.ingredients &&
+                                      fav.food.ingredients.length > 0
+                                        ? `
                                         <div class="mb-4">
                                             <p class="text-sm font-medium text-gray-500 mb-1">Ingredients:</p>
                                             <div class="flex flex-wrap gap-2">
-                                                ${fav.food.ingredients.map(ingredient => `
+                                                ${fav.food.ingredients
+                                                  .map(
+                                                    (ingredient) => `
                                                     <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${ingredient}</span>
-                                                `).join("")}
+                                                `
+                                                  )
+                                                  .join("")}
                                             </div>
                                         </div>
-                                    ` : ""}
+                                    `
+                                        : ""
+                                    }
                                     <div class="flex gap-3">
-                                        <button onclick="addToCart('${fav.food.id}')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
+                                        <button onclick="addToCart('${
+                                          fav.food.id
+                                        }')" class="flex-1 btn-primary text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300">
                                             <i class="fas fa-plus mr-2"></i> Add to Cart
                                         </button>
-                                        <button onclick="buyNow('${fav.food.id}')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
+                                        <button onclick="buyNow('${
+                                          fav.food.id
+                                        }')" class="flex-1 bg-white border border-green-600 text-green-600 px-4 py-2.5 rounded-lg hover:bg-green-50 transition-all duration-300">
                                             <i class="fas fa-bolt mr-2"></i> Buy Now
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         `;
-                    }).join("")}
+                      })
+                      .join("")}
                 </div>
-            `}
+            `
+            }
         </div>
     `;
 }
-
-
 
 function renderProfilePage() {
   const userData = JSON.parse(localStorage.getItem("userData")) || {};
@@ -1756,47 +2203,83 @@ function toggleMobileMenu() {
 }
 
 function showPage(page) {
-  currentPage = page;
-  updateNavbar();
-  const renderFunctions = {
-    home: renderHomePage,
-    menu: renderMenuPage,
-    booking: renderBookingPage,
-    favourites: renderFavouritesPage,
-    order: renderOrderPage,
-    profile: renderProfilePage,
-    signin: renderSignInPage,
-    signup: renderSignUpPage,
-  };
-  const renderFunction = renderFunctions[page];
-  if (renderFunction) {
-    renderFunction();
-  } else {
-    console.error(`Page ${page} not found`);
-  }
+    currentPage = page;
+    updateNavbar();
+    const renderFunctions = {
+        home: renderHomePage,
+        menu: renderMenuPage,
+        booking: renderBookingPage,
+        favourites: renderFavouritesPage,
+        order: renderOrderPage,
+        profile: renderProfilePage,
+        signin: renderSignInPage,
+        signup: renderSignUpPage,
+        "event-details": renderEventDetailsPage, // Add this line
+    };
+    const renderFunction = renderFunctions[page];
+    if (renderFunction) {
+        renderFunction();
+    } else {
+        console.error(`Page ${page} not found`);
+    }
+}
+
+async function loadEvents() {
+    try {
+        const data = await makeRequest(`${baseUrl}events/list/`, "GET", null, false);
+        return data.map(event => ({
+            id: event.id,
+            type: event.is_happening ? "current" : "upcoming",
+            name: event.event_name,
+            date: new Date(event.event_date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }),
+            time: new Date(event.event_date).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }),
+            description: event.descriptions,
+            image: event.image
+        }));
+    } catch (error) {
+        console.error("Error fetching events:", error);
+        showToast("Failed to load events", "error");
+        return [];
+    }
 }
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("accessToken");
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (token && userData) {
-        isLoggedIn = true;
-        isAdmin = userData.staff || userData.superuser;
-    }
-    console.log('Initial state:', { isLoggedIn, isAdmin, token, userData });
-    console.log('Initial favoriteItems:', JSON.parse(localStorage.getItem('favoriteItems')) || []);
+  const token = localStorage.getItem("accessToken");
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  if (token && userData) {
+    isLoggedIn = true;
+    isAdmin = userData.staff || userData.superuser;
+  }
+  console.log("Initial state:", { isLoggedIn, isAdmin, token, userData });
+  console.log(
+    "Initial favoriteItems:",
+    JSON.parse(localStorage.getItem("favoriteItems")) || []
+  );
 
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
-        cart = parsedCart.filter(item => isValidNumber(item.price)).map(item => ({
-            ...item,
-            price: parseFloat(item.price)
-        }));
-        localStorage.setItem("cart", JSON.stringify(cart));
-    }
-    loadCartFromStorage();
-    updateNavbar();
-    showPage("home");
+  const storedCart = localStorage.getItem("cart");
+  if (storedCart) {
+    const parsedCart = JSON.parse(storedCart);
+    cart = parsedCart
+      .filter((item) => isValidNumber(item.price))
+      .map((item) => ({
+        ...item,
+        price: parseFloat(item.price),
+      }));
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+  loadCartFromStorage();
+  updateNavbar();
+  showPage("home");
 });
