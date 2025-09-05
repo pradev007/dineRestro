@@ -41,7 +41,8 @@ def login_user(request):
             'staff': user.is_staff,
             'active': user.is_active,
             'superuser': user.is_superuser,
-            'joined': user.date_joined
+            'joined': user.date_joined,
+            'user_id': user.id
         })
     else:
         return Response({"detail":"Invalid email or password"}, status=status.HTTP_401_UNAUTHORIZED)

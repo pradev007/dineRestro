@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'foods',
     'offers',
     'events',
+    'order',
 
     # packages
     'corsheaders',
