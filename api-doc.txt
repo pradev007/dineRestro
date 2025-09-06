@@ -117,3 +117,82 @@ response:
 }
 
 =============================================================================================================
+
+-------------------------------------------------------------------------------------
+## favourite foods
+list all favourite foods of a user: 
+GET:    {{base_url}}foods/favourites/
+response:
+[
+    {
+        "id": 6,
+        "food": {
+            "id": 2,
+            "name": "sausage 2",
+            "price": "60.00",
+            "image": "/media/foods/images/pic1.jpg",
+            "description": "this is sausage 2",
+            "ingredients": [
+                "chilli",
+                "cheese",
+                "meat"
+            ],
+            "category": {
+                "id": 1,
+                "name": "Fast Foods"
+            }
+        },
+        "created_at": "2025-09-03T07:52:29.953351Z"
+    },
+    {
+        "id": 7,
+        "food": {
+            "id": 1,
+            "name": "sausage 1",
+            "price": "50.00",
+            "image": "/media/foods/images/download_2_a9yzT7x.jpg",
+            "description": "this is sausage",
+            "ingredients": [
+                "chilli",
+                "cheese",
+                "meat"
+            ],
+            "category": {
+                "id": 8,
+                "name": "Newari Foods"
+            }
+        },
+        "created_at": "2025-09-03T08:34:27.693034Z"
+    }
+]
+
+Create a favourite food
+POST:   {{base_url}}foods/favourites/
+body: 
+{
+    "food_id": 10
+}
+
+response:
+{
+    "id": 8,
+    "food": {
+        "id": 10,
+        "name": "pork sekuwa",
+        "price": "80.00",
+        "image": "http://127.0.0.1:8000/media/foods/images/images_0IMrTwy.webp",
+        "description": "this is fries",
+        "ingredients": [
+            "tomato",
+            "cheese",
+            "basil"
+        ],
+        "category": {
+            "id": 2,
+            "name": "Burgers"
+        }
+    },
+    "created_at": "2025-09-06T08:41:51.851720Z"
+}
+
+======================================================================================================
