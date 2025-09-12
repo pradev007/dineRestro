@@ -13,6 +13,7 @@ urlpatterns = [
     path("events/", include("events.urls")),
     path("", include("cart.urls")),
     path('', include('order.urls')),
+    path('offers/',include("offers.urls")),
     # path("api/", include("payment.urls")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

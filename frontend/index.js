@@ -24,40 +24,6 @@ const bookingPrices = {
   8: 800,
 };
 
-// Static data for events, discounts, and staff
-
-const discounts = [
-  {
-    occasion: "National Coffee Day",
-    date: "September 29, 2025",
-    offer: "50% off all coffee drinks",
-  },
-  {
-    occasion: "Cafe Anniversary",
-    date: "October 10, 2025",
-    offer: "Buy one dessert, get one free",
-  },
-  {
-    occasion: "Halloween Special",
-    date: "October 31, 2025",
-    offer: "20% off all spooky-themed drinks",
-  },
-  {
-    occasion: "Thanksgiving Week",
-    date: "November 24-30, 2025",
-    offer: "Free dessert with any main course",
-  },
-  {
-    occasion: "Christmas Celebration",
-    date: "December 20-25, 2025",
-    offer: "25% off all festive drinks and desserts",
-  },
-  {
-    occasion: "New Year Countdown",
-    date: "December 31, 2025",
-    offer: "Free champagne toast with any meal",
-  },
-];
 
 const staff = [
   {
@@ -232,6 +198,29 @@ async function loginUser(email, password) {
     console.error("Login error:", error);
     showToast(error.message || "Login failed", "error");
     return null;
+  }
+}
+
+
+async function loadOffers() {
+  try {
+    const token = localStorage.getItem("token");
+    const requiresAuth = !!token; // Use authentication if token exists
+    const data = await makeRequest(`${baseUrl}offers/offers/`, "GET", null, requiresAuth);
+    console.log("Offers API Response:", data);
+    return data.map(offer => ({
+      occasion: offer.name,
+      date: new Date(offer.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+      offer: offer.discount ? `${offer.discount}% off` : "Special Offer",
+    }));
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    showToast("Failed to load offers", "error");
+    return [];
   }
 }
 
@@ -826,8 +815,16 @@ async function renderHomePage() {
     console.log("Events API Response:", apiEvents);
   } catch (error) {
     console.error("Error fetching events:", error);
-    // Fallback to static events if API fails
-    apiEvents = events;
+    apiEvents = [];
+  }
+
+  // Load offers from API
+  let allDiscounts = [];
+  try {
+    allDiscounts = await loadOffers();
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    allDiscounts = [];
   }
 
   const mainContent = document.getElementById("main-content");
@@ -952,89 +949,97 @@ async function renderHomePage() {
                     <h2 class="text-3xl font-bold mb-4 text-yellow-800">Special Offers</h2>
                     <p class="text-xl mb-6 text-yellow-700">Enjoy our exclusive deals and discounts</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        ${discounts
-                          .map(
-                            (discount) => `
+                        ${
+                          allDiscounts.length === 0
+                            ? `
+                            <div class="col-span-3 text-center py-12">
+                                <i class="fas fa-tag text-5xl text-gray-400 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-600">No offers available</h3>
+                                <p class="text-gray-500">Check back later for exciting deals!</p>
+                            </div>
+                        `
+                            : allDiscounts
+                                .map(
+                                  (discount) => `
                             <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
                                 <h3 class="text-xl font-bold mb-2 text-yellow-900">${discount.occasion}</h3>
                                 <p class="mb-3 text-yellow-700">${discount.date}</p>
                                 <p class="text-lg font-bold text-yellow-800">${discount.offer}</p>
                             </div>
                         `
-                          )
-                          .join("")}
+                                )
+                                .join("")
+                        }
                     </div>
                 </div>
             </section>
 
-            
-<section class="animate__animated animate__fadeIn">
-    <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        ${
-          apiEvents.length === 0
-            ? `
-            <div class="col-span-2 text-center py-12">
-                <i class="fas fa-calendar text-5xl text-gray-400 mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-600">No events scheduled</h3>
-                <p class="text-gray-500">Check back later for upcoming events!</p>
-            </div>
-        `
-            : apiEvents
-                .map((event) => {
-                  // Format the date from API response
-                  const eventDate = new Date(event.event_date);
-                  const formattedDate = eventDate.toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  });
-
-                  return `
-                <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+            <!-- Upcoming Events -->
+            <section class="animate__animated animate__fadeIn">
+                <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     ${
-                      event.image
-                        ? `<img src="${event.image}" alt="${event.event_name}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-64 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                        : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
-                    }
-                    <div class="bg-yellow-50 text-purple-600 p-6">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="px-3 py-1 rounded-full text-sm font-medium ${
-                              event.is_happening
-                                ? "bg-yellow-200 text-purple-600"
-                                : "bg-yellow-300 text-purple-600"
-                            }">
-                                ${
-                                  event.is_happening
-                                    ? "Happening Now"
-                                    : "Coming Soon"
-                                }
-                            </span>
-                            <span class="text-purple-600">${formattedDate}</span>
+                      apiEvents.length === 0
+                        ? `
+                        <div class="col-span-2 text-center py-12">
+                            <i class="fas fa-calendar text-5xl text-gray-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-600">No events scheduled</h3>
+                            <p class="text-gray-500">Check back later for upcoming events!</p>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">${
-                          event.event_name
-                        }</h3>
-                        <p class="text-purple-600 mb-4">${
-                          event.descriptions || "No description available"
-                        }</p>
-                        <button onclick="showEventDetails(${JSON.stringify(
-                          event
-                        ).replace(
-                          /"/g,
-                          "&quot;"
-                        )})" class="text-purple-600 font-medium hover:text-purple-800 flex items-center transition-all duration-300">
-                            Learn More <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-                })
-                .join("")
-        }
-    </div>
-</section>
+                    `
+                        : apiEvents
+                            .map((event) => {
+                              const eventDate = new Date(event.event_date);
+                              const formattedDate = eventDate.toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              });
 
+                              return `
+                            <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                                ${
+                                  event.image
+                                    ? `<img src="${event.image}" alt="${event.event_name}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-64 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
+                                    : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
+                                }
+                                <div class="bg-yellow-50 text-purple-600 p-6">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                                          event.is_happening
+                                            ? "bg-yellow-200 text-purple-600"
+                                            : "bg-yellow-300 text-purple-600"
+                                        }">
+                                            ${
+                                              event.is_happening
+                                                ? "Happening Now"
+                                                : "Coming Soon"
+                                            }
+                                        </span>
+                                        <span class="text-purple-600">${formattedDate}</span>
+                                    </div>
+                                    <h3 class="text-xl font-bold mb-2">${
+                                      event.event_name
+                                    }</h3>
+                                    <p class="text-purple-600 mb-4">${
+                                      event.descriptions || "No description available"
+                                    }</p>
+                                    <button onclick="showEventDetails(${JSON.stringify(
+                                      event
+                                    ).replace(
+                                      /"/g,
+                                      "&quot;"
+                                    )})" class="text-purple-600 font-medium hover:text-purple-800 flex items-center transition-all duration-300">
+                                        Learn More <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                            })
+                            .join("")
+                    }
+                </div>
+            </section>
         </div>
     `;
 
