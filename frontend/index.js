@@ -7,10 +7,9 @@ let selectedTable = null;
 let bookingDetails = { date: "", time: "", guests: 2, table: "" };
 let cart = [];
 let currentEvent = null;
-let foodItems = []; // Add foodItems to global state
-let favoriteItems = []; // Initialize favoriteItems
+let foodItems = [];
+let favoriteItems = [];
 const baseUrl = "http://127.0.0.1:8000/";
-// const baseUrl = "https://dinerestro-ycpq.onrender.com/";
 
 // Booking pricing structure
 const bookingPrices = {
@@ -23,7 +22,6 @@ const bookingPrices = {
   7: 800,
   8: 800,
 };
-
 
 const staff = [
   {
@@ -163,7 +161,6 @@ async function loginUser(email, password) {
       password,
     });
 
-    // Check if user is staff or superuser
     if (data.staff || data.superuser) {
       throw new Error("Staff or admin accounts cannot log in here");
     }
@@ -182,12 +179,11 @@ async function loginUser(email, password) {
     );
 
     isLoggedIn = true;
-    isAdmin = false; // Ensure isAdmin is false since staff/superuser cannot log in
+    isAdmin = false;
 
     updateNavbar();
     showToast(`Welcome back, ${data.fullname}!`);
 
-    // Redirect to the previous page if it's not signin/signup, otherwise go to home
     const redirectPage = ["signin", "signup"].includes(currentPage)
       ? "home"
       : currentPage;
@@ -201,14 +197,13 @@ async function loginUser(email, password) {
   }
 }
 
-
 async function loadOffers() {
   try {
     const token = localStorage.getItem("token");
-    const requiresAuth = !!token; // Use authentication if token exists
+    const requiresAuth = !!token;
     const data = await makeRequest(`${baseUrl}offers/offers/`, "GET", null, requiresAuth);
-    console.log("Offers API Response:", data);
     return data.map(offer => ({
+      id: offer.id,
       occasion: offer.name,
       date: new Date(offer.date).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -224,6 +219,24 @@ async function loadOffers() {
   }
 }
 
+async function createBooking(bookingData) {
+  try {
+    const response = await makeRequest(
+      `${baseUrl}table-booking/bookings/create/`,
+      "POST",
+      bookingData,
+      true
+    );
+    showToast("Booking created successfully!", "success");
+    showPage("home");
+    return response;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    showToast("Failed to create booking: " + error.message, "error");
+    throw error;
+  }
+}
+
 function logoutUser() {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
@@ -234,6 +247,58 @@ function logoutUser() {
   updateNavbar();
   showToast("Logged out successfully");
   showPage("home");
+}
+
+function showEventPopup(event) {
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  overlay.id = "event-popup-overlay";
+
+  const formattedDate = new Date(event.event_date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  overlay.innerHTML = `
+    <div class="bg-yellow-50 rounded-xl p-8 max-w-lg w-full mx-4 shadow-lg animate__animated animate__fadeIn">
+      <h2 class="text-2xl font-bold text-yellow-900 mb-4">${event.event_name}</h2>
+      <p class="text-lg text-yellow-700 mb-2"><strong>Date:</strong> ${formattedDate}</p>
+      <p class="text-lg text-yellow-700 mb-2"><strong>Status:</strong> ${
+        event.is_happening ? "Happening Now" : "Coming Soon"
+      }</p>
+      <p class="text-lg text-yellow-700 mb-4"><strong>Description:</strong> ${
+        event.descriptions || "No description available"
+      }</p>
+      ${
+        event.image
+          ? `<img src="${event.image}" alt="${event.event_name}" class="w-full h-48 object-cover rounded-lg mb-4" onerror="this.style.display='none'" />`
+          : ""
+      }
+      <button onclick="document.getElementById('event-popup-overlay').remove()" class="btn-primary text-white px-6 py-3 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+        Close
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function showOfferPopup(offer) {
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  overlay.id = "offer-popup-overlay";
+
+  overlay.innerHTML = `
+    <div class="bg-yellow-50 rounded-xl p-8 max-w-lg w-full mx-4 shadow-lg animate__animated animate__fadeIn">
+      <h2 class="text-2xl font-bold text-yellow-900 mb-4">${offer.occasion}</h2>
+      <p class="text-lg text-yellow-700 mb-2"><strong>Date:</strong> ${offer.date}</p>
+      <p class="text-lg text-yellow-700 mb-4"><strong>Offer:</strong> ${offer.offer}</p>
+      <button onclick="document.getElementById('offer-popup-overlay').remove()" class="btn-primary text-white px-6 py-3 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+        Close
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
 }
 
 async function loadCategories() {
@@ -260,13 +325,11 @@ async function loadCategories() {
 async function loadFoodItems() {
   try {
     const response = await makeRequest(`${baseUrl}foods/foods/`, "GET");
-    console.log("Food Items API Response:", response);
     foodItems = (response || []).map((item) => ({
       ...item,
       price: isValidNumber(item.price) ? parseFloat(item.price) : 0,
     }));
 
-    // Load favorites from backend if logged in
     if (isLoggedIn) {
       try {
         favoriteItems =
@@ -276,31 +339,36 @@ async function loadFoodItems() {
             null,
             true
           )) || [];
-        console.log("Favorites API Response:", favoriteItems);
         localStorage.setItem("favoriteItems", JSON.stringify(favoriteItems));
       } catch (error) {
         console.error("Error fetching favorites:", error);
         favoriteItems = JSON.parse(localStorage.getItem("favoriteItems")) || [];
-        console.log("Loaded favorites from localStorage:", favoriteItems);
       }
     } else {
       favoriteItems = JSON.parse(localStorage.getItem("favoriteItems")) || [];
-      console.log(
-        "Loaded favorites from localStorage (not logged in):",
-        favoriteItems
-      );
     }
 
-    // Add is_favorite flag to foodItems
     foodItems = foodItems.map((food) => ({
       ...food,
       is_favorite: favoriteItems.some((fav) => fav.food?.id === food.id),
     }));
-    console.log("Updated foodItems with is_favorite:", foodItems);
     return foodItems;
   } catch (error) {
     console.error("Error fetching food items:", error);
     showToast("Failed to load food items", "error");
+    return [];
+  }
+}
+
+async function loadAvailableTables() {
+  try {
+    const token = localStorage.getItem("token");
+    const requiresAuth = !!token;
+    const tables = await makeRequest(`${baseUrl}table-booking/tables/`, "GET", null, requiresAuth);
+    return tables.filter(table => table.is_available);
+  } catch (error) {
+    console.error("Error fetching tables:", error);
+    showToast("Failed to load available tables", "error");
     return [];
   }
 }
@@ -406,24 +474,22 @@ function addToCart(id) {
       return;
     }
 
-    // Ensure price is a number
     const price = parseFloat(food.price);
     if (isNaN(price)) {
       showToast(`Invalid price for ${food.name}`, "error");
       return;
     }
 
-    // Check if item already exists in cart
     const existingItem = cart.find((item) => String(item.id) === String(id));
     if (existingItem) {
-      existingItem.quantity = (existingItem.quantity || 1) + 1; // Increment quantity
+      existingItem.quantity = (existingItem.quantity || 1) + 1;
       showToast(`${food.name} quantity updated in cart!`, "success");
     } else {
-      cart.push({ ...food, price: price, quantity: 1 }); // Add new item with numeric price
+      cart.push({ ...food, price: price, quantity: 1 });
       showToast(`${food.name} added to cart!`, "success");
     }
 
-    saveCartToStorage(); // Save cart to localStorage
+    saveCartToStorage();
     updateCartCount();
     updateCartDisplay();
   });
@@ -432,13 +498,13 @@ function addToCart(id) {
 function removeFromCart(index) {
   const item = cart[index];
   if (item.quantity > 1) {
-    item.quantity -= 1; // Decrement quantity
+    item.quantity -= 1;
     showToast(`${item.name} quantity reduced in cart`, "success");
   } else {
-    cart.splice(index, 1); // Remove item if quantity is 1
+    cart.splice(index, 1);
     showToast(`${item.name} removed from cart`, "success");
   }
-  saveCartToStorage(); // Save updated cart
+  saveCartToStorage();
   updateCartCount();
   updateCartDisplay();
 }
@@ -446,7 +512,7 @@ function removeFromCart(index) {
 function updateCartCount() {
   const cartCount = document.getElementById("cart-count");
   const mobileCartCount = document.getElementById("mobile-cart-count");
-  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0); // Sum quantities
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
   if (cartCount) {
     cartCount.textContent = totalItems;
     cartCount.classList.toggle("hidden", totalItems === 0);
@@ -473,7 +539,6 @@ function updateCartDisplay() {
     } else {
       cartItemsDiv.innerHTML = cart
         .map((item, index) => {
-          // Safely convert price to a number or use a fallback
           const price = isValidNumber(item.price)
             ? parseFloat(item.price).toFixed(2)
             : "N/A";
@@ -512,7 +577,7 @@ function loadCartFromStorage() {
   if (storedCart) {
     cart = JSON.parse(storedCart).map((item) => ({
       ...item,
-      price: isValidNumber(item.price) ? parseFloat(item.price) : 0, // Fallback to 0 if invalid
+      price: isValidNumber(item.price) ? parseFloat(item.price) : 0,
     }));
     updateCartCount();
     updateCartDisplay();
@@ -604,7 +669,7 @@ function completePayment() {
     "success"
   );
   cart = [];
-  saveCartToStorage(); // Save empty cart
+  saveCartToStorage();
   if (document.getElementById("delivery-address")) {
     document.getElementById("delivery-address").value = "";
   }
@@ -622,7 +687,6 @@ function showEventDetails(event) {
   showPage("event-details");
 }
 
-// Add this function to render event details page
 function renderEventDetailsPage() {
   if (!currentEvent) {
     showToast("Event not found", "error");
@@ -630,7 +694,6 @@ function renderEventDetailsPage() {
     return;
   }
 
-  // Format the date from API response
   const eventDate = new Date(currentEvent.event_date);
   const formattedDate = eventDate.toLocaleDateString("en-US", {
     year: "numeric",
@@ -648,7 +711,6 @@ function renderEventDetailsPage() {
             </button>
             
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <!-- Event Image -->
                 <div class="relative h-96">
                     ${
                       currentEvent.image
@@ -678,10 +740,8 @@ function renderEventDetailsPage() {
                     </div>
                 </div>
 
-                <!-- Event Details -->
                 <div class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Main Content -->
                         <div class="md:col-span-2">
                             <h2 class="text-2xl font-bold mb-4">Event Description</h2>
                             <p class="text-gray-700 text-lg leading-relaxed">
@@ -714,7 +774,6 @@ function renderEventDetailsPage() {
                             </div>
                         </div>
 
-                        <!-- Sidebar -->
                         <div class="bg-gray-50 rounded-xl p-6">
                             <h3 class="text-xl font-bold mb-4">Event Information</h3>
                             
@@ -756,7 +815,6 @@ function renderEventDetailsPage() {
                         </div>
                     </div>
 
-                    <!-- Additional Information -->
                     <div class="mt-12 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6">
                         <h3 class="text-xl font-bold mb-4">Additional Information</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -779,7 +837,6 @@ function renderEventDetailsPage() {
                         </div>
                     </div>
 
-                    <!-- Call to Action -->
                     <div class="mt-8 text-center">
                         <p class="text-gray-600 mb-4">Don't miss out on this exciting event!</p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -797,7 +854,6 @@ function renderEventDetailsPage() {
     `;
 }
 
-// Page rendering functions
 async function renderHomePage() {
   const foods = (await loadFoodItems()) || [];
   const categories = (await loadCategories()) || [];
@@ -808,17 +864,17 @@ async function renderHomePage() {
           .slice(0, 4)
       : [];
 
-  // Load events from API
   let apiEvents = [];
   try {
-    apiEvents = await makeRequest(`${baseUrl}events/list/`, "GET");
-    console.log("Events API Response:", apiEvents);
+    const token = localStorage.getItem("token");
+    const requiresAuth = !!token;
+    apiEvents = await makeRequest(`${baseUrl}events/list/`, "GET", null, requiresAuth);
   } catch (error) {
     console.error("Error fetching events:", error);
+    showToast("Failed to load events", "error");
     apiEvents = [];
   }
 
-  // Load offers from API
   let allDiscounts = [];
   try {
     allDiscounts = await loadOffers();
@@ -830,9 +886,8 @@ async function renderHomePage() {
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
         <div class="space-y-16">
-            <!-- Hero Section -->
             <section class="relative h-screen-80 rounded-2xl overflow-hidden hero-section animate__animated animate__fadeIn">
-                <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-center px-4">
+                <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-center px-4">
                     <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 animate__animated animate__fadeInDown">Savor Exceptional Dining</h1>
                     <p class="text-xl md:text-2xl text-white mb-8 max-w-3xl animate__animated animate__fadeIn animate__delay-1s">Experience culinary excellence with our carefully crafted menu and impeccable service</p>
                     <div class="flex flex-col sm:flex-row gap-4 animate__animated animate__fadeInUp animate__delay-2s">
@@ -846,7 +901,6 @@ async function renderHomePage() {
                 </div>
             </section>
 
-            <!-- Featured Categories -->
             <section class="animate__animated animate__fadeIn">
                 <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Our Menu Categories</h2>
                 ${
@@ -874,7 +928,6 @@ async function renderHomePage() {
                 }
             </section>
 
-            <!-- Popular Dishes -->
             <section class="animate__animated animate__fadeIn">
                 <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Popular Dishes</h2>
                 ${
@@ -943,7 +996,6 @@ async function renderHomePage() {
                 }
             </section>
 
-            <!-- Special Offers -->
             <section class="bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-2xl p-8 text animate__animated animate__fadeIn">
                 <div class="max-w-4xl mx-auto text-center">
                     <h2 class="text-3xl font-bold mb-4 text-yellow-800">Special Offers</h2>
@@ -961,7 +1013,7 @@ async function renderHomePage() {
                             : allDiscounts
                                 .map(
                                   (discount) => `
-                            <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300">
+                            <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer" onclick="showOfferPopup(${JSON.stringify(discount).replace(/"/g, "&quot;")})">
                                 <h3 class="text-xl font-bold mb-2 text-yellow-900">${discount.occasion}</h3>
                                 <p class="mb-3 text-yellow-700">${discount.date}</p>
                                 <p class="text-lg font-bold text-yellow-800">${discount.offer}</p>
@@ -974,70 +1026,33 @@ async function renderHomePage() {
                 </div>
             </section>
 
-            <!-- Upcoming Events -->
-            <section class="animate__animated animate__fadeIn">
-                <h2 class="text-3xl font-bold text-center mb-12 text-purple-600">Upcoming Events</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    ${
-                      apiEvents.length === 0
-                        ? `
-                        <div class="col-span-2 text-center py-12">
-                            <i class="fas fa-calendar text-5xl text-gray-400 mb-4"></i>
-                            <h3 class="text-xl font-semibold text-gray-600">No events scheduled</h3>
-                            <p class="text-gray-500">Check back later for upcoming events!</p>
-                        </div>
-                    `
-                        : apiEvents
-                            .map((event) => {
-                              const eventDate = new Date(event.event_date);
-                              const formattedDate = eventDate.toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              });
-
-                              return `
-                            <div class="bg-yellow-100 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-                                ${
-                                  event.image
-                                    ? `<img src="${event.image}" alt="${event.event_name}" class="w-full h-64 object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=&quot;w-full h-64 bg-gray-100 flex items-center justify-center&quot;><span class=&quot;text-gray-500&quot;>Not Available</span></div>'" />`
-                                    : `<div class="w-full h-64 bg-gray-100 flex items-center justify-center"><span class="text-gray-500">Not Available</span></div>`
-                                }
-                                <div class="bg-yellow-50 text-purple-600 p-6">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <span class="px-3 py-1 rounded-full text-sm font-medium ${
-                                          event.is_happening
-                                            ? "bg-yellow-200 text-purple-600"
-                                            : "bg-yellow-300 text-purple-600"
-                                        }">
-                                            ${
-                                              event.is_happening
-                                                ? "Happening Now"
-                                                : "Coming Soon"
-                                            }
-                                        </span>
-                                        <span class="text-purple-600">${formattedDate}</span>
-                                    </div>
-                                    <h3 class="text-xl font-bold mb-2">${
-                                      event.event_name
-                                    }</h3>
-                                    <p class="text-purple-600 mb-4">${
-                                      event.descriptions || "No description available"
-                                    }</p>
-                                    <button onclick="showEventDetails(${JSON.stringify(
-                                      event
-                                    ).replace(
-                                      /"/g,
-                                      "&quot;"
-                                    )})" class="text-purple-600 font-medium hover:text-purple-800 flex items-center transition-all duration-300">
-                                        Learn More <i class="fas fa-arrow-right ml-2"></i>
-                                    </button>
-                                </div>
+            <section class="bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-2xl p-8 text animate__animated animate__fadeIn">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-4 text-yellow-800">Upcoming Events</h2>
+                    <p class="text-xl mb-6 text-yellow-700">Join us for exciting upcoming events</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${
+                          apiEvents.length === 0
+                            ? `
+                            <div class="col-span-3 text-center py-12">
+                                <i class="fas fa-calendar text-5xl text-gray-400 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-600">No events scheduled</h3>
+                                <p class="text-gray-500">Check back later for upcoming events!</p>
                             </div>
-                        `;
-                            })
-                            .join("")
-                    }
+                        `
+                            : apiEvents
+                                .map(
+                                  (event) => `
+                            <div class="bg-yellow-50 rounded-xl p-6 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer" onclick="showEventPopup(${JSON.stringify(event).replace(/"/g, "&quot;")})">
+                                <h3 class="text-xl font-bold mb-2 text-yellow-900">${event.event_name}</h3>
+                                <p class="mb-3 text-yellow-700">${new Date(event.event_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+                                <p class="text-lg font-bold text-yellow-800">${event.descriptions || "No description available"}</p>
+                            </div>
+                        `
+                                )
+                                .join("")
+                        }
+                    </div>
                 </div>
             </section>
         </div>
@@ -1050,7 +1065,6 @@ async function renderHomePage() {
   }
 }
 
-// Helper function to validate numbers
 function isValidNumber(value) {
   return !isNaN(parseFloat(value)) && isFinite(value);
 }
@@ -1197,15 +1211,12 @@ async function renderOrderPage() {
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
         <div class="space-y-8 animate__animated animate__fadeIn">
-            <!-- Order Header -->
             <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
                 <h1 class="text-4xl font-bold mb-4">Order Online</h1>
                 <p class="text-xl max-w-2xl mx-auto">Enjoy our delicious food from the comfort of your home</p>
             </div>
 
-            <!-- Order Content -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Cart Section -->
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-shopping-cart text-green-600 mr-2"></i> Your Order
@@ -1292,13 +1303,11 @@ async function renderOrderPage() {
                     }
                 </div>
 
-                <!-- Order Details Section -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <h2 class="text-2xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-info-circle text-green-600 mr-2"></i> Order Details
                     </h2>
                     <div class="space-y-6">
-                        <!-- Order Type -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Order Type</label>
                             <div class="grid grid-cols-2 gap-3">
@@ -1311,14 +1320,12 @@ async function renderOrderPage() {
                             </div>
                         </div>
 
-                        <!-- Delivery Address -->
                         <div id="delivery-address-container" class="hidden">
                             <label for="delivery-address" class="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
                             <input type="text" id="delivery-address" placeholder="Enter your full address"
                                 class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
                         </div>
 
-                        <!-- Payment Method -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
                             <div class="space-y-3">
@@ -1339,14 +1346,12 @@ async function renderOrderPage() {
                             </div>
                         </div>
 
-                        <!-- Special Instructions -->
                         <div>
                             <label for="instructions" class="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
                             <textarea id="instructions" rows="3" placeholder="Any special requests or dietary restrictions"
                                 class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"></textarea>
                         </div>
 
-                        <!-- Place Order Button -->
                         <button onclick="placeOrder()"
                             class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 ${
                               cart.length === 0
@@ -1360,7 +1365,6 @@ async function renderOrderPage() {
                 </div>
             </div>
 
-            <!-- Quick Order Section -->
             <div class="bg-white rounded-2xl shadow-xl p-6">
                 <h2 class="text-2xl font-semibold mb-6 flex items-center">
                     <i class="fas fa-bolt text-yellow-500 mr-2"></i> Quick Order
@@ -1430,149 +1434,109 @@ async function renderOrderPage() {
     `;
 }
 
-function renderBookingPage() {
+async function renderBookingPage() {
+  const tables = await loadAvailableTables();
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
-    <div class="max-w-7xl mx-auto animate__animated animate__fadeIn">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Booking Form (Left) -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
-            <h2 class="text-3xl font-bold mb-2">Table Reservation</h2>
-            <p class="opacity-90">Secure your spot for an exceptional dining experience</p>
-          </div>
-          <div class="p-6 md:p-8">
-            <div class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                  <div class="relative">
-                    <input type="date" id="date" value="${
-                      bookingDetails.date
-                    }" onchange="updateBookingDetails('date', this.value)"
-                      class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                  <select id="time" onchange="updateBookingDetails('time', this.value)"
-                    class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200">
-                    <option value="">Select time</option>
-                    ${[
-                      "12:00 PM",
-                      "1:00 PM",
-                      "2:00 PM",
-                      "6:00 PM",
-                      "7:00 PM",
-                      "8:00 PM",
-                      "9:00 PM",
-                    ]
-                      .map(
-                        (slot) => `
-                      <option value="${slot}" ${
-                          bookingDetails.time === slot ? "selected" : ""
-                        }>${slot}</option>
-                    `
-                      )
-                      .join("")}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
-                <select id="guests" onchange="updateBookingDetails('guests', this.value)"
-                  class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200">
-                  ${[1, 2, 3, 4, 5, 6, 7, 8]
-                    .map(
-                      (num) => `
-                    <option value="${num}" ${
-                        bookingDetails.guests === num ? "selected" : ""
-                      }>${num} ${num === 1 ? "Guest" : "Guests"}</option>
-                  `
-                    )
-                    .join("")}
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">Select Table</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  ${[
-                    "Table 1",
-                    "Table 2",
-                    "Table 3",
-                    "Table 4",
-                    "Table 5",
-                    "Table 6",
-                  ]
-                    .map(
-                      (table) => `
-                    <div onclick="selectTable('${table}')"
-                      class="table-slot cursor-pointer p-4 text-center rounded-lg border-2 transition-all duration-300 ${
-                        selectedTable === table
-                          ? "border-green-500 bg-green-500 text-white"
-                          : "border-gray-200 bg-white hover:border-green-300"
-                      }">
-                      <i class="fas fa-chair text-2xl mb-2 ${
-                        selectedTable === table
-                          ? "text-green-600"
-                          : "text-gray-400"
-                      }"></i>
-                      <p class="font-medium">${table}</p>
-                    </div>
-                  `
-                    )
-                    .join("")}
-                </div>
-              </div>
-              <button onclick="handleBooking()"
-                class="w-full btn-primary text-white py-3.5 rounded-lg text-lg font-bold hover:shadow-lg transition-all duration-300 mt-6">
-                <i class="fas fa-calendar-check mr-2"></i> Confirm Reservation
-              </button>
-              ${
-                !isLoggedIn
-                  ? `
-                <div class="text-center text-sm text-gray-500 mt-4">
-                  You need to <a href="#" onclick="showPage('signin')" class="text-red-600 font-bold">sign in</a> to book a table
-                </div>
-              `
-                  : ""
-              }
+    <div class="bg-gradient-to-r from-yellow-100 to-yellow-300 rounded-2xl p-8 text animate__animated animate__fadeIn">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-4 text-yellow-800">Book a Table</h2>
+        <p class="text-xl mb-6 text-yellow-700">Reserve your spot for a delightful dining experience</p>
+        <form id="booking-form" class="bg-yellow-50 rounded-xl p-6 shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-yellow-900 font-semibold mb-2">Select Table</label>
+              <select name="table" class="w-full p-3 rounded-lg border border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                <option value="" disabled selected>Select a table</option>
+                ${
+                  tables.length === 0
+                    ? `<option value="" disabled>No tables available</option>`
+                    : tables
+                        .map(
+                          (table) => `
+                          <option value="${table.id}" data-seats="${table.seats}">
+                            Table ${table.table_number} (${table.seats} seats)
+                          </option>
+                        `
+                        )
+                        .join("")
+                }
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-yellow-900 font-semibold mb-2">Booking Date</label>
+              <input type="date" name="booking_date" class="w-full p-3 rounded-lg border border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+            </div>
+            <div>
+              <label class="block text-yellow-900 font-semibold mb-2">Booking Time</label>
+              <input type="time" name="booking_time" class="w-full p-3 rounded-lg border border-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
             </div>
           </div>
-        </div>
-
-        <!-- Reservation Information (Right) -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="p-6 md:p-8">
-            <h3 class="text-xl font-semibold mb-4 flex items-center">
-              <i class="fas fa-info-circle text-green-600 mr-2"></i> Reservation Information
-            </h3>
-            <ul class="space-y-3 text-gray-600">
-              <li class="flex items-start">
-                <i class="fas fa-clock text-green-500 mt-1 mr-2"></i>
-                <span>Reservations are held for 15 minutes past the booked time</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-user-group text-green-500 mt-1 mr-2"></i>
-                <span>Pricing: Rs. 200-800 based on number of guests</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-utensils text-green-500 mt-1 mr-2"></i>
-                <span>Special dietary requirements can be noted during checkout</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-phone text-green-500 mt-1 mr-2"></i>
-                <span>Need help? Call us at (123) 456-7890</span>
-              </li>
-            </ul>
-            <div class="mt-6">
-              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hotel dining tables" class="w-full h-64 object-cover rounded-lg shadow-md">
-            </div>
-          </div>
-        </div>
+          <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg w-full hover:shadow-lg transition-all duration-300">
+            Submit Booking
+          </button>
+        </form>
       </div>
     </div>
   `;
+
+  document.getElementById("booking-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const selectedTableId = parseInt(formData.get("table"));
+  const guestNumber = parseInt(formData.get("guest_number"));
+  const bookingDate = formData.get("booking_date");
+  let bookingTime = formData.get("booking_time");
+
+  const selectedTableData = tables.find((table) => table.id === selectedTableId);
+
+  if (!selectedTableData) {
+    showToast("Selected table is invalid", "error");
+    return;
+  }
+
+  if (guestNumber > selectedTableData.seats) {
+    showToast(
+      `Table ${selectedTableData.table_number} only has ${selectedTableData.seats} seats. Please select a table with enough seats.`,
+      "error"
+    );
+    return;
+  }
+
+  // Normalize time to HH:MM:SS format
+  if (bookingTime.length === 5) {
+    bookingTime = `${bookingTime}:00`; // Add seconds if not provided
+  }
+
+  const bookingData = {
+    table: selectedTableId,
+    booking_date: bookingDate,
+    booking_time: bookingTime,
+    guest_number: guestNumber,
+  };
+
+  try {
+    const response = await createBooking(bookingData);
+    showToast(
+      `Booking confirmed! Booking ID: ${response.id} for Table ${selectedTableData.table_number} on ${response.booking_date} at ${response.booking_time}`,
+      "success"
+    );
+    document.getElementById("booking-form").reset(); // Clear form after success
+  } catch (error) {
+    if (error.message.includes("table is not available")) {
+      showToast(
+        `Table ${selectedTableData.table_number} is no longer available. Please select another table.`,
+        "error"
+      );
+      // Optionally refresh table list
+      const refreshedTables = await loadAvailableTables();
+      // Update dropdown with new table list if needed
+    } else {
+      showToast(`Failed to create booking: ${error.message}`, "error");
+    }
+  }
+});
 }
 
 async function handleBooking() {
@@ -1627,8 +1591,6 @@ async function renderFavouritesPage() {
   }
 
   await loadFoodItems();
-  console.log("Rendering favorites page with favoriteItems:", favoriteItems);
-
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
         <div class="space-y-8 animate__animated animate__fadeIn">
@@ -1658,7 +1620,7 @@ async function renderFavouritesPage() {
                         }
                         const imageUrl =
                           fav.food.image && !fav.food.image.startsWith("http")
-                            ? `${baseUrl}${fav.food.image.replace(/^\/+/, "")}` // Remove leading slashes
+                            ? `${baseUrl}${fav.food.image.replace(/^\/+/, "")}`
                             : fav.food.image || "";
                         return `
                             <div class="food-card bg-white rounded-xl overflow-hidden relative">
@@ -1740,16 +1702,13 @@ function renderProfilePage() {
   mainContent.innerHTML = `
     <div class="max-w-2xl mx-auto animate__animated animate__fadeIn">
       <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <!-- Profile Header -->
         <div class="bg-gradient-to-r from-red-500 to-purple-700 p-6 text-white text-center">
           <h2 class="text-3xl font-bold mb-2">Your Profile</h2>
           <p class="opacity-90">Manage your account details</p>
         </div>
 
-        <!-- Profile Content -->
         <div class="p-6 md:p-8">
           <div class="space-y-6">
-            <!-- Profile Info -->
             <div class="flex items-center justify-between border-b border-gray-200 pb-4">
               <div class="flex items-center">
                 <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mr-4">
@@ -1769,7 +1728,6 @@ function renderProfilePage() {
               </button>
             </div>
 
-            <!-- Account Details -->
             <div>
               <h3 class="text-lg font-semibold mb-3">Account Details</h3>
               <div class="space-y-3">
@@ -1800,7 +1758,6 @@ function renderProfilePage() {
               </div>
             </div>
 
-            <!-- Edit Profile -->
             <div>
               <h3 class="text-lg font-semibold mb-3">Edit Profile</h3>
               <div class="space-y-4">
@@ -1840,36 +1797,47 @@ function renderSignInPage() {
         <div id="signin-error" class="hidden bg-red-100 text-red-700 p-3 rounded-lg mb-4">
           <span id="signin-error-text"></span>
         </div>
-        <div class="space-y-6">
+        <form id="signin-form" class="space-y-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input type="email" id="signin-email" placeholder="Enter your email"
-              class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
+              class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" required />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div class="relative">
-              <input type="password" id="signin-password" placeholder="Enter your password"
-                class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" />
-              <button onclick="togglePasswordVisibility('signin-password')"
-                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                <i class="fas fa-eye"></i>
-              </button>
-            </div>
+            <input type="password" id="signin-password" placeholder="Enter your password"
+              class="input-field w-full p-3 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200" required />
           </div>
-          <button onclick="signIn()"
-            class="w-full btn-primary text-white py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300">
+          <button type="submit" class="btn-primary text-white w-full py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300">
             <i class="fas fa-sign-in-alt mr-2"></i> Sign In
           </button>
-          <div class="text-center text-sm text-gray-500">
-            Don't have an account? <a href="#" onclick="showPage('signup')" class="text-green-600 font-medium">Sign Up</a>
-          </div>
-        </div>
+        </form>
+        <p class="text-center mt-6 text-gray-600">
+          Don't have an account? 
+          <button onclick="showPage('signup')" class="text-green-600 hover:text-green-800 font-medium">
+            Sign Up
+          </button>
+        </p>
       </div>
     </div>
   `;
-}
 
+  // Add event listener for form submission
+  document.getElementById("signin-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("signin-email").value;
+    const password = document.getElementById("signin-password").value;
+
+    try {
+      await loginUser(email, password);
+    } catch (error) {
+      const errorDiv = document.getElementById("signin-error");
+      const errorText = document.getElementById("signin-error-text");
+      errorText.textContent = error.message || "Invalid email or password";
+      errorDiv.classList.remove("hidden");
+    }
+  });
+}
 function renderSignUpPage() {
   const mainContent = document.getElementById("main-content");
   mainContent.innerHTML = `
