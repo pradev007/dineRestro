@@ -7,8 +7,15 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
+    ROLE_CHOICE = (
+        ('customer', 'Customer'),
+        ('vendor','Vendor'),
+        ('admin','Admin'),
+    )
     email = models.EmailField(_("email address"), unique=True)
     fullname = models.CharField(_("fullname"), max_length=50)
+    role = models.CharField(max_length=10,choices=ROLE_CHOICE, default='customer')
+
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -20,4 +27,4 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.fullname
+        return f"{self.fullname} ({self.role})"

@@ -3,6 +3,6 @@ from .models import CustomUser
 
 # Register your models here.
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('fullname','email','id')
+    list_display = ('fullname','email','id','role')
 
 admin.site.register(CustomUser, CustomUserAdmin)
