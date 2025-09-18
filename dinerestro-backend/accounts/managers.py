@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, fullname, password, **extra_fields):
         if not email:
-            raise ValueError("email is required")
+            raise ValueError("email is required !")
         if not fullname:
             raise ValueError("fullname cannot be empty")
         email = self.normalize_email(email)
@@ -23,4 +23,3 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Super user must have is_superuser = True'))
         return self.create_user(email,fullname,password,**extra_fields)
-        
