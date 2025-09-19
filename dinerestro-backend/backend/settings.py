@@ -126,7 +126,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+# added mysql database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # MUST be exactly this
