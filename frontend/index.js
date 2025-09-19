@@ -142,7 +142,7 @@ async function makeRequest(url, method, body = null, requiresAuth = false) {
 
 async function registerUser(email, password, fullname) {
   try {
-    const data = await makeRequest(`${baseUrl}users/register/`, "POST", {
+    const data = await makeRequest(`${baseUrl}accounts/user/register/`, "POST", {
       email,
       password,
       fullname,
@@ -156,7 +156,7 @@ async function registerUser(email, password, fullname) {
 
 async function loginUser(email, password) {
   try {
-    const data = await makeRequest(`${baseUrl}users/login/`, "POST", {
+    const data = await makeRequest(`${baseUrl}accounts/user/login/`, "POST", {
       email,
       password,
     });
@@ -558,7 +558,7 @@ function updateCartDisplay() {
                                 </div>
                             </div>
                             <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
-                                <i class="fas fa-times"></i>
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                     `;
@@ -1255,7 +1255,7 @@ async function renderOrderPage() {
                                     </div>
                                 </div>
                                 <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 transition-all duration-300">
-                                    <i class="fas fa-times"></i>
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
                         `

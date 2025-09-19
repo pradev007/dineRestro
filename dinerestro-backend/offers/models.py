@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class offerModel(models.Model):
-    name = models.TextField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     date = models.DateTimeField()
     discount = models.IntegerField(null=True,blank=True)
 
