@@ -565,6 +565,21 @@
             </div>
         </div>
     </footer>
+    <script src="https://js.stripe.com/v3/"></script>
+<button id="checkout-button">Pay</button>
+
+<script>
+    var stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+
+    document.getElementById("checkout-button").addEventListener("click", function () {
+        fetch("/payments/create-checkout-session/", { method: "POST" })
+        .then(response => response.json())
+        .then(session => {
+            return stripe.redirectToCheckout({ sessionId: session.id });
+        });
+    });
+</script>
+
 
     <script src="/frontend/index.js" defer></script>
 
